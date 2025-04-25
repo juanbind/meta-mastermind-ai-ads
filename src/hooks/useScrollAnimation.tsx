@@ -10,25 +10,37 @@ export const useScrollAnimation = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
-            // Add staggered animation for child elements if they exist
+            
+            // Enhanced child element animation with more variety
             if (entry.target.children.length > 0) {
               Array.from(entry.target.children).forEach((child, index) => {
+                const animationDelay = index * 200; // Increased delay for more pronounced effect
+                const randomTransform = [
+                  'translateY(20px)',
+                  'translateX(-20px)',
+                  'scale(0.9)',
+                  'rotate(5deg)'
+                ];
+                
                 setTimeout(() => {
                   (child as HTMLElement).classList.add('child-visible');
-                }, index * 150); // Stagger each child by 150ms
+                  (child as HTMLElement).style.transform = randomTransform[index % randomTransform.length];
+                }, animationDelay);
               });
             }
           } else {
-            // Optional: Remove the class when element is not in view
-            // This will reset the animation when scrolling up and down
             entry.target.classList.remove('visible');
             Array.from(entry.target.children).forEach((child) => {
               (child as HTMLElement).classList.remove('child-visible');
+              (child as HTMLElement).style.transform = '';
             });
           }
         });
       },
-      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' } // Trigger slightly before element comes into view
+      { 
+        threshold: 0.15, 
+        rootMargin: '0px 0px -10% 0px'
+      }
     );
 
     if (ref.current) {
@@ -45,7 +57,7 @@ export const useScrollAnimation = () => {
   return ref;
 };
 
-// Add another hook for more elaborate animations
+// Enhanced scroll reveal hook with more animation variety
 export const useScrollReveal = () => {
   const elementsRef = useRef<(HTMLElement | null)[]>([]);
 
@@ -59,19 +71,31 @@ export const useScrollReveal = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Check if target is in view
           if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
+            const target = entry.target as HTMLElement;
+            target.classList.add('revealed');
+            
+            // Additional classes for more dynamic animations
+            const animationType = target.dataset.animation;
+            switch(animationType) {
+              case 'pop':
+                target.classList.add('animate-[pop_0.5s_ease-out]');
+                break;
+              case 'bounce':
+                target.classList.add('animate-[bounce_0.5s_ease-in-out]');
+                break;
+            }
           } else {
-            // Reset animation when out of view for repeating effect
-            entry.target.classList.remove('revealed');
+            const target = entry.target as HTMLElement;
+            target.classList.remove('revealed');
+            target.classList.remove('animate-[pop_0.5s_ease-out]');
+            target.classList.remove('animate-[bounce_0.5s_ease-in-out]');
           }
         });
       },
       { threshold: 0.2, rootMargin: '-50px' }
     );
 
-    // Observe all refs
     elementsRef.current.forEach((el) => {
       if (el) observer.observe(el);
     });
