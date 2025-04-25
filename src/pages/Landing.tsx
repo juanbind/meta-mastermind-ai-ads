@@ -1,17 +1,18 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Search, LayoutGrid, Users, Zap } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
+import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
 
-const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ 
-  icon, 
-  title, 
-  description 
-}) => {
+const FeatureCard = ({ icon, title, description }) => {
+  const revealRef = useScrollReveal();
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+    <div
+      ref={el => revealRef(el)}
+      data-animation="pop"
+      className="reveal-element bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover-lift"
+    >
       <div className="bg-metamaster-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-metamaster-primary mb-4">
         {icon}
       </div>
@@ -21,14 +22,17 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description:
   );
 };
 
-const Landing: React.FC = () => {
+const Landing = () => {
+  const heroRef = useScrollAnimation();
+  const revealRef = useScrollReveal();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-metamaster-gray-100">
       <Navbar />
       
       <div className="pt-24 pb-16 px-4">
         {/* Hero Section */}
-        <div className="container mx-auto text-center max-w-4xl">
+        <div ref={heroRef} className="container mx-auto text-center max-w-4xl animate-on-scroll">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             The Ultimate <span className="gradient-text">Facebook Ads</span> & <span className="gradient-text">Funnel Building</span> Platform
           </h1>
@@ -38,15 +42,28 @@ const Landing: React.FC = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-            <Button className="bg-metamaster-primary hover:bg-metamaster-secondary text-white text-lg px-8 py-6 rounded-lg h-auto">
+            <Button 
+              ref={el => revealRef(el)}
+              data-animation="slide-right"
+              className="reveal-element bg-metamaster-primary hover:bg-metamaster-secondary text-white text-lg px-8 py-6 rounded-lg h-auto button-press"
+            >
               Get Started Free <ArrowRight className="ml-2" size={18} />
             </Button>
-            <Button variant="outline" className="text-lg px-8 py-6 rounded-lg h-auto">
+            <Button 
+              ref={el => revealRef(el)}
+              data-animation="slide-left"
+              variant="outline" 
+              className="reveal-element text-lg px-8 py-6 rounded-lg h-auto button-press"
+            >
               Watch Demo
             </Button>
           </div>
           
-          <div className="relative">
+          <div 
+            ref={el => revealRef(el)}
+            data-animation="fade-up"
+            className="reveal-element relative"
+          >
             <div className="bg-metamaster-gray-800 rounded-xl overflow-hidden shadow-2xl border border-metamaster-gray-700">
               <img 
                 src="https://placehold.co/1200x675/121212/e6e6e6?text=MetaMaster+Dashboard" 
@@ -62,7 +79,11 @@ const Landing: React.FC = () => {
         
         {/* Features Section */}
         <div className="container mx-auto py-20">
-          <div className="text-center mb-16">
+          <div 
+            ref={el => revealRef(el)}
+            data-animation="fade-up"
+            className="reveal-element text-center mb-16"
+          >
             <h2 className="text-3xl font-bold mb-4">Everything You Need In One Place</h2>
             <p className="text-metamaster-gray-600 max-w-2xl mx-auto">
               MetaMaster combines powerful tools for Facebook ad research, funnel building, and customer management
@@ -95,7 +116,11 @@ const Landing: React.FC = () => {
         </div>
         
         {/* CTA Section */}
-        <div className="container mx-auto py-16">
+        <div 
+          ref={el => revealRef(el)}
+          data-animation="fade-up"
+          className="reveal-element container mx-auto py-16"
+        >
           <div className="bg-gradient-to-r from-metamaster-primary to-metamaster-secondary rounded-2xl p-8 md:p-12 text-white">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="max-w-2xl">
@@ -149,7 +174,7 @@ const Landing: React.FC = () => {
         </div>
         
         {/* Footer */}
-        <footer className="container mx-auto py-10 border-t border-gray-200">
+        <footer className="container mx-auto py-10 border-t border-gray-200 stagger-reveal">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <h3 className="font-bold mb-4">Product</h3>
