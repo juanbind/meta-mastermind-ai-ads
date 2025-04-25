@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
@@ -81,29 +82,70 @@
 @layer utilities {
   .animate-on-scroll {
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease-out;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.13, 0.53, 0.38, 0.97);
+    will-change: opacity, transform;
   }
 
   .animate-on-scroll.visible {
     opacity: 1;
     transform: translateY(0);
   }
+  
+  /* Add staggered animations for child elements */
+  .animate-on-scroll > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s;
+  }
+  
+  .animate-on-scroll > *.child-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Add different animation styles based on data attributes */
+  .reveal-element {
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .reveal-element[data-animation="fade-up"] {
+    transform: translateY(40px);
+  }
+  
+  .reveal-element[data-animation="fade-in"] {
+    transform: scale(0.95);
+  }
+  
+  .reveal-element[data-animation="slide-left"] {
+    transform: translateX(-40px);
+  }
+  
+  .reveal-element[data-animation="slide-right"] {
+    transform: translateX(40px);
+  }
+  
+  .reveal-element.revealed {
+    opacity: 1;
+    transform: translate(0) scale(1);
+  }
 
   .button-press {
-    transition: transform 0.1s ease;
+    transition: transform 0.12s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .button-press:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
   }
 
   .hover-lift {
-    transition: transform 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease;
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   }
 
   .gradient-text {
@@ -143,4 +185,27 @@
 
 .font-inter {
   font-family: 'Inter', sans-serif;
+}
+
+/* Add page transition animations */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
 }
