@@ -1,11 +1,23 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to landing page
+    navigate("/", { replace: true });
+  }, [navigate]);
+
+  // Return a loading screen in case the redirect takes a moment
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-metamaster-gray-100">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+        <h1 className="text-xl font-medium mb-2">Loading MetaMaster...</h1>
+        <div className="w-16 h-1 bg-metamaster-primary mx-auto rounded-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 h-full w-1/2 bg-white/30 animate-pulse-light"></div>
+        </div>
       </div>
     </div>
   );
