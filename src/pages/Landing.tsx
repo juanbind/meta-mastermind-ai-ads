@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -9,18 +8,14 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
-
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
-
   const handleGetStarted = () => {
     navigate('/auth');
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#0D47A1] to-metamaster-dark/95">
+  return <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#0D47A1] to-metamaster-dark/95">
       <Navbar />
       
       <main className="pt-32">
@@ -33,17 +28,13 @@ const Landing = () => {
             Never pay for a marketing agency, CRM, or funnel builder again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
-          <Button 
-            className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-8 py-6 rounded-xl h-auto"
-            size="lg"
-            onClick={handleGetStarted}
-          >
+          <Button className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-8 py-6 rounded-xl h-auto" size="lg" onClick={handleGetStarted}>
             Get Started
           </Button>
 
           <div className="mt-20 mb-20 relative mx-auto max-w-5xl">
             <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white/10 transition-transform duration-500 mx-auto">
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
                     <div className="w-8 h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
@@ -89,19 +80,10 @@ const Landing = () => {
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with MetaMaster.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button 
-                className="bg-white text-metamaster-primary hover:bg-white/90 text-lg px-8 py-6 h-auto rounded-xl"
-                size="lg"
-                onClick={handleGetStarted}
-              >
+              <Button className="bg-white text-metamaster-primary hover:bg-white/90 text-lg px-8 py-6 h-auto rounded-xl" size="lg" onClick={handleGetStarted}>
                 Start 7-Day Free Trial
               </Button>
-              <Button 
-                variant="outline"
-                className="border-2 border-white/20 hover:bg-white/10 text-white text-lg px-8 py-6 h-auto rounded-xl"
-                size="lg"
-                onClick={() => navigate('/auth')}
-              >
+              <Button variant="outline" className="border-2 border-white/20 hover:bg-white/10 text-white text-lg px-8 py-6 h-auto rounded-xl" size="lg" onClick={() => navigate('/auth')}>
                 Schedule a Demo
               </Button>
             </div>
@@ -111,8 +93,6 @@ const Landing = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
