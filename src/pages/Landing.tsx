@@ -55,7 +55,7 @@ const Landing = () => {
         {/* Pricing Section */}
         <section className="py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-slate-50 md:text-5xl">
               🚀 Try MetaMaster FREE for 7 Days
             </h2>
             <p className="text-lg text-metamaster-gray-300">
@@ -83,7 +83,7 @@ const Landing = () => {
               <Button className="bg-white text-metamaster-primary hover:bg-white/90 text-lg px-8 py-6 h-auto rounded-xl" size="lg" onClick={handleGetStarted}>
                 Start 7-Day Free Trial
               </Button>
-              <Button variant="outline" className="border-2 border-white/20 hover:bg-white/10 text-white text-lg px-8 py-6 h-auto rounded-xl" size="lg" onClick={() => navigate('/auth')}>
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-white/20 text-lg px-8 py-6 h-auto rounded-xl bg-slate-50 text-sky-600">
                 Schedule a Demo
               </Button>
             </div>
