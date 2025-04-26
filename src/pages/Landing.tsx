@@ -35,7 +35,7 @@ const Landing = () => {
           <div className="mt-20 mb-20 relative mx-auto max-w-5xl">
             <div className="r">
               <div className="">
-                <div className="text-center">
+                <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white">
                   <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
                     <div className="w-8 h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
                       <ArrowRight className="w-4 h-4 text-white" />
