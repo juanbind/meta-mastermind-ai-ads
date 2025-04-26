@@ -20,7 +20,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#121a2b] to-metamaster-dark/95">
+    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#0D47A1] to-metamaster-dark/95">
       <Navbar />
       
       <main className="pt-32">
@@ -42,15 +42,17 @@ const Landing = () => {
           </Button>
 
           <div className="mt-20 mb-20 relative mx-auto max-w-5xl">
-            <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white/10 transition-transform duration-500">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
-                  <div className="w-8 h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
-                    <ArrowRight className="w-4 h-4 text-white" />
+            <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white/10 transition-transform duration-500 mx-auto">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
+                    <div className="w-8 h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
+                      <ArrowRight className="w-4 h-4 text-white" />
+                    </div>
                   </div>
+                  <p className="text-xl font-semibold text-white mb-2">VSL Video Coming Soon</p>
+                  <p className="text-metamaster-gray-300">This space is reserved for your VSL video</p>
                 </div>
-                <p className="text-xl text-white mb-2">VSL Video Coming Soon</p>
-                <p className="text-metamaster-gray-400">This space is reserved for your VSL video</p>
               </div>
             </div>
           </div>
@@ -60,7 +62,17 @@ const Landing = () => {
         <FeatureSection />
 
         {/* Pricing Section */}
-        <PricingSection />
+        <section className="py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              🚀 Try MetaMaster FREE for 7 Days
+            </h2>
+            <p className="text-lg text-metamaster-gray-300">
+              No credit card required – cancel anytime. Choose the plan that fits your growth stage.
+            </p>
+          </div>
+          <PricingSection />
+        </section>
 
         {/* FAQ Section */}
         <div className="container mx-auto py-20 px-4">
