@@ -33,7 +33,7 @@ const Landing = () => {
           </Button>
 
           <div className="mt-20 mb-20 relative mx-auto max-w-5xl">
-            <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white/10 transition-transform duration-500 mx-auto">
+            <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white">
               <div className="">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
