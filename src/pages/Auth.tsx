@@ -1,44 +1,62 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import Logo from '@/components/Logo';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Check if user is already logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (isLoggedIn) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
   
   const handleAuthSuccess = () => {
+    // Set logged in state
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    toast({
+      title: "Success!",
+      description: "You have successfully logged in.",
+    });
+    
     // Redirect to dashboard on successful auth
     navigate('/dashboard');
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-metamaster-gray-100">
-      <div className="grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-2xl overflow-hidden w-full max-w-5xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-metamaster-dark via-[#121a2b] to-metamaster-dark/95">
+      <div className="grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-2xl overflow-hidden w-full max-w-5xl bg-white/5 backdrop-blur-md border border-white/10">
         {/* Left Side - Form */}
-        <div className="bg-white p-8 md:p-12">
+        <div className="p-8 md:p-12">
           <div className="mb-8">
             <Logo />
           </div>
           
-          <h1 className="text-2xl font-bold mb-2">
+          <h1 className="text-2xl font-bold mb-2 text-white">
             {activeTab === 'login' ? 'Welcome back' : 'Create your account'}
           </h1>
-          <p className="text-metamaster-gray-600 mb-6">
+          <p className="text-metamaster-gray-400 mb-6">
             {activeTab === 'login' 
               ? 'Sign in to access your account.' 
               : 'Get started with MetaMaster today.'}
           </p>
           
-          <div className="flex border-b mb-6">
+          <div className="flex border-b border-white/10 mb-6">
             <button
               onClick={() => setActiveTab('login')}
               className={`pb-2 px-4 mr-4 text-sm font-medium ${
                 activeTab === 'login'
                   ? 'text-metamaster-primary border-b-2 border-metamaster-primary'
-                  : 'text-metamaster-gray-500'
+                  : 'text-metamaster-gray-400'
               }`}
             >
               Sign In
@@ -48,7 +66,7 @@ const Auth: React.FC = () => {
               className={`pb-2 px-4 text-sm font-medium ${
                 activeTab === 'register'
                   ? 'text-metamaster-primary border-b-2 border-metamaster-primary'
-                  : 'text-metamaster-gray-500'
+                  : 'text-metamaster-gray-400'
               }`}
             >
               Sign Up
@@ -61,7 +79,7 @@ const Auth: React.FC = () => {
             <RegisterForm onSuccess={handleAuthSuccess} />
           )}
           
-          <div className="mt-6 text-center text-sm text-metamaster-gray-600">
+          <div className="mt-6 text-center text-sm text-metamaster-gray-400">
             <p>
               {activeTab === 'login' 
                 ? "Don't have an account? " 
@@ -77,7 +95,7 @@ const Auth: React.FC = () => {
         </div>
         
         {/* Right Side - Image/Info */}
-        <div className="hidden md:block bg-gradient-to-br from-metamaster-primary to-metamaster-secondary p-12 text-white relative">
+        <div className="hidden md:block bg-gradient-to-br from-metamaster-primary/80 to-metamaster-secondary/80 p-12 text-white relative">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
               <path fill="#FFFFFF" d="M40.7,-68.2C52.9,-62.3,63,-49.1,69.5,-34.7C75.9,-20.4,78.8,-5,76.2,9.1C73.6,23.3,65.6,36.3,55.3,47.2C45,58.2,32.3,67.1,18.1,72.4C3.9,77.7,-11.7,79.3,-24,73.7C-36.2,68.1,-45,55.4,-53.8,42.9C-62.6,30.5,-71.3,18.3,-74.5,4.1C-77.7,-10.1,-75.3,-26.3,-67.3,-38.9C-59.2,-51.5,-45.5,-60.5,-31.5,-65.2C-17.6,-70,-8.8,-70.5,3.2,-75.5C15.3,-80.5,28.5,-90.1,40.7,-62.2Z" transform="translate(100 100)" />

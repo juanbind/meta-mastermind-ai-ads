@@ -15,8 +15,12 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full' }) => {
 
   return (
     <div className={`flex items-center ${variant === 'icon' ? '' : 'space-x-2'}`}>
-      <div className={`${sizeClasses[size]} aspect-square bg-gradient-to-r from-metamaster-primary to-metamaster-secondary rounded-lg flex items-center justify-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 hover:scale-105`}>
-        <span className="text-white font-bold text-lg">M</span>
+      <div className={`${sizeClasses[size]} aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 hover:scale-105`}>
+        <img 
+          src="/lovable-uploads/b98c86bf-eb30-48c8-b5cd-db790735e047.png" 
+          alt="MetaMaster Logo" 
+          className={`${sizeClasses[size]}`}
+        />
       </div>
       
       {variant === 'full' && (

@@ -1,7 +1,9 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
@@ -11,9 +13,14 @@ import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation'
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-metamaster-dark/95 to-metamaster-dark/90">
+    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#121a2b] to-metamaster-dark/95">
       <Navbar />
       
       <main className="pt-32">
@@ -29,12 +36,13 @@ const Landing = () => {
           <Button 
             className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-8 py-6 rounded-xl h-auto"
             size="lg"
+            onClick={handleGetStarted}
           >
             Get Started
           </Button>
 
           <div className="mt-20 mb-20 relative mx-auto max-w-5xl">
-            <div className="relative rounded-2xl overflow-hidden bg-metamaster-dark/50 aspect-video flex items-center justify-center border border-white/10">
+            <div className="relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 aspect-video flex items-center justify-center border border-white/10 transition-transform duration-500">
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
                   <div className="w-8 h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
@@ -60,7 +68,7 @@ const Landing = () => {
         </div>
         
         {/* CTA Section */}
-        <div className="bg-metamaster-primary text-white py-20 px-4">
+        <div className="bg-gradient-to-r from-metamaster-primary/90 to-metamaster-secondary text-white py-20 px-4">
           <div className="container mx-auto text-center max-w-3xl">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to Transform Your Facebook Ad Results?
@@ -72,6 +80,7 @@ const Landing = () => {
               <Button 
                 className="bg-white text-metamaster-primary hover:bg-white/90 text-lg px-8 py-6 h-auto rounded-xl"
                 size="lg"
+                onClick={handleGetStarted}
               >
                 Start 7-Day Free Trial
               </Button>
@@ -79,6 +88,7 @@ const Landing = () => {
                 variant="outline"
                 className="border-2 border-white/20 hover:bg-white/10 text-white text-lg px-8 py-6 h-auto rounded-xl"
                 size="lg"
+                onClick={() => navigate('/auth')}
               >
                 Schedule a Demo
               </Button>
@@ -87,6 +97,8 @@ const Landing = () => {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 };

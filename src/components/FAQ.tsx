@@ -28,6 +28,18 @@ const FAQ = () => {
     {
       question: "Do you offer any discounts for annual billing?",
       answer: "Yes, we offer a 20% discount when you choose annual billing. This option is available for all plans and represents a significant savings compared to monthly billing."
+    },
+    {
+      question: "Can I cancel my subscription at any time?",
+      answer: "Yes, you can cancel your subscription at any time. There are no long-term contracts or cancellation fees. If you cancel, you'll maintain access to your plan features until the end of your current billing cycle."
+    },
+    {
+      question: "Do you offer refunds?",
+      answer: "We offer a 14-day money-back guarantee on all plans. If you're not satisfied with your purchase, contact our support team within 14 days of your purchase for a full refund."
+    },
+    {
+      question: "Do I need any technical skills to use MetaMaster?",
+      answer: "No technical skills are required to use MetaMaster. Our platform is designed with an intuitive, user-friendly interface that makes it easy for anyone to discover winning ads, build campaigns, and manage their marketing efforts."
     }
   ];
 

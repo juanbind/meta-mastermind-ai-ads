@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { AuthCheck } from "./components/auth/AuthCheck";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -35,10 +36,29 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/ads-library" element={<AdsLibrary />} />
-          <Route path="/funnel-builder" element={<FunnelBuilder />} />
-          <Route path="/crm" element={<CRM />} />
+          
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            <AuthCheck>
+              <Dashboard />
+            </AuthCheck>
+          } />
+          <Route path="/ads-library" element={
+            <AuthCheck>
+              <AdsLibrary />
+            </AuthCheck>
+          } />
+          <Route path="/funnel-builder" element={
+            <AuthCheck>
+              <FunnelBuilder />
+            </AuthCheck>
+          } />
+          <Route path="/crm" element={
+            <AuthCheck>
+              <CRM />
+            </AuthCheck>
+          } />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
