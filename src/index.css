@@ -73,7 +73,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-metamaster-dark text-white font-inter;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -81,8 +81,8 @@
 @layer utilities {
   .animate-on-scroll {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.13, 0.53, 0.38, 0.97);
+    transform: translateY(40px);
+    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
     will-change: opacity, transform;
   }
 
@@ -93,8 +93,8 @@
   
   .animate-on-scroll > * {
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0.1s;
+    transform: translateY(30px);
+    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
   }
   
   .animate-on-scroll > *.child-visible {
@@ -106,31 +106,12 @@
     opacity: 0;
     transform: translateY(40px) scale(0.95);
     transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  
-  .reveal-element[data-animation="fade-up"] {
-    transform: translateY(60px) scale(0.95);
-  }
-  
-  .reveal-element[data-animation="fade-in"] {
-    transform: scale(0.85);
-  }
-  
-  .reveal-element[data-animation="slide-left"] {
-    transform: translateX(-60px) scale(0.95);
-  }
-  
-  .reveal-element[data-animation="slide-right"] {
-    transform: translateX(60px) scale(0.95);
-  }
-  
-  .reveal-element[data-animation="pop"] {
-    transform: scale(0.7) rotate(5deg);
+    will-change: opacity, transform;
   }
   
   .reveal-element.revealed {
     opacity: 1;
-    transform: translate(0) scale(1) rotate(0);
+    transform: translateY(0) scale(1);
   }
 
   .button-press {
