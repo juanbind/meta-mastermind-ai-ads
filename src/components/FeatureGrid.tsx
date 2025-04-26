@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Search, Zap, LayoutGrid, Image, BarChart2, Users } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Search, Zap, LayoutGrid, BarChart2, Users, Image } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -12,26 +11,21 @@ interface FeatureCardProps {
   delay?: number;
 }
 
-const FeatureCard = ({ icon, title, description, features, className, delay }: FeatureCardProps) => (
+const FeatureCard = ({ icon, title, description, features, delay }: FeatureCardProps) => (
   <div 
-    className={cn(
-      "reveal-element bg-metamaster-gray-800/50 rounded-xl p-6 border border-metamaster-gray-700/50 hover:border-metamaster-primary/50 transition-all duration-300",
-      className
-    )}
+    className="reveal-element bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-metamaster-primary/30 transition-all duration-500 hover:transform hover:-translate-y-1"
     data-animation="fade-up"
     style={{ animationDelay: `${delay}ms` }}
   >
-    <div className="bg-metamaster-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-metamaster-primary mb-4">
+    <div className="bg-gradient-to-br from-metamaster-primary/20 to-metamaster-secondary/20 w-14 h-14 rounded-xl flex items-center justify-center text-metamaster-primary mb-6">
       {icon}
     </div>
-    <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-    <p className="text-metamaster-gray-400 mb-4">{description}</p>
-    <ul className="space-y-2">
+    <h3 className="text-2xl font-semibold mb-3 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">{title}</h3>
+    <p className="text-metamaster-gray-400 mb-6 text-lg">{description}</p>
+    <ul className="space-y-3">
       {features.map((feature, index) => (
         <li key={index} className="flex items-center text-metamaster-gray-300">
-          <svg className="w-5 h-5 mr-2 text-metamaster-primary" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
+          <div className="w-1.5 h-1.5 rounded-full bg-metamaster-primary mr-3" />
           {feature}
         </li>
       ))}
@@ -42,63 +36,63 @@ const FeatureCard = ({ icon, title, description, features, className, delay }: F
 const FeatureGrid = () => {
   const features = [
     {
-      icon: <Search className="w-6 h-6" />,
-      title: "Ad Discovery & Research",
-      description: "Search and find winning Facebook ads with AI-powered filtering and insights.",
+      icon: <Search className="w-7 h-7 text-metamaster-primary" />,
+      title: "Smart Ad Research",
+      description: "Find winning Facebook ads with AI-powered insights",
       features: [
-        "Full Facebook & Instagram Ads Library integration",
-        "Natural language search for ads",
-        "Ad Performance Scoring system"
+        "Access to full ads library",
+        "Natural language search",
+        "Performance scoring"
       ]
     },
     {
-      icon: <Zap className="w-6 h-6" />,
-      title: "AI Media Buyer Tools",
-      description: "Let AI build your campaigns with the strategy of a 7-figure media buyer.",
+      icon: <Zap className="w-7 h-7 text-metamaster-primary" />,
+      title: "AI Campaign Builder",
+      description: "Create campaigns with expert media buyer strategies",
       features: [
-        "Smart Campaign Generator (4-10 questions)",
-        '"Done-For-You" Campaign Planner',
-        "Ad Creative Blueprint Generator"
+        "Smart campaign generator",
+        "Done-for-you planner",
+        "Creative blueprint AI"
       ]
     },
     {
-      icon: <LayoutGrid className="w-6 h-6" />,
-      title: "Drag & Drop Funnel Builder",
-      description: "Create high-converting funnels with our intuitive drag-and-drop builder.",
+      icon: <LayoutGrid className="w-7 h-7 text-metamaster-primary" />,
+      title: "Funnel Builder",
+      description: "Build high-converting funnels with drag & drop",
       features: [
-        "Mobile-first funnel templates",
-        "Pre-built templates by niche",
-        "Multi-step funnels with conditional logic"
+        "Mobile-first templates",
+        "Pre-built niche funnels",
+        "Multi-step flows"
       ]
     },
     {
-      icon: <Image className="w-6 h-6" />,
-      title: "Ad Asset Tools",
-      description: "Download, organize, and repurpose winning ad creatives.",
+      icon: <Image className="w-7 h-7 text-metamaster-primary" />,
+      title: "Creative Tools",
+      description: "Download and organize winning ad creatives",
       features: [
-        "Direct video/image downloader",
-        "Audio extractor for viral sounds",
-        "Organized creative database"
+        "Direct asset downloader",
+        "Audio extractor",
+        "Creative database"
       ]
     },
     {
-      icon: <BarChart2 className="w-6 h-6" />,
-      title: "Performance Intelligence",
-      description: "Analyze and predict ad performance with AI-powered insights.",
+      icon: <BarChart2 className="w-7 h-7 text-metamaster-primary" />,
+      title: "Performance AI",
+      description: "Analyze and predict ad performance",
       features: [
-        "Estimated ad performance scoring",
-        "Engagement heatmaps for ads",
-        "Industry benchmarks comparison"
+        "Ad performance scoring",
+        "Engagement analytics",
+        "Industry benchmarks"
       ]
     },
     {
-      icon: <Users className="w-6 h-6" />,
-      title: "Built-in CRM",
-      description: "Manage leads, clients, and team members all in one place.",
+      icon: <Users className="w-7 h-7 text-metamaster-primary" />,
+      title: "Team & Clients",
+      description: "Manage your team and clients in one place",
       features: [
-        "Multi-user workspaces",
-        "Client folders for agencies",
-        "Client dashboard (white-label)"
+        "Multi-user access",
+        "Client workspaces",
+        "White-label dashboard"
       ]
     }
   ];
@@ -106,9 +100,11 @@ const FeatureGrid = () => {
   return (
     <div className="container mx-auto py-20">
       <div className="text-center mb-16 reveal-element" data-animation="fade-up">
-        <h2 className="text-4xl font-bold mb-4 text-white">All-in-One Facebook Ads Platform</h2>
-        <p className="text-metamaster-gray-400 max-w-2xl mx-auto">
-          Everything you need to discover, create, optimize, and scale your Facebook ads in one powerful platform.
+        <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          All-in-One Facebook Ads Platform
+        </h2>
+        <p className="text-xl text-metamaster-gray-400 max-w-2xl mx-auto">
+          Everything you need to discover, create, and scale winning Facebook ads
         </p>
       </div>
       
@@ -117,7 +113,7 @@ const FeatureGrid = () => {
           <FeatureCard
             key={index}
             {...feature}
-            delay={index * 100}
+            delay={index * 150}
           />
         ))}
       </div>
