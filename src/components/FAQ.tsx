@@ -11,34 +11,34 @@ const FAQ = () => {
   const faqs = [
     {
       question: "What's included in the free trial?",
-      answer: "Our 14-day free trial includes full access to all platform features including the ad library, AI campaign builder, funnel builder, and team collaboration tools. No credit card required to start."
+      answer: "Our 7-day free trial includes full access to all features of the plan you select. This allows you to explore the complete platform including the ad library, AI Media Buyer, funnel builder, and CRM, depending on the plan you choose."
     },
     {
-      question: "How does the AI campaign builder work?",
-      answer: "Our AI analyzes thousands of successful Facebook ads to create optimized campaign strategies. Simply answer a few questions about your business and goals, and the AI will generate a complete campaign structure with targeting recommendations."
+      question: "Can I upgrade or downgrade my plan later?",
+      answer: "Yes, you can upgrade or downgrade your plan at any time. If you upgrade, you'll be charged the prorated difference for the remainder of your billing cycle. If you downgrade, the new plan will take effect at the start of your next billing cycle."
     },
     {
-      question: "Can I import my existing ads and funnels?",
-      answer: "Yes! MetaMaster supports importing your existing Facebook ads, landing pages, and funnels. Our platform will analyze your current assets and provide AI-powered recommendations for optimization."
+      question: "Is there a limit to how many ads I can save?",
+      answer: "The Starter plan allows you to save up to 100 ads, Pro plan increases this to 500, and Agency plan offers unlimited ad saving. These limits reset monthly, and you can always delete saved ads to make room for new ones."
     },
     {
-      question: "Do you offer agency features?",
-      answer: "Absolutely! Our Agency plan includes multi-client management, white-label reporting, team collaboration tools, and unlimited ad research. Perfect for agencies managing multiple client accounts."
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) as well as PayPal for payment. All payments are securely processed and encrypted."
     },
     {
-      question: "What makes MetaMaster different?",
-      answer: "Unlike other tools, MetaMaster combines AI-powered ad research, campaign creation, and funnel building in one platform. Our AI learns from millions of ads to provide data-driven recommendations unique to your business."
+      question: "Do you offer any discounts for annual billing?",
+      answer: "Yes, we offer a 20% discount when you choose annual billing. This option is available for all plans and represents a significant savings compared to monthly billing."
     }
   ];
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <div className="text-center mb-12 reveal-element" data-animation="fade-up">
+      <div className="text-center mb-12">
         <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
           Frequently Asked Questions
         </h2>
         <p className="text-metamaster-gray-400 text-lg">
-          Everything you need to know about our platform
+          Find answers to common questions about MetaMaster.
         </p>
       </div>
       
@@ -47,9 +47,7 @@ const FAQ = () => {
           <AccordionItem 
             key={index} 
             value={`item-${index}`}
-            className="reveal-element bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 px-6"
-            data-animation="fade-up"
-            style={{ animationDelay: `${index * 100}ms` }}
+            className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 px-6"
           >
             <AccordionTrigger className="text-lg text-white hover:text-metamaster-primary py-6">
               {faq.question}

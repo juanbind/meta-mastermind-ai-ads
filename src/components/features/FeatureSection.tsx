@@ -1,0 +1,110 @@
+
+import React from 'react';
+import { Search, Zap, LayoutGrid, BarChart2, Users, Image } from 'lucide-react';
+
+const features = [
+  {
+    icon: <Search className="w-6 h-6 text-metamaster-primary" />,
+    title: "Ad Discovery & Research",
+    description: "Search and find winning Facebook ads with AI-powered filtering and insights.",
+    features: [
+      "Full Facebook & Instagram Ads Library integration",
+      "Natural language search for ads",
+      "Ad Performance Scoring system"
+    ]
+  },
+  {
+    icon: <Zap className="w-6 h-6 text-metamaster-primary" />,
+    title: "AI Media Buyer Tools",
+    description: "Let AI build your campaigns with the strategy of a 7-figure media buyer.",
+    features: [
+      "Smart Campaign Generator (4-10 questions)",
+      '"Done-For-You" Campaign Planner',
+      "Ad Creative Blueprint Generator"
+    ]
+  },
+  {
+    icon: <LayoutGrid className="w-6 h-6 text-metamaster-primary" />,
+    title: "Drag & Drop Funnel Builder",
+    description: "Create high-converting funnels with our intuitive drag-and-drop builder.",
+    features: [
+      "Mobile-first funnel templates",
+      "Pre-built templates by niche",
+      "Multi-step funnels with conditional logic"
+    ]
+  },
+  {
+    icon: <Image className="w-6 h-6 text-metamaster-primary" />,
+    title: "Ad Asset Tools",
+    description: "Download, organize, and repurpose winning ad creatives.",
+    features: [
+      "Direct video/image downloader",
+      "Audio extractor for viral sounds",
+      "Organized creative database"
+    ]
+  },
+  {
+    icon: <BarChart2 className="w-6 h-6 text-metamaster-primary" />,
+    title: "Performance Intelligence",
+    description: "Analyze and predict ad performance with AI-powered insights.",
+    features: [
+      "Estimated ad performance scoring",
+      "Engagement heatmaps for ads",
+      "Industry benchmarks comparison"
+    ]
+  },
+  {
+    icon: <Users className="w-6 h-6 text-metamaster-primary" />,
+    title: "Built-in CRM",
+    description: "Manage leads, clients, and team members all in one place.",
+    features: [
+      "Multi-user workspaces",
+      "Client folders for agencies",
+      "Client dashboard (white-label)"
+    ]
+  }
+];
+
+export function FeatureSection() {
+  return (
+    <section className="py-20 px-4">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          All-in-One Facebook Ads Platform
+        </h2>
+        <p className="text-lg text-metamaster-gray-400 max-w-3xl mx-auto">
+          Everything you need to discover, create, optimize, and scale your Facebook ads in one powerful platform.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        {features.map((feature, index) => (
+          <div 
+            key={index}
+            className="p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300"
+          >
+            <div className="w-12 h-12 rounded-lg bg-metamaster-primary/10 flex items-center justify-center mb-6">
+              {feature.icon}
+            </div>
+            <h3 className="text-xl font-semibold mb-3 text-white">{feature.title}</h3>
+            <p className="text-metamaster-gray-400 mb-6">{feature.description}</p>
+            <ul className="space-y-3">
+              {feature.features.map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-metamaster-gray-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-metamaster-primary" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a 
+              href="#" 
+              className="inline-block mt-6 text-metamaster-primary hover:text-metamaster-primary/80 transition-colors"
+            >
+              Learn more →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
