@@ -8,6 +8,7 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
+
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
@@ -20,7 +21,7 @@ const Landing = () => {
       
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
-        <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll">
+        <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 gradient-text text-slate-50 lg:text-6xl">
             Build Meta Ad Funnels in Seconds
           </h1>
@@ -33,14 +34,13 @@ const Landing = () => {
           </Button>
 
           <div className="mt-12 md:mt-20 mb-12 md:mb-20 relative mx-auto max-w-5xl px-4">
-            <div className="aspect-video relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 border border-white/10 flex flex-col items-center justify-center">
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
+            <div className="aspect-video relative rounded-2xl overflow-hidden bg-[#0A0F1D] border border-white/10 flex items-center justify-center">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center">
                 <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
                   <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
                 </div>
               </div>
-              <p className="text-lg md:text-xl font-semibold text-white mb-2">VSL Video Coming Soon</p>
-              <p className="text-sm md:text-base text-metamaster-gray-300">This space is reserved for your VSL video</p>
+              <p className="absolute mt-16 text-lg md:text-xl font-semibold text-white">VSL Video Coming Soon</p>
             </div>
           </div>
         </div>
@@ -91,4 +91,5 @@ const Landing = () => {
       <Footer />
     </div>;
 };
+
 export default Landing;
