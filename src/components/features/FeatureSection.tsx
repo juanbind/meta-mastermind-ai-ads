@@ -67,38 +67,38 @@ const features = [
 
 export function FeatureSection() {
   return (
-    <section className="py-20 px-4">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+    <section className="py-16 md:py-20 px-4">
+      <div className="text-center mb-12 md:mb-16">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
           All-in-One Facebook Ads Platform
         </h2>
-        <p className="text-lg text-metamaster-gray-400 max-w-3xl mx-auto">
+        <p className="text-base md:text-lg text-metamaster-gray-400 max-w-3xl mx-auto">
           Everything you need to discover, create, optimize, and scale your Facebook ads in one powerful platform.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
         {features.map((feature, index) => (
           <div 
             key={index}
-            className="p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300"
+            className="p-4 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300"
           >
-            <div className="w-12 h-12 rounded-lg bg-metamaster-primary/10 flex items-center justify-center mb-6">
+            <div className="w-12 h-12 rounded-lg bg-metamaster-primary/10 flex items-center justify-center mb-4 md:mb-6">
               {feature.icon}
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-white">{feature.title}</h3>
-            <p className="text-metamaster-gray-400 mb-6">{feature.description}</p>
-            <ul className="space-y-3">
+            <h3 className="text-lg md:text-xl font-semibold mb-2 md:mb-3 text-white">{feature.title}</h3>
+            <p className="text-sm md:text-base text-metamaster-gray-400 mb-4 md:mb-6">{feature.description}</p>
+            <ul className="space-y-2 md:space-y-3">
               {feature.features.map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-metamaster-gray-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-metamaster-primary" />
+                <li key={i} className="flex items-center gap-2 md:gap-3 text-sm md:text-base text-metamaster-gray-300">
+                  <div className="w-1.5 h-1.5 rounded-full bg-metamaster-primary flex-shrink-0" />
                   {item}
                 </li>
               ))}
             </ul>
             <a 
               href="#" 
-              className="inline-block mt-6 text-metamaster-primary hover:text-metamaster-primary/80 transition-colors"
+              className="inline-block mt-4 md:mt-6 text-sm md:text-base text-metamaster-primary hover:text-metamaster-primary/80 transition-colors"
             >
               Learn more →
             </a>
