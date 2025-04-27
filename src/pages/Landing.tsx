@@ -8,7 +8,6 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
-
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
@@ -51,12 +50,10 @@ const Landing = () => {
         {/* Pricing Section */}
         <section className="py-16 md:py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-slate-100 md:text-5xl">
               🚀 Try MetaMaster FREE for 7 Days
             </h2>
-            <p className="text-base md:text-lg text-metamaster-gray-300">
-              No credit card required – cancel anytime. Choose the plan that fits your growth stage.
-            </p>
+            <p className="text-base md:text-lg text-metamaster-gray-300">No credit card required – cancel anytime.</p>
           </div>
           <PricingSection />
         </section>
@@ -91,5 +88,4 @@ const Landing = () => {
       <Footer />
     </div>;
 };
-
 export default Landing;
