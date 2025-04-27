@@ -49,7 +49,7 @@ const Landing = () => {
         {/* Pricing Section */}
         <section className="py-16 md:py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-slate-50 md:text-5xl">
               🚀 Try MetaMaster FREE for 7 Days
             </h2>
             <p className="text-base md:text-lg text-metamaster-gray-300">No credit card required – cancel anytime.</p>
