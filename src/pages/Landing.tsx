@@ -24,9 +24,7 @@ const Landing = () => {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 gradient-text text-slate-50 lg:text-6xl">
             Build Meta Ad Funnels in Seconds
           </h1>
-          <p className="text-lg md:text-xl text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
-            Never pay for a marketing agency, CRM, or funnel builder again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
-          </p>
+          <p className="text-lg text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">Never pay for a marketing agency, CRM, or funnel builder again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!</p>
           
           <Button className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-6 py-4 md:px-8 md:py-6 rounded-xl h-auto w-full sm:w-auto" size="lg" onClick={handleGetStarted}>
             Get Started
