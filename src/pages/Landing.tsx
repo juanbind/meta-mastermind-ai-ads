@@ -20,16 +20,16 @@ const Landing = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-metamaster-dark via-[#0D47A1] to-metamaster-dark/95">
+    <div className="min-h-screen hero-gradient dark-gradient">
       <Navbar />
       
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 gradient-text">
             Build Meta Ad Funnels in Seconds
           </h1>
-          <p className="text-lg md:text-xl text-metamaster-gray-400 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+          <p className="text-lg md:text-xl text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
             Never pay for a marketing agency, CRM, or funnel builder again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
