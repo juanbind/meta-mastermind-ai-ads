@@ -26,7 +26,7 @@ export function PricingSection() {
       name: "Starter",
       price: "$50",
       description: "Perfect for creators, freelancers, and new advertisers.",
-      color: "green-400",
+      color: "green-500",
       features: [
         { name: "Access to all Ad Tools", included: true },
         { name: "Full Campaign Builder", included: true },
@@ -84,12 +84,12 @@ export function PricingSection() {
       {pricingPlans.map((plan) => (
         <Card 
           key={plan.name} 
-          className={`relative p-8 bg-[#0A0F1D]/80 backdrop-blur-sm border ${
-            plan.badge ? 'border-[#1E88E5] shadow-lg shadow-[#1E88E5]/10' : 'border-white/10'
-          } rounded-2xl transition-all duration-300 hover:border-${plan.color}/50`}
+          className={`relative p-8 bg-white/5 backdrop-blur-sm border ${
+            plan.badge ? 'border-2 border-metamaster-primary shadow-xl' : 'border-white/10'
+          } rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-${plan.color}/10`}
         >
           {plan.badge && (
-            <span className="absolute -top-3 right-4 bg-[#1E88E5] text-white text-sm px-3 py-1 rounded-full font-medium">
+            <span className="absolute -top-3 right-4 bg-metamaster-primary text-white text-sm px-3 py-1 rounded-full font-medium">
               {plan.badge}
             </span>
           )}
@@ -97,9 +97,9 @@ export function PricingSection() {
             <h3 className={`text-2xl font-bold mb-2 text-${plan.color}`}>{plan.name}</h3>
             <div className="flex items-baseline mb-2">
               <span className="text-4xl font-bold text-white">{plan.price}</span>
-              <span className="text-gray-300 ml-2">/month</span>
+              <span className="text-metamaster-gray-300 ml-2">/month</span>
             </div>
-            <p className="text-gray-300 text-lg">{plan.description}</p>
+            <p className="text-metamaster-gray-300 text-lg">{plan.description}</p>
           </div>
 
           <div className="space-y-4">
@@ -110,11 +110,11 @@ export function PricingSection() {
                     <Check className="w-3 h-3 text-white" />
                   </div>
                 ) : (
-                  <div className="w-5 h-5 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center">
-                    <X className="w-3 h-3 text-gray-500" />
+                  <div className="w-5 h-5 rounded-full bg-metamaster-gray-700 flex-shrink-0 flex items-center justify-center">
+                    <X className="w-3 h-3 text-metamaster-gray-500" />
                   </div>
                 )}
-                <span className={`${feature.included ? 'text-white' : 'text-gray-400'} text-base`}>
+                <span className={`${feature.included ? 'text-white font-medium' : 'text-metamaster-gray-400'} text-base`}>
                   {feature.name}
                 </span>
               </div>
@@ -124,8 +124,8 @@ export function PricingSection() {
           <Button 
             className={`w-full mt-8 py-6 text-lg font-medium rounded-xl ${
               plan.badge 
-                ? 'bg-[#1E88E5] hover:bg-[#1E88E5]/90 text-white' 
-                : 'bg-[#0A0F1D] hover:bg-white/5 border border-white/10 text-white'
+                ? 'bg-metamaster-primary hover:bg-metamaster-primary/90 text-white' 
+                : 'bg-white/5 hover:bg-white/10 border border-white/10 text-white'
             }`}
             onClick={handleStartTrial}
           >
