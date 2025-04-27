@@ -54,9 +54,7 @@ const Landing = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
               🚀 Try MetaMaster FREE for 7 Days
             </h2>
-            <p className="text-base md:text-lg text-metamaster-gray-300">
-              No credit card required – cancel anytime. Choose the plan that fits your growth stage.
-            </p>
+            <p className="text-base md:text-lg text-metamaster-gray-300">No credit card required – cancel anytime.</p>
           </div>
           <PricingSection />
         </section>
