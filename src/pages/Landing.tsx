@@ -21,7 +21,7 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 gradient-text text-slate-50 lg:text-7xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 gradient-text text-slate-50 lg:text-6xl">
             Build Meta Ad Funnels in Seconds
           </h1>
           <p className="text-lg md:text-xl text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4">
