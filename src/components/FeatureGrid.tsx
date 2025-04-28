@@ -37,7 +37,7 @@ const FeatureGrid = () => {
   const features = [
     {
       icon: <Search className="w-7 h-7 text-metamaster-primary" />,
-      title: "Smart Ad Research",
+      title: "Smart Ad Research 🔍",
       description: "Find winning Facebook ads with AI-powered insights",
       features: [
         "Access to full ads library",
@@ -47,7 +47,7 @@ const FeatureGrid = () => {
     },
     {
       icon: <Zap className="w-7 h-7 text-metamaster-primary" />,
-      title: "AI Campaign Builder",
+      title: "AI Campaign Builder ⚡",
       description: "Create campaigns with expert media buyer strategies",
       features: [
         "Smart campaign generator",
@@ -57,7 +57,7 @@ const FeatureGrid = () => {
     },
     {
       icon: <LayoutGrid className="w-7 h-7 text-metamaster-primary" />,
-      title: "Funnel Builder",
+      title: "Funnel Builder 🎯",
       description: "Build high-converting funnels with drag & drop",
       features: [
         "Mobile-first templates",
@@ -67,7 +67,7 @@ const FeatureGrid = () => {
     },
     {
       icon: <Image className="w-7 h-7 text-metamaster-primary" />,
-      title: "Creative Tools",
+      title: "Creative Tools 🎨",
       description: "Download and organize winning ad creatives",
       features: [
         "Direct asset downloader",
@@ -77,7 +77,7 @@ const FeatureGrid = () => {
     },
     {
       icon: <BarChart2 className="w-7 h-7 text-metamaster-primary" />,
-      title: "Performance AI",
+      title: "Performance AI 📊",
       description: "Analyze and predict ad performance",
       features: [
         "Ad performance scoring",
@@ -87,7 +87,7 @@ const FeatureGrid = () => {
     },
     {
       icon: <Users className="w-7 h-7 text-metamaster-primary" />,
-      title: "Team & Clients",
+      title: "Team & Clients 👥",
       description: "Manage your team and clients in one place",
       features: [
         "Multi-user access",
