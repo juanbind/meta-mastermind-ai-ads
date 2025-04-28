@@ -85,13 +85,11 @@ export function PricingSection() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 max-w-6xl mx-auto px-4">
       {pricingPlans.map((plan) => (
         <Card 
           key={plan.name} 
-          className={`relative p-4 md:p-6 bg-card rounded-xl shadow-lg border ${
-            plan.badge ? 'border-metamaster-primary border-2 shadow-xl ring-2 ring-metamaster-primary/20' : 'border-border'
-          } hover:shadow-xl transition-all duration-300 flex flex-col`}
+          className={`relative p-4 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300 flex flex-col`}
         >
           {plan.badge && (
             <span className="absolute -top-3 right-4 bg-metamaster-primary text-white text-sm px-3 py-1 rounded-full font-medium">
@@ -103,10 +101,10 @@ export function PricingSection() {
               {plan.emoji} {plan.name}
             </h3>
             <div className="flex items-baseline mb-2">
-              <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-              <span className="text-muted-foreground ml-2">/month</span>
+              <span className="text-4xl font-bold text-white">{plan.price}</span>
+              <span className="text-metamaster-gray-300 ml-2">/month</span>
             </div>
-            <p className="text-muted-foreground text-lg">{plan.description}</p>
+            <p className="text-metamaster-gray-300 text-lg">{plan.description}</p>
           </div>
 
           <div className="space-y-4 flex-grow">
@@ -121,7 +119,7 @@ export function PricingSection() {
                     <X className="w-3 h-3 text-metamaster-gray-500" />
                   </div>
                 )}
-                <span className={`${feature.included ? 'text-foreground font-medium' : 'text-muted-foreground'} text-base`}>
+                <span className={`${feature.included ? 'text-white font-medium' : 'text-metamaster-gray-400'} text-base`}>
                   {feature.name}
                 </span>
               </div>
