@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check, X } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -16,6 +17,7 @@ interface PricingPlan {
   features: PlanFeature[];
   badge?: string;
   color: string;
+  emoji: string;
 }
 
 export function PricingSection() {
@@ -26,7 +28,8 @@ export function PricingSection() {
       name: "Starter",
       price: "$50",
       description: "Perfect for creators, freelancers, and new advertisers.",
-      color: "green-500",
+      color: "text-green-500",
+      emoji: "🟢",
       features: [
         { name: "Access to all Ad Tools", included: true },
         { name: "Full Campaign Builder", included: true },
@@ -43,7 +46,8 @@ export function PricingSection() {
       name: "Pro",
       price: "$275",
       description: "For growing businesses ready to scale profitably.",
-      color: "blue-500",
+      color: "text-metamaster-primary",
+      emoji: "🔵",
       features: [
         { name: "Everything in Starter", included: true },
         { name: "AI Media Buyer (Run up to 3 Campaigns)", included: true },
@@ -61,7 +65,8 @@ export function PricingSection() {
       name: "Agency",
       price: "$500",
       description: "Built for media buyers, agencies, and power users.",
-      color: "red-500",
+      color: "text-red-600",
+      emoji: "🔴",
       features: [
         { name: "Everything in Pro", included: true },
         { name: "Run up to 50 Campaigns", included: true },
@@ -80,13 +85,11 @@ export function PricingSection() {
   };
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 max-w-6xl mx-auto px-4">
       {pricingPlans.map((plan) => (
         <Card 
           key={plan.name} 
-          className={`relative p-8 bg-white/5 backdrop-blur-sm border ${
-            plan.badge ? 'border-2 border-metamaster-primary shadow-xl' : 'border-white/10'
-          } rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-${plan.color}/10`}
+          className={`relative p-4 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300 flex flex-col`}
         >
           {plan.badge && (
             <span className="absolute -top-3 right-4 bg-metamaster-primary text-white text-sm px-3 py-1 rounded-full font-medium">
@@ -94,7 +97,9 @@ export function PricingSection() {
             </span>
           )}
           <div className="mb-8">
-            <h3 className={`text-2xl font-bold mb-2 text-${plan.color}`}>{plan.name}</h3>
+            <h3 className={`text-xl font-semibold mb-2 ${plan.color}`}>
+              {plan.emoji} {plan.name}
+            </h3>
             <div className="flex items-baseline mb-2">
               <span className="text-4xl font-bold text-white">{plan.price}</span>
               <span className="text-metamaster-gray-300 ml-2">/month</span>
@@ -102,9 +107,9 @@ export function PricingSection() {
             <p className="text-metamaster-gray-300 text-lg">{plan.description}</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 flex-grow">
             {plan.features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3">
+              <div key={index} className="flex items-start gap-3">
                 {feature.included ? (
                   <div className="w-5 h-5 rounded-full bg-green-500 flex-shrink-0 flex items-center justify-center">
                     <Check className="w-3 h-3 text-white" />
@@ -133,27 +138,6 @@ export function PricingSection() {
           </Button>
         </Card>
       ))}
-
-      <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 mt-10 col-span-3">
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-            <Check className="w-3 h-3 text-white" />
-          </div>
-          <span className="text-metamaster-gray-300 font-medium">7-Day Free Trial</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-            <Check className="w-3 h-3 text-white" />
-          </div>
-          <span className="text-metamaster-gray-300 font-medium">Cancel Anytime</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-            <Check className="w-3 h-3 text-white" />
-          </div>
-          <span className="text-metamaster-gray-300 font-medium">Free Updates</span>
-        </div>
-      </div>
     </div>
   );
 }
