@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LogoutButtonProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | null;
@@ -15,18 +15,10 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
   className = '' 
 }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signOut } = useAuth();
   
-  const handleLogout = () => {
-    // Clear the logged in state
-    localStorage.removeItem('isLoggedIn');
-    
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully.",
-    });
-    
-    // Redirect to landing page
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
   

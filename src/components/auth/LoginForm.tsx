@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -11,37 +11,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { signIn } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
     if (!email || !password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
       return;
     }
     
     setIsLoading(true);
     
-    // Simulate login API call
-    setTimeout(() => {
-      // For demo purposes, let's simulate a successful login
-      toast({
-        title: "Success",
-        description: "You've successfully logged in!",
-      });
-      setIsLoading(false);
-      
-      // Call onSuccess if provided
+    try {
+      await signIn(email, password);
       if (onSuccess) {
         onSuccess();
       }
-    }, 1500);
+    } catch (error) {
+      // Error is handled in the auth context
+      console.error("Sign in error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

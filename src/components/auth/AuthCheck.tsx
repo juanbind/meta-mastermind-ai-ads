@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthCheckProps {
   children: React.ReactNode;
@@ -14,23 +15,27 @@ export const AuthCheck: React.FC<AuthCheckProps> = ({
 }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // For demonstration purposes, we'll use localStorage
-  // In a real app, you'd use a proper auth solution
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  // Add this line to make yourself always "logged in" for testing
-  // const isLoggedIn = true;
+  const { user, loading } = useAuth();
   
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!loading && !user) {
       toast({
         title: "Authentication required",
         description: "Please login or sign up to access this page.",
       });
       navigate(redirectTo);
     }
-  }, [isLoggedIn, navigate, redirectTo, toast]);
+  }, [user, loading, navigate, redirectTo, toast]);
+  
+  // Show nothing while checking auth status
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-metamaster-primary"></div>
+      </div>
+    );
+  }
   
   // If authenticated, render children
-  return isLoggedIn ? <>{children}</> : null;
+  return user ? <>{children}</> : null;
 };

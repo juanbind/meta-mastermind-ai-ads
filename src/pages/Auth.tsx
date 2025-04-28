@@ -4,30 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import Logo from '@/components/Logo';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Auth: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { user } = useAuth();
   
-  // Check if user is already logged in
+  // Redirect if user is already logged in
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn) {
+    if (user) {
       navigate('/dashboard');
     }
-  }, [navigate]);
+  }, [user, navigate]);
   
   const handleAuthSuccess = () => {
-    // Set logged in state
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    toast({
-      title: "Success!",
-      description: "You have successfully logged in.",
-    });
-    
     // Redirect to dashboard on successful auth
     navigate('/dashboard');
   };
