@@ -1,18 +1,8 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-// Export a dummy client if credentials are missing
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
-
-// Log a helpful message for developers
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials missing. Auth functionality will be limited. Connect your project to Supabase through the Lovable interface.');
-}
+// Export the supabase client from the integration
+export const supabase = supabaseClient;
 
 // Helper function to safely use supabase client
 export const getSupabase = () => {

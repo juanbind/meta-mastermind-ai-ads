@@ -4,11 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
+import { useAuth } from '@/contexts/AuthContext';
+import ProfileDropdown from './auth/ProfileDropdown';
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   // Detect scroll for navbar styling
   useEffect(() => {
@@ -21,19 +24,6 @@ const Navbar: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  // Function to handle protected navigation
-  const handleProtectedNavigation = (path: string) => {
-    // For demonstration, we're using localStorage to check if user is logged in
-    // In a real app, you'd use a proper auth solution
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
-    if (isLoggedIn) {
-      navigate(path);
-    } else {
-      navigate('/auth');
-    }
-  };
   
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -47,25 +37,25 @@ const Navbar: React.FC = () => {
           
           <div className="hidden md:flex items-center space-x-6">
             <button 
-              onClick={() => handleProtectedNavigation('/dashboard')} 
+              onClick={() => navigate('/dashboard')}
               className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
             >
               Dashboard
             </button>
             <button 
-              onClick={() => handleProtectedNavigation('/ads-library')} 
+              onClick={() => navigate('/ads-library')}
               className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
             >
               Ads Library
             </button>
             <button 
-              onClick={() => handleProtectedNavigation('/funnel-builder')} 
+              onClick={() => navigate('/funnel-builder')}
               className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
             >
               Funnel Builder
             </button>
             <button 
-              onClick={() => handleProtectedNavigation('/crm')} 
+              onClick={() => navigate('/crm')}
               className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
             >
               CRM
@@ -75,18 +65,21 @@ const Navbar: React.FC = () => {
         
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" size="icon" className="text-white hover:text-metamaster-primary">
-              <Bell size={20} />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-white hover:text-metamaster-primary">
-              <Settings size={20} />
-            </Button>
-            <Button 
-              className="bg-metamaster-primary hover:bg-metamaster-secondary text-white"
-              onClick={() => navigate('/auth')}
-            >
-              Get Started
-            </Button>
+            {!user ? (
+              <Button 
+                className="bg-metamaster-primary hover:bg-metamaster-secondary text-white"
+                onClick={() => navigate('/auth')}
+              >
+                Get Started
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" size="icon" className="text-white hover:text-metamaster-primary">
+                  <Bell size={20} />
+                </Button>
+                <ProfileDropdown />
+              </>
+            )}
           </div>
           
           <Button 
@@ -106,7 +99,7 @@ const Navbar: React.FC = () => {
           <div className="flex flex-col space-y-4">
             <button 
               onClick={() => {
-                handleProtectedNavigation('/dashboard');
+                navigate('/dashboard');
                 setMobileMenuOpen(false);
               }}
               className="text-white hover:text-metamaster-primary font-medium py-2"
@@ -115,7 +108,7 @@ const Navbar: React.FC = () => {
             </button>
             <button 
               onClick={() => {
-                handleProtectedNavigation('/ads-library');
+                navigate('/ads-library');
                 setMobileMenuOpen(false);
               }}
               className="text-white hover:text-metamaster-primary font-medium py-2"
@@ -124,7 +117,7 @@ const Navbar: React.FC = () => {
             </button>
             <button 
               onClick={() => {
-                handleProtectedNavigation('/funnel-builder');
+                navigate('/funnel-builder');
                 setMobileMenuOpen(false);
               }}
               className="text-white hover:text-metamaster-primary font-medium py-2"
@@ -133,22 +126,35 @@ const Navbar: React.FC = () => {
             </button>
             <button 
               onClick={() => {
-                handleProtectedNavigation('/crm');
+                navigate('/crm');
                 setMobileMenuOpen(false);
               }}
               className="text-white hover:text-metamaster-primary font-medium py-2"
             >
               CRM
             </button>
-            <Button 
-              className="bg-metamaster-primary hover:bg-metamaster-secondary text-white w-full mt-2"
-              onClick={() => {
-                navigate('/auth');
-                setMobileMenuOpen(false);
-              }}
-            >
-              Get Started
-            </Button>
+            {!user ? (
+              <Button 
+                className="bg-metamaster-primary hover:bg-metamaster-secondary text-white w-full mt-2"
+                onClick={() => {
+                  navigate('/auth');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Get Started
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="border-white/20 text-white hover:bg-white/10 w-full mt-2"
+                onClick={() => {
+                  navigate('/dashboard');
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Dashboard
+              </Button>
+            )}
           </div>
         </div>
       )}
