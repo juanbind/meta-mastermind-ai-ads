@@ -19,7 +19,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
           {icon}
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-lg mb-2">{title}</h3>
+          <h3 className="font-bold text-lg mb-2 text-metamaster-gray-800">{title}</h3>
           <p className="text-metamaster-gray-600 mb-4">{description}</p>
           <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
             {buttonText}
@@ -70,7 +70,7 @@ const AITools: React.FC = () => {
       <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">AI Tools</h1>
+            <h1 className="text-2xl font-bold mb-2 text-metamaster-gray-800">AI Tools</h1>
             <p className="text-metamaster-gray-600">Leverage AI to supercharge your marketing campaigns</p>
           </div>
           

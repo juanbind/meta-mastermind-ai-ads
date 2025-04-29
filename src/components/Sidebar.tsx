@@ -77,7 +77,7 @@ const Sidebar: React.FC = () => {
             U
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">User Name</p>
+            <p className="text-sm font-medium truncate text-metamaster-gray-800">User Name</p>
             <p className="text-xs text-metamaster-gray-500 truncate">user@example.com</p>
           </div>
         </div>

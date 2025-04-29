@@ -33,7 +33,7 @@ const StatCard: React.FC<{ title: string; value: string; change?: string; icon: 
         )}
       </div>
       <h3 className="text-metamaster-gray-600 text-sm font-medium mb-1">{title}</h3>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-2xl font-bold text-metamaster-gray-800">{value}</p>
     </div>
   );
 };
@@ -50,7 +50,7 @@ const RecentAd: React.FC<{ title: string; image: string; engagement: string; dat
         <img src={image} alt={title} className="w-full h-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-medium truncate">{title}</h4>
+        <h4 className="text-sm font-medium truncate text-metamaster-gray-800">{title}</h4>
         <div className="flex items-center space-x-2 text-xs text-metamaster-gray-600">
           <span>{engagement}</span>
           <span>•</span>
@@ -74,7 +74,7 @@ const ActionCard: React.FC<{ title: string; description: string; buttonText: str
           {icon}
         </div>
         <div>
-          <h3 className="font-bold mb-2">{title}</h3>
+          <h3 className="font-bold mb-2 text-metamaster-gray-800">{title}</h3>
           <p className="text-metamaster-gray-600 text-sm mb-4">{description}</p>
           <Button variant="outline" size="sm" className="flex items-center">
             {buttonText}
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
         <div className="container mx-auto px-4 pb-12">
           {/* Dashboard Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-1">Welcome back, User</h1>
+            <h1 className="text-2xl font-bold mb-1 text-metamaster-gray-800">Welcome back, User</h1>
             <p className="text-metamaster-gray-600">Here's what's happening with your ad campaigns today.</p>
           </div>
           
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
             {/* Left Column - Quick Actions */}
             <div className="space-y-6">
               <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <h3 className="font-bold text-lg mb-4">Quick Actions</h3>
+                <h3 className="font-bold text-lg mb-4 text-metamaster-gray-800">Quick Actions</h3>
                 <div className="space-y-4">
                   <Button className="w-full bg-metamaster-primary hover:bg-metamaster-secondary justify-start">
                     <Search size={18} className="mr-2" /> Search FB Ads Library
@@ -146,29 +146,29 @@ const Dashboard: React.FC = () => {
               </div>
               
               <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <h3 className="font-bold text-lg mb-4">Getting Started</h3>
+                <h3 className="font-bold text-lg mb-4 text-metamaster-gray-800">Getting Started</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center text-sm">
+                  <div className="flex items-center text-sm text-metamaster-gray-800">
                     <CheckCircle size={18} className="text-green-500 mr-3" />
                     <span>Create your account</span>
                   </div>
-                  <div className="flex items-center text-sm">
+                  <div className="flex items-center text-sm text-metamaster-gray-800">
                     <CheckCircle size={18} className="text-green-500 mr-3" />
                     <span>Set up your profile</span>
                   </div>
-                  <div className="flex items-center text-sm">
+                  <div className="flex items-center text-sm text-metamaster-gray-800">
                     <div className="w-5 h-5 rounded-full border-2 border-metamaster-gray-300 mr-3 flex items-center justify-center">
                       <div className="w-2.5 h-2.5 rounded-full bg-metamaster-gray-300"></div>
                     </div>
                     <span>Connect Facebook Ad account</span>
                   </div>
-                  <div className="flex items-center text-sm">
+                  <div className="flex items-center text-sm text-metamaster-gray-800">
                     <div className="w-5 h-5 rounded-full border-2 border-metamaster-gray-300 mr-3 flex items-center justify-center">
                       <div className="w-2.5 h-2.5 rounded-full bg-metamaster-gray-300"></div>
                     </div>
                     <span>Create your first funnel</span>
                   </div>
-                  <div className="flex items-center text-sm">
+                  <div className="flex items-center text-sm text-metamaster-gray-800">
                     <div className="w-5 h-5 rounded-full border-2 border-metamaster-gray-300 mr-3 flex items-center justify-center">
                       <div className="w-2.5 h-2.5 rounded-full bg-metamaster-gray-300"></div>
                     </div>
@@ -208,7 +208,7 @@ const Dashboard: React.FC = () => {
             {/* Right Column - Recent Activity */}
             <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg">Recently Saved Ads</h3>
+                <h3 className="font-bold text-lg text-metamaster-gray-800">Recently Saved Ads</h3>
                 <Button variant="ghost" size="sm" className="text-metamaster-primary">
                   View All
                 </Button>
@@ -255,3 +255,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

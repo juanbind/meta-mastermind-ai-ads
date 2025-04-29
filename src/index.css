@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
@@ -73,7 +74,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-metamaster-dark text-white font-inter;
+    @apply bg-background text-metamaster-gray-800 font-inter;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
