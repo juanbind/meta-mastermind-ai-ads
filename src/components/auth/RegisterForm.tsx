@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -41,14 +40,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       console.log("Signup result:", result);
       
       if (result.success) {
-        // Successfully registered and signed in
+        // Show welcome toast message through AuthContext
+        // Automatically navigate to dashboard
+        navigate('/dashboard');
         if (onSuccess) {
           onSuccess();
-        } else {
-          navigate('/dashboard');
         }
       } else if (result.message === "Email confirmation required") {
-        // If email confirmation is required, we stay on the page
         toast({
           title: "Please check your email",
           description: "We've sent you a confirmation link to complete your registration",

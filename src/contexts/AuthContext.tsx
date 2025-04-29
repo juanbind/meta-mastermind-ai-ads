@@ -27,6 +27,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Auth state changed:", _event, session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Show welcome message if the event is a signup event
+      if (_event === 'SIGNED_IN' && !user) {
+        toast({
+          title: "Welcome to your 7 Day Free No Credit Card Trial of Meta Master!",
+          description: "Need help? Book a Demo Below!",
+          duration: 10000, // Show for 10 seconds
+        });
+      }
     });
     
     // THEN check for existing session
@@ -38,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -84,8 +93,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data.user) {
         toast({
-          title: "Account created successfully",
-          description: "You are now signed in!",
+          title: "Welcome to your 7 Day Free No Credit Card Trial of Meta Master!",
+          description: "Need help? Book a Demo Below!",
+          duration: 10000, // Show for 10 seconds
         });
         return { success: true };
       } else {
