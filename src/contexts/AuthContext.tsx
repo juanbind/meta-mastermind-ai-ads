@@ -9,7 +9,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<{ success: boolean, message?: string }>;
   signOut: () => Promise<void>;
 };
 
@@ -22,15 +22,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
     });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -84,16 +85,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         toast({
           title: "Account created successfully",
-          description: "Please check your email for verification",
+          description: "You are now signed in!",
         });
+        return { success: true };
+      } else {
+        toast({
+          title: "Almost there!",
+          description: "Please check your email to confirm your account",
+        });
+        return { success: false, message: "Email confirmation required" };
       }
     } catch (error: any) {
+      console.error("Sign up error:", error);
       toast({
         title: "Error creating account",
         description: error.message || "An error occurred during sign up",
         variant: "destructive",
       });
-      throw error;
+      return { success: false, message: error.message };
     } finally {
       setLoading(false);
     }

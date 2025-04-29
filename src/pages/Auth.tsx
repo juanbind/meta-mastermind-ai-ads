@@ -9,17 +9,19 @@ import { useAuth } from '@/contexts/AuthContext';
 const Auth: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !loading) {
+      console.log("User is logged in, redirecting to dashboard...");
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
   
   const handleAuthSuccess = () => {
     // Redirect to dashboard on successful auth
+    console.log("Auth success, redirecting to dashboard...");
     navigate('/dashboard');
   };
   

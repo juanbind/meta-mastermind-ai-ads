@@ -19,9 +19,11 @@ export const AuthCheck: React.FC<AuthCheckProps> = ({
   
   useEffect(() => {
     if (!loading && !user) {
+      console.log("User not authenticated, redirecting to:", redirectTo);
       toast({
         title: "Authentication required",
         description: "Please login or sign up to access this page.",
+        variant: "warning",
       });
       navigate(redirectTo);
     }

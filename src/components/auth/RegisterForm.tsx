@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -12,30 +14,49 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     // Validation
     if (!name || !email || !password) {
+      setError('All fields are required');
       return;
     }
     
     if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      await signUp(email, password, name);
-      if (onSuccess) {
-        onSuccess();
+      const result = await signUp(email, password, name);
+      console.log("Signup result:", result);
+      
+      if (result.success) {
+        // Successfully registered and signed in
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate('/dashboard');
+        }
+      } else if (result.message === "Email confirmation required") {
+        // If email confirmation is required, we stay on the page
+        toast({
+          title: "Please check your email",
+          description: "We've sent you a confirmation link to complete your registration",
+        });
       }
     } catch (error) {
+      console.error("Registration error:", error);
       // Error is handled in the auth context
-      console.error("Sign up error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -43,6 +64,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/50 text-red-700 p-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+      
       <div>
         <label htmlFor="name" className="block text-sm font-medium mb-1 text-white">
           Full Name

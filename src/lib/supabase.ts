@@ -10,5 +10,7 @@ export const getSupabase = () => {
     console.error('Supabase client not initialized. Please connect to Supabase first.');
     return null;
   }
+  
+  console.log('Supabase client initialized:', !!supabase);
   return supabase;
 };
