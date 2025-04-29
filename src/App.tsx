@@ -13,6 +13,11 @@ import Dashboard from "./pages/Dashboard";
 import AdsLibrary from "./pages/AdsLibrary";
 import FunnelBuilder from "./pages/FunnelBuilder";
 import CRM from "./pages/CRM";
+import AITools from "./pages/AITools";
+import Reports from "./pages/Reports";
+import Templates from "./pages/Templates";
+import Integrations from "./pages/Integrations";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -58,6 +63,33 @@ const App = () => (
             <Route path="/crm" element={
               <AuthCheck>
                 <CRM />
+              </AuthCheck>
+            } />
+            
+            {/* New Routes */}
+            <Route path="/ai-tools" element={
+              <AuthCheck>
+                <AITools />
+              </AuthCheck>
+            } />
+            <Route path="/reports" element={
+              <AuthCheck>
+                <Reports />
+              </AuthCheck>
+            } />
+            <Route path="/templates" element={
+              <AuthCheck>
+                <Templates />
+              </AuthCheck>
+            } />
+            <Route path="/integrations" element={
+              <AuthCheck>
+                <Integrations />
+              </AuthCheck>
+            } />
+            <Route path="/settings" element={
+              <AuthCheck>
+                <Settings />
               </AuthCheck>
             } />
             
