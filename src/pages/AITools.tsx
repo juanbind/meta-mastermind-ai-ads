@@ -3,15 +3,33 @@ import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Zap, Brain, Sparkles, FileCode, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ToolCardProps {
   title: string;
   description: string;
   icon: React.ReactNode;
   buttonText: string;
+  comingSoon?: boolean;
 }
 
-const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonText }) => {
+const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonText, comingSoon = true }) => {
+  const { toast } = useToast();
+  
+  const handleToolClick = () => {
+    if (comingSoon) {
+      toast({
+        title: `${title} - Coming Soon`,
+        description: "This tool will be available in an upcoming update. Stay tuned!",
+      });
+    } else {
+      toast({
+        title: `${title} activated`,
+        description: "Tool is now ready to use.",
+      });
+    }
+  };
+  
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
       <div className="flex items-start space-x-4">
@@ -19,9 +37,19 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
           {icon}
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-lg mb-2 text-metamaster-gray-800">{title}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-lg mb-2 text-metamaster-gray-800">{title}</h3>
+            {comingSoon && (
+              <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium">
+                Coming Soon
+              </span>
+            )}
+          </div>
           <p className="text-metamaster-gray-600 mb-4">{description}</p>
-          <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
+          <Button 
+            className="bg-metamaster-primary hover:bg-metamaster-secondary"
+            onClick={handleToolClick}
+          >
             {buttonText}
           </Button>
         </div>
@@ -82,6 +110,7 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
+                comingSoon={true}
               />
             ))}
           </div>

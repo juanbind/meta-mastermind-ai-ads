@@ -98,31 +98,30 @@ const Dashboard: React.FC = () => {
             <p className="text-metamaster-gray-600">Here's what's happening with your ad campaigns today.</p>
           </div>
           
-          {/* Stats Row */}
+          {/* Stats Row - All showing zeros instead of mock data */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard 
               title="Total Ads Saved" 
-              value="127"
-              change="12.8%"
+              value="0"
+              change="0%"
               icon={<BarChart size={18} />}
             />
             <StatCard 
               title="Funnels Created" 
-              value="24"
-              change="4.3%"
+              value="0"
+              change="0%"
               icon={<Zap size={18} />}
             />
             <StatCard 
               title="Total Leads" 
-              value="1,485"
-              change="28.5%"
+              value="0"
+              change="0%"
               icon={<TrendingUp size={18} />}
             />
             <StatCard 
               title="Ad Searches" 
-              value="347"
-              change="5.2%"
-              isPositive={false}
+              value="0"
+              change="0%"
               icon={<Search size={18} />}
             />
           </div>
@@ -205,7 +204,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            {/* Right Column - Recent Activity */}
+            {/* Right Column - Recent Activity - Showing no data state */}
             <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg text-metamaster-gray-800">Recently Saved Ads</h3>
@@ -214,37 +213,13 @@ const Dashboard: React.FC = () => {
                 </Button>
               </div>
               
-              <div className="space-y-1 divide-y divide-gray-100">
-                <RecentAd
-                  title="Fitness Program Ad"
-                  image="https://placehold.co/100x100/1E88E5/FFFFFF?text=Ad"
-                  engagement="High Engagement"
-                  date="2 hours ago"
-                />
-                <RecentAd
-                  title="E-commerce Product Carousel"
-                  image="https://placehold.co/100x100/0D47A1/FFFFFF?text=Ad"
-                  engagement="Medium Engagement"
-                  date="Yesterday"
-                />
-                <RecentAd
-                  title="SaaS Demo Video Ad"
-                  image="https://placehold.co/100x100/2A2A2A/FFFFFF?text=Ad"
-                  engagement="Very High Engagement"
-                  date="2 days ago"
-                />
-                <RecentAd
-                  title="Real Estate Lead Gen Ad"
-                  image="https://placehold.co/100x100/757575/FFFFFF?text=Ad"
-                  engagement="Medium Engagement"
-                  date="3 days ago"
-                />
-                <RecentAd
-                  title="Coaching Program Testimonial"
-                  image="https://placehold.co/100x100/1E88E5/FFFFFF?text=Ad"
-                  engagement="High Engagement"
-                  date="5 days ago"
-                />
+              <div className="flex flex-col items-center justify-center h-64 text-center">
+                <Search size={48} className="text-metamaster-gray-300 mb-3" />
+                <p className="text-metamaster-gray-600 mb-2">No ads saved yet</p>
+                <p className="text-metamaster-gray-400 text-sm mb-4">Start exploring the ads library to save ads</p>
+                <Button variant="outline" className="text-metamaster-gray-800">
+                  Browse Ad Library
+                </Button>
               </div>
             </div>
           </div>
@@ -255,4 +230,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-

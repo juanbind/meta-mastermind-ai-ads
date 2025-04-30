@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Search, Filter, Grid, List, FileText, LayoutTemplate, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface TemplateCardProps {
   title: string;
@@ -13,6 +14,22 @@ interface TemplateCardProps {
 }
 
 const TemplateCard: React.FC<TemplateCardProps> = ({ title, category, image, rating, usedCount }) => {
+  const { toast } = useToast();
+  
+  const handleUseTemplate = () => {
+    toast({
+      title: "Template Access",
+      description: `The ${title} template will be available after your account is fully set up.`,
+    });
+  };
+  
+  const handleCopyTemplate = () => {
+    toast({
+      title: "Template Copied",
+      description: `${title} has been copied to your templates.`,
+    });
+  };
+  
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       <div className="relative">
@@ -23,7 +40,7 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ title, category, image, rat
       </div>
       
       <div className="p-4">
-        <h3 className="font-bold text-lg mb-2">{title}</h3>
+        <h3 className="font-bold text-lg mb-2 text-metamaster-gray-800">{title}</h3>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <div className="flex">
@@ -42,10 +59,19 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ title, category, image, rat
           </div>
         </div>
         <div className="flex space-x-2">
-          <Button size="sm" className="flex-1 bg-metamaster-primary hover:bg-metamaster-secondary">
+          <Button 
+            size="sm" 
+            className="flex-1 bg-metamaster-primary hover:bg-metamaster-secondary"
+            onClick={handleUseTemplate}
+          >
             Use Template
           </Button>
-          <Button size="sm" variant="outline" className="w-9 p-0">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="w-9 p-0"
+            onClick={handleCopyTemplate}
+          >
             <Copy size={16} />
           </Button>
         </div>
@@ -55,50 +81,80 @@ const TemplateCard: React.FC<TemplateCardProps> = ({ title, category, image, rat
 };
 
 const Templates: React.FC = () => {
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const { toast } = useToast();
+  
   const templates = [
     {
       title: "E-commerce Sales Funnel",
       category: "Funnel",
       image: "https://placehold.co/600x400/1E88E5/FFFFFF?text=E-commerce",
       rating: 5,
-      usedCount: 1245
+      usedCount: 0
     },
     {
       title: "Lead Magnet Funnel",
       category: "Funnel",
       image: "https://placehold.co/600x400/0D47A1/FFFFFF?text=Lead+Magnet",
       rating: 4,
-      usedCount: 856
+      usedCount: 0
     },
     {
       title: "Coaching Application",
       category: "Funnel",
       image: "https://placehold.co/600x400/2A2A2A/FFFFFF?text=Coaching",
       rating: 5,
-      usedCount: 723
+      usedCount: 0
     },
     {
       title: "SaaS Product Launch",
       category: "Campaign",
       image: "https://placehold.co/600x400/757575/FFFFFF?text=SaaS",
       rating: 4,
-      usedCount: 512
+      usedCount: 0
     },
     {
       title: "Facebook Retargeting Ads",
       category: "Ad Set",
       image: "https://placehold.co/600x400/1E88E5/FFFFFF?text=Facebook",
       rating: 4,
-      usedCount: 489
+      usedCount: 0
     },
     {
       title: "Real Estate Landing Page",
       category: "Page",
       image: "https://placehold.co/600x400/0D47A1/FFFFFF?text=Real+Estate",
       rating: 5,
-      usedCount: 378
+      usedCount: 0
     }
   ];
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          template.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === "all" || template.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleFilterChange = (category: string) => {
+    setActiveCategory(category);
+    if (category !== "all") {
+      toast({
+        title: `${category} Templates`,
+        description: `Showing ${category} templates only.`,
+      });
+    }
+  };
+
+  const handleSearch = () => {
+    if (searchQuery) {
+      toast({
+        title: "Search Results",
+        description: `Showing templates matching "${searchQuery}"`,
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
@@ -106,7 +162,7 @@ const Templates: React.FC = () => {
       <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">Templates</h1>
+            <h1 className="text-2xl font-bold mb-2 text-metamaster-gray-800">Templates</h1>
             <p className="text-metamaster-gray-600">Ready-to-use templates to accelerate your marketing</p>
           </div>
           
@@ -121,11 +177,21 @@ const Templates: React.FC = () => {
                   type="text"
                   placeholder="Search templates..."
                   className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               
               <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center"
+                  onClick={() => toast({
+                    title: "Filters",
+                    description: "Advanced filtering coming soon.",
+                  })}
+                >
                   <Filter size={16} className="mr-2" /> Filters
                 </Button>
                 <div className="flex border border-gray-200 rounded-lg">
@@ -142,36 +208,84 @@ const Templates: React.FC = () => {
           
           {/* Template Categories */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            <Button className="bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap">
+            <Button 
+              className={activeCategory === "all" ? 
+                "bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap" : 
+                "bg-transparent text-metamaster-gray-800 hover:bg-metamaster-gray-200 whitespace-nowrap"}
+              variant={activeCategory === "all" ? "default" : "outline"}
+              onClick={() => handleFilterChange("all")}
+            >
               All Templates
             </Button>
-            <Button variant="outline" className="whitespace-nowrap">
+            <Button 
+              variant={activeCategory === "Funnel" ? "default" : "outline"}
+              className={activeCategory === "Funnel" ? 
+                "bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap" : 
+                "whitespace-nowrap"}
+              onClick={() => handleFilterChange("Funnel")}
+            >
               <LayoutTemplate size={16} className="mr-2" /> Funnels
             </Button>
-            <Button variant="outline" className="whitespace-nowrap">
+            <Button 
+              variant={activeCategory === "Page" ? "default" : "outline"}
+              className={activeCategory === "Page" ? 
+                "bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap" : 
+                "whitespace-nowrap"}
+              onClick={() => handleFilterChange("Page")}
+            >
               <FileText size={16} className="mr-2" /> Landing Pages
             </Button>
-            <Button variant="outline" className="whitespace-nowrap">
+            <Button 
+              variant={activeCategory === "Campaign" ? "default" : "outline"}
+              className={activeCategory === "Campaign" ? 
+                "bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap" : 
+                "whitespace-nowrap"}
+              onClick={() => handleFilterChange("Campaign")}
+            >
               Ad Campaigns
             </Button>
-            <Button variant="outline" className="whitespace-nowrap">
-              Email Sequences
+            <Button 
+              variant={activeCategory === "Ad Set" ? "default" : "outline"}
+              className={activeCategory === "Ad Set" ? 
+                "bg-metamaster-primary hover:bg-metamaster-secondary whitespace-nowrap" : 
+                "whitespace-nowrap"}
+              onClick={() => handleFilterChange("Ad Set")}
+            >
+              Ad Sets
             </Button>
           </div>
           
           {/* Template Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {templates.map((template, index) => (
-              <TemplateCard 
-                key={index}
-                title={template.title}
-                category={template.category}
-                image={template.image}
-                rating={template.rating}
-                usedCount={template.usedCount}
-              />
-            ))}
-          </div>
+          {filteredTemplates.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredTemplates.map((template, index) => (
+                <TemplateCard 
+                  key={index}
+                  title={template.title}
+                  category={template.category}
+                  image={template.image}
+                  rating={template.rating}
+                  usedCount={template.usedCount}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl p-10 shadow-md border border-gray-100 text-center">
+              <Search size={48} className="mx-auto text-metamaster-gray-300 mb-3" />
+              <h3 className="text-lg font-bold text-metamaster-gray-800 mb-2">No templates found</h3>
+              <p className="text-metamaster-gray-600 mb-4">
+                Try searching with different keywords or browse all available templates.
+              </p>
+              <Button 
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveCategory('all');
+                }}
+              >
+                View All Templates
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
