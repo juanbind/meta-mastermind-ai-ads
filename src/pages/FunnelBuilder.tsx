@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -19,7 +18,8 @@ import {
   MoveDiagonal,
   CircleDot,
   SeparatorHorizontal,
-  Zap
+  Zap,
+  Trash
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
@@ -32,7 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import FunnelElement from '@/components/funnel/FunnelElement';
 import FunnelCanvas, { CanvasItem } from '@/components/funnel/FunnelCanvas';
 import { ELEMENT_TYPES } from '@/components/funnel/FunnelElement';
-import { supabase } from '@/lib/supabase';
+import { supabase, FunnelData } from '@/lib/supabase';
 
 interface Template {
   id: string;
@@ -43,16 +43,8 @@ interface Template {
   description?: string;
 }
 
-interface Funnel {
-  id: string;
-  name: string;
-  content: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-  is_published: boolean;
-  published_url?: string;
-}
+// Use our FunnelData type for the Funnel interface
+type Funnel = FunnelData;
 
 const TemplateCard: React.FC<{ template: Template; onClick: () => void }> = ({ template, onClick }) => {
   return (
@@ -273,7 +265,7 @@ const FunnelBuilder: React.FC = () => {
         if (error) throw error;
         
         if (data) {
-          setFunnels(data);
+          setFunnels(data as Funnel[]);
         }
       } catch (error) {
         console.error('Error fetching funnels:', error);
@@ -307,7 +299,8 @@ const FunnelBuilder: React.FC = () => {
         .insert({
           name: newFunnelName,
           content: JSON.stringify([]),
-          is_published: false
+          is_published: false,
+          user_id: (await supabase.auth.getUser()).data.user?.id || 'anonymous'
         })
         .select()
         .single();
@@ -315,8 +308,8 @@ const FunnelBuilder: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        setFunnels([data, ...funnels]);
-        setActiveFunnel(data);
+        setFunnels([data as Funnel, ...funnels]);
+        setActiveFunnel(data as Funnel);
         toast({
           title: "Funnel created",
           description: `Your new funnel "${newFunnelName}" is ready to edit.`,
@@ -346,7 +339,8 @@ const FunnelBuilder: React.FC = () => {
         .insert({
           name: templateName,
           content: template.content,
-          is_published: false
+          is_published: false,
+          user_id: (await supabase.auth.getUser()).data.user?.id || 'anonymous'
         })
         .select()
         .single();
@@ -354,8 +348,8 @@ const FunnelBuilder: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        setFunnels([data, ...funnels]);
-        setActiveFunnel(data);
+        setFunnels([data as Funnel, ...funnels]);
+        setActiveFunnel(data as Funnel);
         toast({
           title: "Template applied",
           description: `Template "${template.name}" has been applied. You can now customize it.`,
@@ -510,8 +504,8 @@ const FunnelBuilder: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        setFunnels([data, ...funnels]);
-        setActiveFunnel(data);
+        setFunnels([data as Funnel, ...funnels]);
+        setActiveFunnel(data as Funnel);
         toast({
           title: "AI Funnel created",
           description: "Your AI-generated funnel is ready to customize.",
@@ -573,7 +567,8 @@ const FunnelBuilder: React.FC = () => {
         .insert({
           name: `${funnel.name} (Copy)`,
           content: funnel.content,
-          is_published: false
+          is_published: false,
+          user_id: (await supabase.auth.getUser()).data.user?.id || 'anonymous'
         })
         .select()
         .single();
@@ -581,7 +576,7 @@ const FunnelBuilder: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        setFunnels([data, ...funnels]);
+        setFunnels([data as Funnel, ...funnels]);
         toast({
           title: "Funnel duplicated",
           description: `A copy of "${funnel.name}" has been created.`,
