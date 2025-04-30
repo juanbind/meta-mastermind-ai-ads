@@ -17,6 +17,12 @@ export const ELEMENT_TYPES = {
   FORM: 'form',
   BULLET_LIST: 'bullet-list',
   BUTTON: 'button',
+  INPUT: 'input',
+  DROPDOWN: 'dropdown',
+  CALENDAR: 'calendar',
+  DIVIDER: 'divider',
+  ICON: 'icon',
+  SPACING: 'spacing',
 };
 
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
