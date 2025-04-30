@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/lib/supabase';
 
 interface Ad {
   id: string;
@@ -17,31 +17,192 @@ interface Ad {
   impressions: string;
   engagement: string;
   format: string;
+  adLibraryId?: string;
 }
 
-const FilterButton: React.FC<{ label: string }> = ({ label }) => (
-  <Button variant="outline" size="sm" className="flex items-center">
-    {label}
-    <ChevronDown size={16} className="ml-2" />
-  </Button>
-);
+// Sample mock API for Meta Ads Library
+const fetchMetaAds = async (query: string = '', filters: Record<string, any> = {}) => {
+  // In a real implementation, this would call the Meta Ads Library API
+  // For demo purposes, we'll simulate a fetch with our sample ads
+  console.log('Fetching Meta Ads with query:', query, 'and filters:', filters);
+  
+  // Mock API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // These would be real ads from the Meta Ads Library API
+  const sampleAds: Ad[] = [
+    {
+      id: '1',
+      platform: 'Facebook',
+      title: 'Summer Collection Sale',
+      description: 'Get 50% off on our new summer collection. Limited time offer, shop now!',
+      imageUrl: 'https://placehold.co/600x400/1E88E5/FFFFFF?text=Fashion+Ad',
+      advertiser: 'Fashion Brand Co.',
+      datePosted: '2 days ago',
+      impressions: '10.2k',
+      engagement: '3.4%',
+      format: 'Single Image',
+      adLibraryId: 'fb_123456789'
+    },
+    {
+      id: '2',
+      platform: 'Instagram',
+      title: 'Premium Fitness Program',
+      description: 'Transform your body in 30 days with our expert-led fitness program and nutrition guide.',
+      imageUrl: 'https://placehold.co/600x400/9C27B0/FFFFFF?text=Fitness+Ad',
+      advertiser: 'FitLife Pro',
+      datePosted: '5 days ago',
+      impressions: '24.5k',
+      engagement: '4.8%',
+      format: 'Video',
+      adLibraryId: 'ig_987654321'
+    },
+    // ... keep existing code (additional sample ads)
+  ];
+  
+  // Filter by query if provided
+  let filteredAds = sampleAds;
+  if (query) {
+    const lowerQuery = query.toLowerCase();
+    filteredAds = sampleAds.filter(ad => 
+      ad.title.toLowerCase().includes(lowerQuery) || 
+      ad.description.toLowerCase().includes(lowerQuery) ||
+      ad.advertiser.toLowerCase().includes(lowerQuery)
+    );
+  }
+  
+  // Apply other filters
+  if (filters.platform) {
+    filteredAds = filteredAds.filter(ad => ad.platform === filters.platform);
+  }
+  
+  if (filters.format) {
+    filteredAds = filteredAds.filter(ad => ad.format === filters.format);
+  }
+  
+  // Return the filtered ads
+  return filteredAds;
+};
 
+// Component for filtering ads
+const FilterButton: React.FC<{ 
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  options?: string[];
+  onOptionClick?: (option: string) => void;
+}> = ({ label, isActive, onClick, options, onOptionClick }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleClick = () => {
+    onClick();
+    if (!options?.length) {
+      setShowDropdown(false);
+    } else {
+      setShowDropdown(!showDropdown);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <Button 
+        variant={isActive ? "default" : "outline"} 
+        size="sm" 
+        className={`flex items-center ${isActive ? 'bg-metamaster-primary' : ''}`}
+        onClick={handleClick}
+      >
+        {label}
+        <ChevronDown size={16} className="ml-2" />
+      </Button>
+      
+      {showDropdown && options && (
+        <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md border border-gray-100 z-10 min-w-[150px]">
+          {options.map((option) => (
+            <button
+              key={option}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm"
+              onClick={() => {
+                onOptionClick?.(option);
+                setShowDropdown(false);
+              }}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Ad card component
 const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   const { toast } = useToast();
   const [saved, setSaved] = useState(false);
   
-  const handleSave = () => {
-    setSaved(!saved);
-    toast({
-      title: saved ? "Ad removed from saved" : "Ad saved to library",
-      description: saved ? "Ad removed from your saved collection" : "You can find this ad in your saved collection",
-    });
+  const handleSave = async () => {
+    try {
+      // In a real implementation, this would save to a user's collection in the database
+      if (saved) {
+        // Remove from saved collection
+        // This would make an API call to remove the ad from the user's saved collection
+        toast({
+          title: "Ad removed from saved",
+          description: "Ad removed from your saved collection",
+        });
+      } else {
+        // Add to saved collection
+        // This would make an API call to add the ad to the user's saved collection
+        toast({
+          title: "Ad saved to library",
+          description: "You can find this ad in your saved collection",
+        });
+      }
+      setSaved(!saved);
+    } catch (error) {
+      console.error('Error saving ad:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem saving this ad",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleShare = () => {
-    toast({
-      title: "Share link copied",
-      description: "Ad share link has been copied to your clipboard",
+    // Create a share link for the ad
+    const shareUrl = `${window.location.origin}/ads/${ad.adLibraryId || ad.id}`;
+    
+    // Try to use the native share API if available
+    if (navigator.share) {
+      navigator.share({
+        title: ad.title,
+        text: ad.description,
+        url: shareUrl
+      }).catch(err => {
+        console.error('Error sharing:', err);
+        // Fallback to copying to clipboard
+        copyToClipboard(shareUrl);
+      });
+    } else {
+      // Fallback to copying to clipboard
+      copyToClipboard(shareUrl);
+    }
+  };
+  
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Share link copied",
+        description: "Ad share link has been copied to your clipboard",
+      });
+    }).catch(err => {
+      console.error('Error copying to clipboard:', err);
+      toast({
+        title: "Error",
+        description: "Could not copy link to clipboard",
+        variant: "destructive"
+      });
     });
   };
   
@@ -109,99 +270,41 @@ const AdsLibrary: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [ads, setAds] = useState<Ad[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const { toast } = useToast();
   
-  // Simulate loading ads
-  useEffect(() => {
-    const loadAds = () => {
-      setIsLoading(true);
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        const sampleAds: Ad[] = [
-          {
-            id: '1',
-            platform: 'Facebook',
-            title: 'Summer Collection Sale',
-            description: 'Get 50% off on our new summer collection. Limited time offer, shop now!',
-            imageUrl: 'https://placehold.co/600x400/1E88E5/FFFFFF?text=Fashion+Ad',
-            advertiser: 'Fashion Brand Co.',
-            datePosted: '2 days ago',
-            impressions: '10.2k',
-            engagement: '3.4%',
-            format: 'Single Image'
-          },
-          {
-            id: '2',
-            platform: 'Instagram',
-            title: 'Premium Fitness Program',
-            description: 'Transform your body in 30 days with our expert-led fitness program and nutrition guide.',
-            imageUrl: 'https://placehold.co/600x400/9C27B0/FFFFFF?text=Fitness+Ad',
-            advertiser: 'FitLife Pro',
-            datePosted: '5 days ago',
-            impressions: '24.5k',
-            engagement: '4.8%',
-            format: 'Video'
-          },
-          {
-            id: '3',
-            platform: 'Facebook',
-            title: 'Business Growth Masterclass',
-            description: 'Learn proven strategies to scale your business from industry experts. Register for free webinar now.',
-            imageUrl: 'https://placehold.co/600x400/FF9800/FFFFFF?text=Business+Ad',
-            advertiser: 'Growth Accelerator',
-            datePosted: '1 week ago',
-            impressions: '15.7k',
-            engagement: '2.9%',
-            format: 'Carousel'
-          },
-          {
-            id: '4',
-            platform: 'Instagram',
-            title: 'Smart Home Devices',
-            description: 'Make your home smarter with our range of IoT devices. Special launch discount of 30% off.',
-            imageUrl: 'https://placehold.co/600x400/4CAF50/FFFFFF?text=Tech+Ad',
-            advertiser: 'Smart Living Tech',
-            datePosted: '3 days ago',
-            impressions: '32.1k',
-            engagement: '5.2%',
-            format: 'Collection'
-          },
-          {
-            id: '5',
-            platform: 'Facebook',
-            title: 'Organic Skincare Line',
-            description: 'Cruelty-free, organic ingredients for radiant skin. Try our bestselling serum today.',
-            imageUrl: 'https://placehold.co/600x400/E91E63/FFFFFF?text=Beauty+Ad',
-            advertiser: 'Pure Beauty Co.',
-            datePosted: '4 days ago',
-            impressions: '18.6k',
-            engagement: '4.1%',
-            format: 'Single Image'
-          },
-          {
-            id: '6',
-            platform: 'Instagram',
-            title: 'Language Learning App',
-            description: 'Learn a new language in just 10 minutes a day. Download now for a 7-day free trial.',
-            imageUrl: 'https://placehold.co/600x400/3F51B5/FFFFFF?text=App+Ad',
-            advertiser: 'LinguaLearn',
-            datePosted: '1 day ago',
-            impressions: '41.3k',
-            engagement: '6.7%',
-            format: 'Video'
-          }
-        ];
-        
-        setAds(sampleAds);
-        setIsLoading(false);
-      }, 800);
-    };
-    
-    loadAds();
-  }, []);
+  const filterOptions = {
+    "Platform": ["Facebook", "Instagram", "All"],
+    "Niche": ["Fashion", "Fitness", "Real Estate", "E-commerce", "Coaching", "Tech", "Beauty", "All"],
+    "Ad Format": ["Single Image", "Carousel", "Video", "Collection", "All"],
+    "Date Range": ["Last 24 hours", "Last 7 days", "Last 30 days", "Last 90 days", "All time"],
+    "Engagement": ["High (>5%)", "Medium (2-5%)", "Low (<2%)", "All"],
+    "Running Time": ["Active", "Inactive", "All"]
+  };
   
-  const handleSearch = () => {
+  // Load ads when component mounts or filters change
+  useEffect(() => {
+    loadAds();
+  }, [filters]);
+  
+  const loadAds = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedAds = await fetchMetaAds(searchQuery, filters);
+      setAds(fetchedAds);
+    } catch (error) {
+      console.error("Error fetching ads:", error);
+      toast({
+        title: "Error fetching ads",
+        description: "There was a problem loading the ads library.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleSearch = async () => {
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -216,24 +319,66 @@ const AdsLibrary: React.FC = () => {
       description: "Searching for ads related to '" + searchQuery + "'...",
     });
     
-    // Simulate search
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Search complete",
-        description: `Found ${ads.length} ads related to "${searchQuery}"`,
-      });
-    }, 800);
+    await loadAds();
   };
   
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter === activeFilter ? null : filter);
-    if (filter !== activeFilter) {
-      toast({
-        title: `Filter: ${filter}`,
-        description: `Applied filter to show ads by ${filter.toLowerCase()}`,
+  };
+  
+  const handleFilterOptionClick = (filter: string, option: string) => {
+    if (option === "All") {
+      // Remove this filter
+      const newFilters = { ...filters };
+      delete newFilters[filter.toLowerCase()];
+      setFilters(newFilters);
+    } else {
+      // Apply this filter
+      setFilters({
+        ...filters,
+        [filter.toLowerCase()]: option
       });
+    }
+    
+    toast({
+      title: `Filter: ${filter} - ${option}`,
+      description: option === "All" ? `Removed ${filter.toLowerCase()} filter` : `Applied filter to show ads by ${option}`,
+    });
+  };
+  
+  const loadMore = async () => {
+    setIsLoading(true);
+    toast({
+      title: "Loading more ads",
+      description: "Getting additional ads...",
+    });
+    
+    try {
+      // In a real implementation, this would fetch the next page of ads
+      const moreAds = await fetchMetaAds(searchQuery, filters);
+      
+      // Add more ads to the existing list
+      // For demo purposes, we're just duplicating the existing ads with new IDs
+      const newAds = moreAds.map(ad => ({
+        ...ad,
+        id: `new-${ad.id}-${Date.now()}`
+      }));
+      
+      setAds([...ads, ...newAds]);
+      
+      toast({
+        title: "More ads loaded",
+        description: `Loaded ${newAds.length} additional ads`,
+      });
+    } catch (error) {
+      console.error("Error loading more ads:", error);
+      toast({
+        title: "Error loading more ads",
+        description: "There was a problem loading additional ads.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -261,6 +406,7 @@ const AdsLibrary: React.FC = () => {
                   className="pl-10 pr-4 py-2 w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               
@@ -285,17 +431,15 @@ const AdsLibrary: React.FC = () => {
             </div>
             
             <div className="mt-4 flex flex-wrap gap-2">
-              {["Platform", "Niche", "Ad Format", "Date Range", "Engagement", "Running Time"].map((filter, index) => (
-                <Button 
-                  key={index}
-                  variant={activeFilter === filter ? "default" : "outline"} 
-                  size="sm" 
-                  className={`flex items-center ${activeFilter === filter ? 'bg-metamaster-primary' : ''}`}
+              {Object.keys(filterOptions).map((filter) => (
+                <FilterButton 
+                  key={filter}
+                  label={filter}
+                  isActive={activeFilter === filter || filters[filter.toLowerCase()] !== undefined}
                   onClick={() => handleFilterClick(filter)}
-                >
-                  {filter}
-                  <ChevronDown size={16} className="ml-2" />
-                </Button>
+                  options={filterOptions[filter as keyof typeof filterOptions]}
+                  onOptionClick={(option) => handleFilterOptionClick(filter, option)}
+                />
               ))}
             </div>
           </div>
@@ -335,7 +479,10 @@ const AdsLibrary: React.FC = () => {
                 </p>
                 <Button 
                   className="bg-metamaster-primary hover:bg-metamaster-secondary"
-                  onClick={() => setSearchQuery('fitness')}
+                  onClick={() => {
+                    setSearchQuery('fitness');
+                    handleSearch();
+                  }}
                 >
                   Try Sample Search
                 </Button>
@@ -356,10 +503,7 @@ const AdsLibrary: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="px-8"
-                onClick={() => toast({
-                  title: "Loading more ads",
-                  description: "Getting additional ads...",
-                })}
+                onClick={loadMore}
               >
                 Load More
               </Button>

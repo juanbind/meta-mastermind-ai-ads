@@ -1,19 +1,19 @@
 
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, Edit, Trash, Save, X, Link, Calendar, Video, Image } from 'lucide-react';
+import { X, ArrowUp, ArrowDown, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { ELEMENT_TYPES } from './FunnelElement';
-import { CanvasItem } from './FunnelCanvas';
+import TextFormatToolbar, { TextStyle } from './TextFormatToolbar';
 
-interface RenderedElementProps {
-  item: CanvasItem;
+interface FunnelRenderedElementProps {
+  item: {
+    id: string;
+    type: string;
+    content: string;
+    props?: Record<string, any>;
+  };
   isEditing: boolean;
   onEdit: () => void;
   onSave: (content: string, props?: Record<string, any>) => void;
@@ -21,10 +21,10 @@ interface RenderedElementProps {
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
-  device?: 'mobile' | 'tablet' | 'desktop';
+  device: 'mobile' | 'tablet' | 'desktop';
 }
 
-const FunnelRenderedElement: React.FC<RenderedElementProps> = ({
+const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   item,
   isEditing,
   onEdit,
@@ -33,554 +33,366 @@ const FunnelRenderedElement: React.FC<RenderedElementProps> = ({
   onRemove,
   onMoveUp,
   onMoveDown,
-  device = 'mobile',
+  device,
 }) => {
-  const [editingContent, setEditingContent] = useState(item.content);
-  const [editingProps, setEditingProps] = useState(item.props || {});
-  const [date, setDate] = useState<Date | undefined>(undefined);
-
+  const [editedContent, setEditedContent] = useState(item.content);
+  const [localProps, setLocalProps] = useState(item.props || {});
+  const [textStyle, setTextStyle] = useState<TextStyle>({
+    fontFamily: localProps?.style?.fontFamily || 'Arial, Helvetica, sans-serif',
+    fontSize: localProps?.style?.fontSize || '16px',
+    fontWeight: localProps?.style?.fontWeight || 'normal',
+    fontStyle: localProps?.style?.fontStyle || 'normal',
+    textDecoration: localProps?.style?.textDecoration || 'none',
+    color: localProps?.style?.color || '#000000',
+    textAlign: localProps?.style?.textAlign || 'left',
+  });
+  
+  const handleStyleChange = (newStyle: Partial<TextStyle>) => {
+    const updatedStyle = { ...textStyle, ...newStyle };
+    setTextStyle(updatedStyle);
+    
+    // Update the localProps with the new style
+    const updatedProps = {
+      ...localProps,
+      style: updatedStyle
+    };
+    setLocalProps(updatedProps);
+  };
+  
   const handleSave = () => {
-    onSave(editingContent, editingProps);
+    onSave(editedContent, localProps);
   };
 
-  const updateProps = (key: string, value: any) => {
-    setEditingProps({ ...editingProps, [key]: value });
+  // Apply the defined styles to the text elements
+  const getStyledContent = () => {
+    const style = localProps?.style || {};
+    
+    return (
+      <div style={style}>
+        {item.content}
+      </div>
+    );
   };
 
+  // Renders the element based on its type
   const renderElement = () => {
-    const deviceClass = device === 'mobile' ? 'text-sm' : '';
-
     switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return <h2 className={`text-2xl font-bold ${deviceClass}`}>{item.content}</h2>;
-        
+        return <h2 style={textStyle}>{item.content}</h2>;
+      
       case ELEMENT_TYPES.PARAGRAPH:
-        return <p className={`text-metamaster-gray-700 ${deviceClass}`}>{item.content}</p>;
-        
+        return <p style={textStyle}>{item.content}</p>;
+      
       case ELEMENT_TYPES.IMAGE:
         return (
-          <div className="relative">
-            <img
-              src={item.props?.src || 'https://placehold.co/600x400?text=Image'}
-              alt={item.props?.alt || 'Funnel image'}
-              className="w-full h-auto rounded"
-            />
-            {item.content && <p className={`text-sm text-center mt-2 ${deviceClass}`}>{item.content}</p>}
-          </div>
+          <img 
+            src={item.props?.src || 'https://placehold.co/600x400?text=Image'} 
+            alt={item.props?.alt || 'Image'} 
+            className="w-full" 
+          />
         );
-        
+      
       case ELEMENT_TYPES.VIDEO:
         return (
-          <div className="relative">
-            <div className="aspect-w-16 aspect-h-9 bg-black rounded overflow-hidden">
-              {item.props?.src ? (
-                <iframe
-                  src={item.props.src}
-                  title={item.content || 'Video'}
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                  <img 
-                    src={item.props?.placeholder || 'https://placehold.co/600x400/2A2A2A/FFFFFF?text=Video+Placeholder'} 
-                    alt="Video placeholder"
-                    className="max-w-full max-h-full"
-                  />
-                </div>
-              )}
-            </div>
-            {item.content && <p className={`text-sm text-center mt-2 ${deviceClass}`}>{item.content}</p>}
+          <div className="relative aspect-video w-full bg-gray-100 flex items-center justify-center">
+            {item.props?.src ? (
+              <iframe 
+                src={item.props.src} 
+                className="w-full h-full"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <div className="text-center p-4">
+                <p>Video Placeholder</p>
+                <p className="text-sm text-gray-500">Edit to add a video URL</p>
+              </div>
+            )}
           </div>
         );
-        
+      
       case ELEMENT_TYPES.FORM:
         return (
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className={`font-medium mb-2 ${deviceClass}`}>{item.content || 'Contact Form'}</h3>
+          <div className="border border-gray-200 p-4 rounded">
+            <h3 className="mb-2" style={textStyle}>{item.content}</h3>
             <div className="space-y-3">
-              {item.props?.fields?.includes('name') && (
-                <Input type="text" placeholder="Name" />
-              )}
-              {item.props?.fields?.includes('email') && (
-                <Input type="email" placeholder="Email" />
-              )}
-              <Button className="w-full bg-metamaster-primary hover:bg-metamaster-secondary">
+              {(item.props?.fields || ['name', 'email']).map((field: string) => (
+                <div key={field} className="space-y-1">
+                  <label className="text-sm font-medium capitalize">{field}</label>
+                  <input 
+                    type={field === 'email' ? 'email' : 'text'} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded" 
+                    placeholder={`Enter ${field}`} 
+                    disabled
+                  />
+                </div>
+              ))}
+              <button className="w-full bg-blue-600 text-white py-2 rounded mt-2">
                 {item.props?.buttonText || 'Submit'}
-              </Button>
+              </button>
             </div>
           </div>
         );
-        
+      
       case ELEMENT_TYPES.BULLET_LIST:
         return (
-          <ul className={`list-disc pl-5 ${deviceClass}`}>
+          <ul className="list-disc pl-5 space-y-1" style={textStyle}>
             {item.content.split('\n').map((line, i) => (
               <li key={i}>{line}</li>
             ))}
           </ul>
         );
-        
+      
       case ELEMENT_TYPES.BUTTON:
         return (
-          <div className="text-center">
-            <Button 
-              className="bg-metamaster-primary hover:bg-metamaster-secondary"
-              onClick={() => item.props?.url && window.open(item.props.url, item.props?.external ? '_blank' : '_self')}
-            >
-              {item.content}
-            </Button>
-          </div>
+          <button 
+            className={`px-4 py-2 rounded ${
+              item.props?.variant === 'outline' 
+                ? 'border border-blue-600 text-blue-600' 
+                : 'bg-blue-600 text-white'
+            }`}
+            style={textStyle}
+          >
+            {item.content}
+          </button>
         );
-        
+      
       case ELEMENT_TYPES.INPUT:
         return (
-          <div className="space-y-2">
-            <label className={`block text-sm font-medium ${deviceClass}`}>{item.content}</label>
-            <Input 
-              placeholder={item.props?.placeholder || `Enter your ${item.content.toLowerCase()}`} 
-              type={item.props?.type || 'text'}
-              required={item.props?.required}
+          <div className="space-y-1">
+            <label className="text-sm font-medium" style={textStyle}>{item.content}</label>
+            <input 
+              type={item.props?.type || 'text'} 
+              className="w-full px-3 py-2 border border-gray-300 rounded" 
+              placeholder={item.props?.placeholder || `Enter ${item.content}`} 
+              disabled
             />
           </div>
         );
-        
+
       case ELEMENT_TYPES.DROPDOWN:
         return (
-          <div className="space-y-2">
-            <label className={`block text-sm font-medium ${deviceClass}`}>{item.content}</label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder={item.props?.placeholder || "Select an option"} />
-              </SelectTrigger>
-              <SelectContent>
-                {item.content.split('\n').map((option, idx) => (
-                  <SelectItem key={idx} value={option.toLowerCase().replace(/\s+/g, '-')}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-1">
+            <label className="text-sm font-medium" style={textStyle}>{item.content}</label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded" disabled>
+              <option>{item.props?.placeholder || 'Select an option'}</option>
+              {item.content.split('\n').map((option, i) => (
+                <option key={i} value={option}>{option}</option>
+              ))}
+            </select>
           </div>
         );
-        
-      case ELEMENT_TYPES.CALENDAR:
-        return (
-          <div className="space-y-2">
-            <label className={`block text-sm font-medium ${deviceClass}`}>{item.content}</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left">
-                  {date ? format(date, 'PPP') : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <CalendarComponent
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        );
-        
+      
       case ELEMENT_TYPES.DIVIDER:
         return (
-          <hr 
-            style={{ 
-              borderStyle: item.props?.style || 'solid', 
-              borderColor: item.props?.color || '#e2e8f0',
-              borderWidth: `${item.props?.height || 1}px 0 0 0`,
-              margin: '1rem 0'
-            }} 
-          />
+          <hr className="my-4 border-t" style={{ 
+            borderColor: item.props?.color || '#e2e8f0',
+            borderTopWidth: `${item.props?.height || 1}px`,
+            borderStyle: item.props?.style || 'solid'
+          }} />
         );
-        
+      
       case ELEMENT_TYPES.SPACING:
-        return (
-          <div style={{ height: `${item.props?.height || 20}px` }}></div>
-        );
-        
+        return <div style={{ height: `${item.props?.height || 20}px` }}></div>;
+      
       case ELEMENT_TYPES.ICON:
         return (
           <div className="flex justify-center">
-            <span className={`text-[${item.props?.color || '#3B82F6'}]`} style={{ fontSize: `${item.props?.size || 24}px` }}>
-              {/* Use a simple unicode star as fallback */}
-              ★
-            </span>
-            {item.content && <p className="text-sm text-center ml-2">{item.content}</p>}
+            <div 
+              className="text-blue-500" 
+              style={{ 
+                fontSize: `${item.props?.size || 24}px`,
+                color: item.props?.color || '#3B82F6'
+              }}
+            >
+              {item.props?.name || '★'}
+            </div>
           </div>
         );
-        
+      
       default:
-        return <div>Unknown element type</div>;
+        return <div>{item.content}</div>;
     }
   };
 
-  const renderEditForm = () => {
-    const commonFields = (
-      <>
-        {item.type !== ELEMENT_TYPES.DIVIDER && item.type !== ELEMENT_TYPES.SPACING && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Content</label>
-            {item.type === ELEMENT_TYPES.BULLET_LIST || item.type === ELEMENT_TYPES.PARAGRAPH || item.type === ELEMENT_TYPES.DROPDOWN ? (
-              <Textarea
-                value={editingContent}
-                onChange={(e) => setEditingContent(e.target.value)}
-                placeholder={item.type === ELEMENT_TYPES.BULLET_LIST ? "Enter items, one per line" : "Enter text"}
-                rows={5}
-                className="w-full"
-              />
-            ) : (
-              <Input
-                value={editingContent}
-                onChange={(e) => setEditingContent(e.target.value)}
-                placeholder="Enter content"
-              />
-            )}
-          </div>
-        )}
-        
-        {/* Element-specific settings */}
-        {renderElementSettings()}
-      </>
-    );
-
-    return (
-      <div className="space-y-4">
-        {commonFields}
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" size="sm" onClick={onCancel}>
-            <X size={16} className="mr-1" /> Cancel
-          </Button>
-          <Button size="sm" onClick={handleSave}>
-            <Save size={16} className="mr-1" /> Save
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
-  const renderElementSettings = () => {
+  // Editor content based on element type
+  const renderEditor = () => {
     switch (item.type) {
-      case ELEMENT_TYPES.IMAGE:
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Image URL</label>
-              <Input
-                value={editingProps.src || ''}
-                onChange={(e) => updateProps('src', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Alt Text</label>
-              <Input
-                value={editingProps.alt || ''}
-                onChange={(e) => updateProps('alt', e.target.value)}
-                placeholder="Image description"
-              />
-            </div>
-          </>
-        );
-        
-      case ELEMENT_TYPES.VIDEO:
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Video URL (YouTube, Vimeo)</label>
-              <Input
-                value={editingProps.src || ''}
-                onChange={(e) => updateProps('src', e.target.value)}
-                placeholder="https://www.youtube.com/embed/VIDEO_ID"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                For YouTube: use embed URL (https://www.youtube.com/embed/VIDEO_ID)
-              </p>
-            </div>
-          </>
-        );
-        
+      case ELEMENT_TYPES.HEADLINE:
+      case ELEMENT_TYPES.PARAGRAPH:
       case ELEMENT_TYPES.BUTTON:
         return (
           <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Button Action</label>
-              <Select
-                value={editingProps.action || 'link'}
-                onValueChange={(value) => updateProps('action', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select action" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="link">External Link</SelectItem>
-                  <SelectItem value="scroll">Scroll to Section</SelectItem>
-                  <SelectItem value="next">Next Step</SelectItem>
-                  <SelectItem value="submit">Submit Form</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {editingProps.action === 'link' && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">URL</label>
-                  <Input
-                    value={editingProps.url || ''}
-                    onChange={(e) => updateProps('url', e.target.value)}
-                    placeholder="https://example.com"
-                  />
-                </div>
-                <div className="flex items-center mb-4">
-                  <Checkbox
-                    id="external"
-                    checked={!!editingProps.external}
-                    onCheckedChange={(checked) => updateProps('external', checked)}
-                  />
-                  <label htmlFor="external" className="ml-2 text-sm">
-                    Open in new tab
-                  </label>
-                </div>
-              </>
-            )}
-            
-            {editingProps.action === 'scroll' && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Section ID</label>
-                <Input
-                  value={editingProps.targetId || ''}
-                  onChange={(e) => updateProps('targetId', e.target.value)}
-                  placeholder="section-id"
-                />
-              </div>
-            )}
+            <TextFormatToolbar 
+              style={textStyle} 
+              onStyleChange={handleStyleChange}
+            />
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              className="w-full mt-2"
+              rows={item.type === ELEMENT_TYPES.PARAGRAPH ? 4 : 2}
+            />
           </>
         );
-        
-      case ELEMENT_TYPES.FORM:
+      
+      case ELEMENT_TYPES.IMAGE:
         return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Form Fields</label>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <Checkbox
-                    id="name-field"
-                    checked={(editingProps.fields || []).includes('name')}
-                    onCheckedChange={(checked) => {
-                      const fields = [...(editingProps.fields || [])];
-                      if (checked && !fields.includes('name')) {
-                        fields.push('name');
-                      } else if (!checked) {
-                        const index = fields.indexOf('name');
-                        if (index !== -1) fields.splice(index, 1);
-                      }
-                      updateProps('fields', fields);
-                    }}
-                  />
-                  <label htmlFor="name-field" className="ml-2 text-sm">Name</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox
-                    id="email-field"
-                    checked={(editingProps.fields || []).includes('email')}
-                    onCheckedChange={(checked) => {
-                      const fields = [...(editingProps.fields || [])];
-                      if (checked && !fields.includes('email')) {
-                        fields.push('email');
-                      } else if (!checked) {
-                        const index = fields.indexOf('email');
-                        if (index !== -1) fields.splice(index, 1);
-                      }
-                      updateProps('fields', fields);
-                    }}
-                  />
-                  <label htmlFor="email-field" className="ml-2 text-sm">Email</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox
-                    id="phone-field"
-                    checked={(editingProps.fields || []).includes('phone')}
-                    onCheckedChange={(checked) => {
-                      const fields = [...(editingProps.fields || [])];
-                      if (checked && !fields.includes('phone')) {
-                        fields.push('phone');
-                      } else if (!checked) {
-                        const index = fields.indexOf('phone');
-                        if (index !== -1) fields.splice(index, 1);
-                      }
-                      updateProps('fields', fields);
-                    }}
-                  />
-                  <label htmlFor="phone-field" className="ml-2 text-sm">Phone</label>
-                </div>
-                <div className="flex items-center">
-                  <Checkbox
-                    id="message-field"
-                    checked={(editingProps.fields || []).includes('message')}
-                    onCheckedChange={(checked) => {
-                      const fields = [...(editingProps.fields || [])];
-                      if (checked && !fields.includes('message')) {
-                        fields.push('message');
-                      } else if (!checked) {
-                        const index = fields.indexOf('message');
-                        if (index !== -1) fields.splice(index, 1);
-                      }
-                      updateProps('fields', fields);
-                    }}
-                  />
-                  <label htmlFor="message-field" className="ml-2 text-sm">Message</label>
-                </div>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Button Text</label>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Image URL</label>
               <Input
-                value={editingProps.buttonText || 'Submit'}
-                onChange={(e) => updateProps('buttonText', e.target.value)}
-                placeholder="Submit"
+                type="text"
+                value={localProps.src || ''}
+                onChange={(e) => setLocalProps({ ...localProps, src: e.target.value })}
+                placeholder="https://example.com/image.jpg"
               />
             </div>
-          </>
-        );
-        
-      case ELEMENT_TYPES.INPUT:
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Input Type</label>
-              <Select
-                value={editingProps.type || 'text'}
-                onValueChange={(value) => updateProps('type', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select input type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="text">Text</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="tel">Phone</SelectItem>
-                  <SelectItem value="number">Number</SelectItem>
-                  <SelectItem value="password">Password</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Placeholder</label>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Alt Text</label>
               <Input
-                value={editingProps.placeholder || ''}
-                onChange={(e) => updateProps('placeholder', e.target.value)}
-                placeholder="Enter placeholder text"
+                type="text"
+                value={localProps.alt || ''}
+                onChange={(e) => setLocalProps({ ...localProps, alt: e.target.value })}
+                placeholder="Image description"
               />
             </div>
-            <div className="flex items-center mb-4">
-              <Checkbox
-                id="required"
-                checked={!!editingProps.required}
-                onCheckedChange={(checked) => updateProps('required', checked)}
-              />
-              <label htmlFor="required" className="ml-2 text-sm">Required field</label>
-            </div>
-          </>
+          </div>
         );
-        
-      case ELEMENT_TYPES.DIVIDER:
+      
+      case ELEMENT_TYPES.VIDEO:
         return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Style</label>
-              <Select
-                value={editingProps.style || 'solid'}
-                onValueChange={(value) => updateProps('style', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select divider style" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="solid">Solid</SelectItem>
-                  <SelectItem value="dashed">Dashed</SelectItem>
-                  <SelectItem value="dotted">Dotted</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Thickness (px)</label>
-              <Input
-                type="number"
-                value={editingProps.height || 1}
-                onChange={(e) => updateProps('height', parseInt(e.target.value))}
-                min={1}
-                max={10}
-              />
-            </div>
-          </>
-        );
-        
-      case ELEMENT_TYPES.SPACING:
-        return (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Height (px)</label>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Video URL (YouTube or Vimeo)</label>
             <Input
-              type="number"
-              value={editingProps.height || 20}
-              onChange={(e) => updateProps('height', parseInt(e.target.value))}
-              min={5}
-              max={200}
+              type="text"
+              value={localProps.src || ''}
+              onChange={(e) => setLocalProps({ ...localProps, src: e.target.value })}
+              placeholder="https://www.youtube.com/embed/video_id"
             />
           </div>
         );
-        
+      
+      case ELEMENT_TYPES.FORM:
+        return (
+          <div className="space-y-3">
+            <TextFormatToolbar 
+              style={textStyle} 
+              onStyleChange={handleStyleChange}
+            />
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Form Title</label>
+              <Input
+                type="text"
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+                placeholder="Contact Form"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Form Fields (one per line)</label>
+              <Textarea
+                value={(localProps.fields || []).join('\n')}
+                onChange={(e) => {
+                  const fields = e.target.value.split('\n').filter(f => f.trim() !== '');
+                  setLocalProps({ ...localProps, fields });
+                }}
+                placeholder="name\nemail\nphone"
+                rows={4}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Button Text</label>
+              <Input
+                type="text"
+                value={localProps.buttonText || ''}
+                onChange={(e) => setLocalProps({ ...localProps, buttonText: e.target.value })}
+                placeholder="Submit"
+              />
+            </div>
+          </div>
+        );
+      
+      case ELEMENT_TYPES.BULLET_LIST:
+        return (
+          <>
+            <TextFormatToolbar 
+              style={textStyle} 
+              onStyleChange={handleStyleChange}
+            />
+            <div className="space-y-1 mt-2">
+              <label className="text-sm font-medium">List Items (one per line)</label>
+              <Textarea
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+                placeholder="Item 1\nItem 2\nItem 3"
+                rows={4}
+              />
+            </div>
+          </>
+        );
+      
       default:
-        return null;
+        return (
+          <Textarea
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            className="w-full"
+            rows={3}
+          />
+        );
     }
   };
 
   return (
-    <div className="group relative border border-gray-200 hover:border-metamaster-primary rounded-lg p-4">
+    <div 
+      className={`relative border-2 rounded-md transition-all ${
+        isEditing ? 'border-blue-500 shadow-lg' : 'border-transparent hover:border-gray-300'
+      }`}
+    >
+      {/* Editing interface */}
       {isEditing ? (
-        <div className="space-y-4">
-          {renderEditForm()}
+        <div className="p-4 bg-gray-50 rounded-md">
+          <div className="mb-3 flex justify-between items-center">
+            <h4 className="font-medium capitalize">Edit {item.type}</h4>
+            <Button variant="ghost" size="sm" onClick={onCancel}>
+              <X size={18} />
+            </Button>
+          </div>
+          
+          {renderEditor()}
+          
+          <div className="flex justify-between mt-4">
+            <Button variant="outline" size="sm" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>
+              Save Changes
+            </Button>
+          </div>
         </div>
       ) : (
         <>
-          {renderElement()}
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 bg-white"
-              onClick={onMoveUp}
-            >
+          {/* Element display */}
+          <div 
+            className="p-4 cursor-pointer" 
+            onClick={onEdit}
+          >
+            {renderElement()}
+          </div>
+          
+          {/* Element controls (visible on hover) */}
+          <div className="absolute -top-3 -right-3 hidden group-hover:flex space-x-1 bg-white shadow-md border border-gray-200 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onMoveUp}>
               <ArrowUp size={14} />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 bg-white"
-              onClick={onMoveDown}
-            >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onMoveDown}>
               <ArrowDown size={14} />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 bg-white"
-              onClick={onEdit}
-            >
-              <Edit size={14} />
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}>
+              <Settings size={14} />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7 bg-white text-red-500 hover:text-red-700 hover:bg-red-50"
-              onClick={onRemove}
-            >
-              <Trash size={14} />
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500" onClick={onRemove}>
+              <Trash2 size={14} />
             </Button>
           </div>
         </>

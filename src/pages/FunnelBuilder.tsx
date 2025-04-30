@@ -294,13 +294,19 @@ const FunnelBuilder: React.FC = () => {
 
     setIsLoading(true);
     try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+      
       const { data, error } = await supabase
         .from('funnels')
         .insert({
           name: newFunnelName,
           content: JSON.stringify([]),
           is_published: false,
-          user_id: (await supabase.auth.getUser()).data.user?.id || 'anonymous'
+          user_id: userId
         })
         .select()
         .single();
@@ -372,11 +378,13 @@ const FunnelBuilder: React.FC = () => {
     
     setIsLoading(true);
     try {
+      const currentDate = new Date().toISOString();
+      
       const { error } = await supabase
         .from('funnels')
         .update({ 
           content: JSON.stringify(items),
-          updated_at: new Date()
+          updated_at: currentDate
         })
         .eq('id', activeFunnel.id);
         
@@ -386,7 +394,7 @@ const FunnelBuilder: React.FC = () => {
       setActiveFunnel({
         ...activeFunnel,
         content: JSON.stringify(items),
-        updated_at: new Date().toISOString()
+        updated_at: currentDate
       });
       
       toast({
@@ -411,13 +419,14 @@ const FunnelBuilder: React.FC = () => {
     setIsLoading(true);
     try {
       const publishedUrl = activeFunnel.published_url || `funnel-${activeFunnel.id}`;
+      const currentDate = new Date().toISOString();
       
       const { error } = await supabase
         .from('funnels')
         .update({ 
           is_published: true,
           published_url: publishedUrl,
-          updated_at: new Date()
+          updated_at: currentDate
         })
         .eq('id', activeFunnel.id);
         
@@ -428,7 +437,7 @@ const FunnelBuilder: React.FC = () => {
         ...activeFunnel,
         is_published: true,
         published_url: publishedUrl,
-        updated_at: new Date().toISOString()
+        updated_at: currentDate
       });
       
       toast({
@@ -491,12 +500,19 @@ const FunnelBuilder: React.FC = () => {
 
   const createFunnelFromAI = async (name: string, content: string) => {
     try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+      
       const { data, error } = await supabase
         .from('funnels')
         .insert({
           name,
           content,
-          is_published: false
+          is_published: false,
+          user_id: userId
         })
         .select()
         .single();
