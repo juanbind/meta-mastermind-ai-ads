@@ -19,7 +19,14 @@ import {
   CircleDot,
   SeparatorHorizontal,
   Zap,
-  Trash
+  Trash,
+  LayoutTemplate,
+  Grid,
+  Star,
+  Clock,
+  Shield,
+  Award,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
@@ -33,6 +40,7 @@ import FunnelElement from '@/components/funnel/FunnelElement';
 import FunnelCanvas, { CanvasItem } from '@/components/funnel/FunnelCanvas';
 import { ELEMENT_TYPES } from '@/components/funnel/FunnelElement';
 import { supabase, FunnelData } from '@/lib/supabase';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 interface Template {
   id: string;
@@ -678,73 +686,142 @@ const FunnelBuilder: React.FC = () => {
                   <div className="space-y-6">
                     <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
                       <h3 className="font-bold text-lg mb-4">Elements</h3>
-                      <div className="space-y-3">
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.HEADLINE} 
-                          icon={<Type size={18} />} 
-                          label="Headline" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.PARAGRAPH} 
-                          icon={<Type size={18} />} 
-                          label="Paragraph" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.IMAGE} 
-                          icon={<Image size={18} />} 
-                          label="Image" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.VIDEO} 
-                          icon={<Video size={18} />} 
-                          label="Video" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.FORM} 
-                          icon={<FormInput size={18} />} 
-                          label="Form" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.BULLET_LIST} 
-                          icon={<ListIcon size={18} />} 
-                          label="Bullet List" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.BUTTON} 
-                          icon={<MoveHorizontal size={18} />} 
-                          label="Button" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.INPUT} 
-                          icon={<FormInput size={18} />} 
-                          label="Input Field" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.DROPDOWN} 
-                          icon={<ListIcon size={18} />} 
-                          label="Dropdown" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.CALENDAR} 
-                          icon={<Calendar size={18} />} 
-                          label="Calendar" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.DIVIDER} 
-                          icon={<SeparatorHorizontal size={18} />} 
-                          label="Divider" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.SPACING} 
-                          icon={<MoveDiagonal size={18} />} 
-                          label="Spacing" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.ICON} 
-                          icon={<CircleDot size={18} />} 
-                          label="Icon" 
-                        />
-                      </div>
+                      
+                      <Accordion type="single" collapsible defaultValue="content-blocks" className="w-full">
+                        <AccordionItem value="content-blocks">
+                          <AccordionTrigger>Content Blocks</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.HERO_SECTION} 
+                                icon={<LayoutTemplate size={18} />} 
+                                label="Hero Section" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FEATURES_BLOCK} 
+                                icon={<Grid size={18} />} 
+                                label="Features Block" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.TESTIMONIAL_BLOCK} 
+                                icon={<MessageSquare size={18} />} 
+                                label="Testimonials" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.CTA_BLOCK} 
+                                icon={<ArrowRight size={18} />} 
+                                label="Call to Action" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FAQ_BLOCK} 
+                                icon={<MessageSquare size={18} />} 
+                                label="FAQ Accordion" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.PRICING_BLOCK} 
+                                icon={<CircleDot size={18} />} 
+                                label="Pricing Block" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      
+                        <AccordionItem value="basic-elements">
+                          <AccordionTrigger>Basic Elements</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.HEADLINE} 
+                                icon={<Type size={18} />} 
+                                label="Headline" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.PARAGRAPH} 
+                                icon={<Type size={18} />} 
+                                label="Paragraph" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.IMAGE} 
+                                icon={<Image size={18} />} 
+                                label="Image" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.VIDEO} 
+                                icon={<Video size={18} />} 
+                                label="Video" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FORM} 
+                                icon={<FormInput size={18} />} 
+                                label="Form" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.BULLET_LIST} 
+                                icon={<ListIcon size={18} />} 
+                                label="Bullet List" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.BUTTON} 
+                                icon={<MoveHorizontal size={18} />} 
+                                label="Button" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.INPUT} 
+                                icon={<FormInput size={18} />} 
+                                label="Input Field" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.DROPDOWN} 
+                                icon={<ListIcon size={18} />} 
+                                label="Dropdown" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.CALENDAR} 
+                                icon={<Calendar size={18} />} 
+                                label="Calendar" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.DIVIDER} 
+                                icon={<SeparatorHorizontal size={18} />} 
+                                label="Divider" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.SPACING} 
+                                icon={<MoveDiagonal size={18} />} 
+                                label="Spacing" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.ICON} 
+                                icon={<CircleDot size={18} />} 
+                                label="Icon" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      
+                        <AccordionItem value="conversion-elements">
+                          <AccordionTrigger>Conversion Elements</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.SOCIAL_PROOF} 
+                                icon={<Star size={18} />} 
+                                label="Social Proof" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.COUNTDOWN} 
+                                icon={<Clock size={18} />} 
+                                label="Countdown Timer" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.TRUST_BADGES} 
+                                icon={<Shield size={18} />} 
+                                label="Trust Badges" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     </div>
                     
                     <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">

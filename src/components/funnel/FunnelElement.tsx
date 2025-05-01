@@ -23,6 +23,20 @@ export const ELEMENT_TYPES = {
   DIVIDER: 'divider',
   ICON: 'icon',
   SPACING: 'spacing',
+  
+  // New content block types
+  HERO_SECTION: 'hero-section',
+  FEATURES_BLOCK: 'features-block',
+  TESTIMONIAL_BLOCK: 'testimonial-block',
+  CTA_BLOCK: 'cta-block',
+  FAQ_BLOCK: 'faq-block',
+  PRICING_BLOCK: 'pricing-block',
+  CONTACT_BLOCK: 'contact-block',
+  
+  // Conversion elements
+  SOCIAL_PROOF: 'social-proof',
+  COUNTDOWN: 'countdown',
+  TRUST_BADGES: 'trust-badges',
 };
 
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {

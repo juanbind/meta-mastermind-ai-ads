@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { LayoutGrid, AlertCircle, Smartphone, Monitor, Tablet } from 'lucide-react';
@@ -126,6 +127,141 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
         return '';
       case ELEMENT_TYPES.ICON:
         return 'star';
+      
+      // New content block defaults
+      case ELEMENT_TYPES.HERO_SECTION:
+        return JSON.stringify({
+          headline: 'Powerful Headline That Converts',
+          subheadline: 'Supporting text that explains your offer and removes objections',
+          buttonText: 'Get Started Now',
+          trustBadges: ['Trusted by 10,000+ customers', 'Satisfaction Guaranteed', 'Award-winning Support']
+        });
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+        return JSON.stringify({
+          headline: 'Why Choose Our Solution',
+          features: [
+            {
+              icon: 'check',
+              title: 'Feature One',
+              description: 'Description of how this feature benefits the customer.'
+            },
+            {
+              icon: 'star',
+              title: 'Feature Two',
+              description: 'Description of how this feature benefits the customer.'
+            },
+            {
+              icon: 'heart',
+              title: 'Feature Three',
+              description: 'Description of how this feature benefits the customer.'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+        return JSON.stringify({
+          testimonials: [
+            {
+              quote: 'This product completely transformed how we operate. The results were immediate and impressive.',
+              name: 'Jane Smith',
+              role: 'CEO, Company Name',
+              rating: 5
+            },
+            {
+              quote: 'I was skeptical at first, but after using it for a month, I can't imagine going back.',
+              name: 'John Doe',
+              role: 'Marketing Director',
+              rating: 5
+            }
+          ]
+        });
+      case ELEMENT_TYPES.CTA_BLOCK:
+        return JSON.stringify({
+          headline: 'Ready to Get Started?',
+          subheadline: 'Join thousands of satisfied customers today.',
+          buttonText: 'Sign Up Now',
+          hasCountdown: false,
+          countdownDate: ''
+        });
+      case ELEMENT_TYPES.FAQ_BLOCK:
+        return JSON.stringify({
+          headline: 'Frequently Asked Questions',
+          faqs: [
+            {
+              question: 'How does your product work?',
+              answer: 'Our product works by implementing cutting-edge technology to solve your specific problems efficiently.'
+            },
+            {
+              question: 'What kind of support do you offer?',
+              answer: 'We offer 24/7 customer support via email, live chat, and phone.'
+            },
+            {
+              question: 'How long does implementation take?',
+              answer: 'Most customers are up and running within 24 hours of signing up.'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.PRICING_BLOCK:
+        return JSON.stringify({
+          headline: 'Simple, Transparent Pricing',
+          subheadline: 'No hidden fees or long-term contracts.',
+          isYearly: false,
+          plans: [
+            {
+              name: 'Basic',
+              monthlyPrice: 9.99,
+              yearlyPrice: 99,
+              description: 'Perfect for individuals',
+              features: ['Feature 1', 'Feature 2', 'Feature 3'],
+              isPopular: false,
+              buttonText: 'Choose Basic'
+            },
+            {
+              name: 'Pro',
+              monthlyPrice: 29.99,
+              yearlyPrice: 299,
+              description: 'Ideal for small teams',
+              features: ['All Basic Features', 'Feature 4', 'Feature 5', 'Feature 6'],
+              isPopular: true,
+              buttonText: 'Choose Pro'
+            },
+            {
+              name: 'Enterprise',
+              monthlyPrice: 99.99,
+              yearlyPrice: 999,
+              description: 'For growing organizations',
+              features: ['All Pro Features', 'Feature 7', 'Feature 8', 'Feature 9', 'Feature 10'],
+              isPopular: false,
+              buttonText: 'Choose Enterprise'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.SOCIAL_PROOF:
+        return JSON.stringify({
+          type: 'counter', // 'counter', 'logos', 'reviews', 'activity'
+          headline: 'Trusted by Thousands',
+          stats: [
+            { label: 'Customers', value: '10,000+' },
+            { label: 'Countries', value: '50+' },
+            { label: 'Satisfaction', value: '99%' }
+          ],
+          logos: []
+        });
+      case ELEMENT_TYPES.COUNTDOWN:
+        return JSON.stringify({
+          type: 'fixed', // 'fixed' or 'evergreen'
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          evergreeDuration: 3600, // 1 hour in seconds
+          message: 'Special Offer Ends In:',
+          expiredMessage: 'Offer Expired'
+        });
+      case ELEMENT_TYPES.TRUST_BADGES:
+        return JSON.stringify({
+          badges: [
+            { type: 'guarantee', text: '30-Day Money Back Guarantee' },
+            { type: 'security', text: 'Secure Payment' },
+            { type: 'certification', text: 'GDPR Compliant' },
+          ]
+        });
       default:
         return '';
     }
@@ -153,6 +289,111 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
         return { height: 20 };
       case ELEMENT_TYPES.ICON:
         return { name: 'star', color: '#3B82F6', size: 24 };
+      
+      // New content block props
+      case ELEMENT_TYPES.HERO_SECTION:
+        return { 
+          bgType: 'color', // 'color', 'image', 'video'
+          bgColor: '#f9fafb',
+          bgImage: '',
+          bgVideo: '',
+          layout: 'center', // 'left', 'center', 'right'
+          style: {
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            headingSize: '48px',
+            subheadingSize: '20px',
+            color: '#111827',
+            buttonColor: '#3B82F6',
+            buttonTextColor: '#ffffff'
+          }
+        };
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+        return { 
+          layout: 'grid', // 'grid', 'alternating'
+          columns: 3, // 2, 3, 4
+          style: {
+            bgColor: '#ffffff',
+            iconColor: '#3B82F6',
+            headingColor: '#111827',
+            textColor: '#4b5563'
+          }
+        };
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+        return { 
+          layout: 'grid', // 'grid', 'slider'
+          showPhotos: true,
+          showRatings: true,
+          style: {
+            bgColor: '#f9fafb',
+            textColor: '#111827',
+            quoteColor: '#6b7280',
+            accentColor: '#3B82F6'
+          }
+        };
+      case ELEMENT_TYPES.CTA_BLOCK:
+        return { 
+          bgType: 'color', // 'color', 'image', 'gradient'
+          bgColor: '#3B82F6',
+          bgImage: '',
+          gradient: 'linear-gradient(90deg, #3B82F6, #6366F1)',
+          style: {
+            textColor: '#ffffff',
+            buttonColor: '#ffffff',
+            buttonTextColor: '#3B82F6',
+            padding: '60px'
+          }
+        };
+      case ELEMENT_TYPES.FAQ_BLOCK:
+        return { 
+          layout: 'accordion', // 'accordion', 'grid'
+          enableSearch: false,
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            borderColor: '#e5e7eb'
+          }
+        };
+      case ELEMENT_TYPES.PRICING_BLOCK:
+        return { 
+          layout: 'horizontal', // 'horizontal', 'vertical'
+          showToggle: true,
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            popularHighlightColor: '#eef2ff',
+            borderColor: '#e5e7eb'
+          }
+        };
+      case ELEMENT_TYPES.SOCIAL_PROOF:
+        return { 
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            logoOpacity: 0.8
+          }
+        };
+      case ELEMENT_TYPES.COUNTDOWN:
+        return { 
+          style: {
+            bgColor: '#f9fafb',
+            textColor: '#111827',
+            accentColor: '#ef4444',
+            timerColor: '#ffffff',
+            timerBgColor: '#ef4444'
+          }
+        };
+      case ELEMENT_TYPES.TRUST_BADGES:
+        return { 
+          layout: 'horizontal', // 'horizontal', 'grid'
+          style: {
+            bgColor: '#ffffff',
+            iconColor: '#3B82F6',
+            textColor: '#6b7280'
+          }
+        };
       default:
         return {};
     }
