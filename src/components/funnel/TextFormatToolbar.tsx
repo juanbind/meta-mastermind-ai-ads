@@ -7,7 +7,6 @@ import {
   AlignLeft, 
   AlignCenter, 
   AlignRight,
-  FontSize,
   Text
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ export interface TextStyle {
   fontStyle: string;
   textDecoration: string;
   color: string;
-  textAlign: string;
+  textAlign: 'left' | 'center' | 'right' | 'justify';
 }
 
 interface TextFormatToolbarProps {
@@ -68,7 +67,7 @@ const TextFormatToolbar: React.FC<TextFormatToolbarProps> = ({ style, onStyleCha
     onStyleChange({ textDecoration: style.textDecoration === 'underline' ? 'none' : 'underline' });
   };
 
-  const setAlignment = (align: string) => {
+  const setAlignment = (align: 'left' | 'center' | 'right' | 'justify') => {
     onStyleChange({ textAlign: align });
   };
 

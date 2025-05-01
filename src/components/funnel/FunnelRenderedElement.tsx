@@ -63,25 +63,26 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     onSave(editedContent, localProps);
   };
 
-  // Apply the defined styles to the text elements
-  const getStyledContent = () => {
-    const style = localProps?.style || {};
+  // Get a safe style object for React components
+  const getStyledProps = () => {
+    const { textAlign, ...rest } = textStyle;
     
-    return (
-      <div style={style}>
-        {item.content}
-      </div>
-    );
+    return {
+      ...rest,
+      textAlign: textAlign as 'left' | 'center' | 'right' | 'justify',
+    };
   };
 
   // Renders the element based on its type
   const renderElement = () => {
+    const styleProps = getStyledProps();
+    
     switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return <h2 style={textStyle}>{item.content}</h2>;
+        return <h2 style={styleProps}>{item.content}</h2>;
       
       case ELEMENT_TYPES.PARAGRAPH:
-        return <p style={textStyle}>{item.content}</p>;
+        return <p style={styleProps}>{item.content}</p>;
       
       case ELEMENT_TYPES.IMAGE:
         return (
@@ -113,7 +114,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.FORM:
         return (
           <div className="border border-gray-200 p-4 rounded">
-            <h3 className="mb-2" style={textStyle}>{item.content}</h3>
+            <h3 className="mb-2" style={styleProps}>{item.content}</h3>
             <div className="space-y-3">
               {(item.props?.fields || ['name', 'email']).map((field: string) => (
                 <div key={field} className="space-y-1">
@@ -135,7 +136,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.BULLET_LIST:
         return (
-          <ul className="list-disc pl-5 space-y-1" style={textStyle}>
+          <ul className="list-disc pl-5 space-y-1" style={styleProps}>
             {item.content.split('\n').map((line, i) => (
               <li key={i}>{line}</li>
             ))}
@@ -150,7 +151,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
                 ? 'border border-blue-600 text-blue-600' 
                 : 'bg-blue-600 text-white'
             }`}
-            style={textStyle}
+            style={styleProps}
           >
             {item.content}
           </button>
@@ -159,7 +160,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.INPUT:
         return (
           <div className="space-y-1">
-            <label className="text-sm font-medium" style={textStyle}>{item.content}</label>
+            <label className="text-sm font-medium" style={styleProps}>{item.content}</label>
             <input 
               type={item.props?.type || 'text'} 
               className="w-full px-3 py-2 border border-gray-300 rounded" 
@@ -172,7 +173,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.DROPDOWN:
         return (
           <div className="space-y-1">
-            <label className="text-sm font-medium" style={textStyle}>{item.content}</label>
+            <label className="text-sm font-medium" style={styleProps}>{item.content}</label>
             <select className="w-full px-3 py-2 border border-gray-300 rounded" disabled>
               <option>{item.props?.placeholder || 'Select an option'}</option>
               {item.content.split('\n').map((option, i) => (
