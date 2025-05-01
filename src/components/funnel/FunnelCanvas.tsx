@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { LayoutGrid, AlertCircle, Smartphone, Monitor, Tablet } from 'lucide-react';
@@ -167,7 +166,7 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
               rating: 5
             },
             {
-              quote: 'I was skeptical at first, but after using it for a month, I can't imagine going back.',
+              quote: "I was skeptical at first, but after using it for a month, I can't imagine going back.",
               name: 'John Doe',
               role: 'Marketing Director',
               rating: 5
