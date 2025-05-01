@@ -24,7 +24,7 @@ export const ELEMENT_TYPES = {
   ICON: 'icon',
   SPACING: 'spacing',
   
-  // New content block types
+  // Content block types
   HERO_SECTION: 'hero-section',
   FEATURES_BLOCK: 'features-block',
   TESTIMONIAL_BLOCK: 'testimonial-block',
