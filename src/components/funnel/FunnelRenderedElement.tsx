@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowUp, ArrowDown, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,14 +38,25 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   const [editedContent, setEditedContent] = useState(item.content);
   const [localProps, setLocalProps] = useState(item.props || {});
   const [textStyle, setTextStyle] = useState<TextStyle>({
-    fontFamily: localProps?.style?.fontFamily || 'Arial, Helvetica, sans-serif',
-    fontSize: localProps?.style?.fontSize || '16px',
-    fontWeight: localProps?.style?.fontWeight || 'normal',
-    fontStyle: localProps?.style?.fontStyle || 'normal',
-    textDecoration: localProps?.style?.textDecoration || 'none',
-    color: localProps?.style?.color || '#000000',
-    textAlign: localProps?.style?.textAlign || 'left',
+    fontFamily: (item.props?.style?.fontFamily) || 'Arial, Helvetica, sans-serif',
+    fontSize: (item.props?.style?.fontSize) || '16px',
+    fontWeight: (item.props?.style?.fontWeight) || 'normal',
+    fontStyle: (item.props?.style?.fontStyle) || 'normal',
+    textDecoration: (item.props?.style?.textDecoration) || 'none',
+    color: (item.props?.style?.color) || '#000000',
+    textAlign: (item.props?.style?.textAlign as 'left' | 'center' | 'right' | 'justify') || 'left',
   });
+  
+  // Update text style when item props change
+  useEffect(() => {
+    if (item.props?.style) {
+      setTextStyle(prevStyle => ({
+        ...prevStyle,
+        ...item.props?.style,
+        textAlign: (item.props?.style?.textAlign as 'left' | 'center' | 'right' | 'justify') || 'left'
+      }));
+    }
+  }, [item.props]);
   
   const handleStyleChange = (newStyle: Partial<TextStyle>) => {
     const updatedStyle = { ...textStyle, ...newStyle };
@@ -118,7 +129,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             <div className="space-y-3">
               {(item.props?.fields || ['name', 'email']).map((field: string) => (
                 <div key={field} className="space-y-1">
-                  <label className="text-sm font-medium capitalize">{field}</label>
+                  <label className="text-sm font-medium capitalize" style={styleProps}>{field}</label>
                   <input 
                     type={field === 'email' ? 'email' : 'text'} 
                     className="w-full px-3 py-2 border border-gray-300 rounded" 
@@ -127,7 +138,10 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
                   />
                 </div>
               ))}
-              <button className="w-full bg-blue-600 text-white py-2 rounded mt-2">
+              <button 
+                className="w-full bg-blue-600 text-white py-2 rounded mt-2"
+                style={styleProps}
+              >
                 {item.props?.buttonText || 'Submit'}
               </button>
             </div>
@@ -211,7 +225,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         );
       
       default:
-        return <div>{item.content}</div>;
+        return <div style={styleProps}>{item.content}</div>;
     }
   };
 
@@ -221,6 +235,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.HEADLINE:
       case ELEMENT_TYPES.PARAGRAPH:
       case ELEMENT_TYPES.BUTTON:
+      case ELEMENT_TYPES.BULLET_LIST:
         return (
           <>
             <TextFormatToolbar 
@@ -313,21 +328,44 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           </div>
         );
       
-      case ELEMENT_TYPES.BULLET_LIST:
+      case ELEMENT_TYPES.INPUT:
+      case ELEMENT_TYPES.DROPDOWN:
         return (
           <>
             <TextFormatToolbar 
               style={textStyle} 
               onStyleChange={handleStyleChange}
             />
-            <div className="space-y-1 mt-2">
-              <label className="text-sm font-medium">List Items (one per line)</label>
-              <Textarea
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                placeholder="Item 1\nItem 2\nItem 3"
-                rows={4}
-              />
+            <div className="space-y-3 mt-2">
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Label Text</label>
+                <Input
+                  type="text"
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  placeholder="Field Label"
+                />
+              </div>
+              {item.type === ELEMENT_TYPES.DROPDOWN && (
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Options (one per line)</label>
+                  <Textarea
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
+                    placeholder="Option 1\nOption 2\nOption 3"
+                    rows={4}
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Placeholder</label>
+                <Input
+                  type="text"
+                  value={localProps.placeholder || ''}
+                  onChange={(e) => setLocalProps({ ...localProps, placeholder: e.target.value })}
+                  placeholder="Enter placeholder text"
+                />
+              </div>
             </div>
           </>
         );
