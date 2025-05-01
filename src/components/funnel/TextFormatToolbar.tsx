@@ -7,6 +7,7 @@ import {
   AlignLeft, 
   AlignCenter, 
   AlignRight,
+  AlignJustify,
   Text
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ export interface TextStyle {
   textDecoration: string;
   color: string;
   textAlign: 'left' | 'center' | 'right' | 'justify';
+  lineHeight?: string;
+  letterSpacing?: string;
 }
 
 interface TextFormatToolbarProps {
@@ -39,6 +42,9 @@ const FONT_FAMILIES = [
 ];
 
 const FONT_SIZES = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px', '48px', '64px'];
+const LINE_HEIGHTS = ['1', '1.2', '1.5', '1.8', '2', '2.5'];
+const LETTER_SPACINGS = ['normal', '0.05em', '0.1em', '0.15em', '0.2em', '-0.05em'];
+
 const COLORS = [
   { name: 'Black', value: '#000000' },
   { name: 'Dark Gray', value: '#333333' },
@@ -52,6 +58,10 @@ const COLORS = [
   { name: 'Purple', value: '#800080' },
   { name: 'Orange', value: '#FFA500' },
   { name: 'Pink', value: '#FFC0CB' },
+  { name: 'Primary', value: '#3B82F6' },
+  { name: 'Success', value: '#10B981' },
+  { name: 'Warning', value: '#F59E0B' },
+  { name: 'Danger', value: '#EF4444' },
 ];
 
 const TextFormatToolbar: React.FC<TextFormatToolbarProps> = ({ style, onStyleChange }) => {
@@ -102,6 +112,23 @@ const TextFormatToolbar: React.FC<TextFormatToolbarProps> = ({ style, onStyleCha
           {FONT_SIZES.map((size) => (
             <SelectItem key={size} value={size}>
               {size}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Line Height */}
+      <Select 
+        value={style.lineHeight || '1.5'} 
+        onValueChange={(value) => onStyleChange({ lineHeight: value })}
+      >
+        <SelectTrigger className="w-[80px] h-8">
+          <SelectValue placeholder="Line Height" />
+        </SelectTrigger>
+        <SelectContent>
+          {LINE_HEIGHTS.map((height) => (
+            <SelectItem key={height} value={height}>
+              {height}
             </SelectItem>
           ))}
         </SelectContent>
@@ -199,6 +226,14 @@ const TextFormatToolbar: React.FC<TextFormatToolbarProps> = ({ style, onStyleCha
           onClick={() => setAlignment('right')}
         >
           <AlignRight size={16} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`h-8 px-2 ${style.textAlign === 'justify' ? 'bg-gray-100' : ''}`}
+          onClick={() => setAlignment('justify')}
+        >
+          <AlignJustify size={16} />
         </Button>
       </div>
     </div>

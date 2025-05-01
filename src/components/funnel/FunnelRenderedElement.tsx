@@ -45,6 +45,8 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     textDecoration: (item.props?.style?.textDecoration) || 'none',
     color: (item.props?.style?.color) || '#000000',
     textAlign: (item.props?.style?.textAlign as 'left' | 'center' | 'right' | 'justify') || 'left',
+    lineHeight: (item.props?.style?.lineHeight) || '1.5',
+    letterSpacing: (item.props?.style?.letterSpacing) || 'normal',
   });
   
   // Update text style when item props change
@@ -90,23 +92,25 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     
     switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return <h2 style={styleProps}>{item.content}</h2>;
+        return <h2 style={styleProps} className="font-bold">{item.content}</h2>;
       
       case ELEMENT_TYPES.PARAGRAPH:
         return <p style={styleProps}>{item.content}</p>;
       
       case ELEMENT_TYPES.IMAGE:
         return (
-          <img 
-            src={item.props?.src || 'https://placehold.co/600x400?text=Image'} 
-            alt={item.props?.alt || 'Image'} 
-            className="w-full" 
-          />
+          <div style={{ textAlign: styleProps.textAlign }}>
+            <img 
+              src={item.props?.src || 'https://placehold.co/600x400?text=Image'} 
+              alt={item.props?.alt || 'Image'} 
+              className="inline-block max-w-full" 
+            />
+          </div>
         );
       
       case ELEMENT_TYPES.VIDEO:
         return (
-          <div className="relative aspect-video w-full bg-gray-100 flex items-center justify-center">
+          <div className="relative aspect-video w-full bg-gray-100 flex items-center justify-center" style={{ textAlign: styleProps.textAlign }}>
             {item.props?.src ? (
               <iframe 
                 src={item.props.src} 
@@ -115,8 +119,8 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
               ></iframe>
             ) : (
               <div className="text-center p-4">
-                <p>Video Placeholder</p>
-                <p className="text-sm text-gray-500">Edit to add a video URL</p>
+                <p style={styleProps}>Video Placeholder</p>
+                <p className="text-sm text-gray-500" style={styleProps}>Edit to add a video URL</p>
               </div>
             )}
           </div>
@@ -124,23 +128,24 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.FORM:
         return (
-          <div className="border border-gray-200 p-4 rounded">
+          <div className="border border-gray-200 p-4 rounded" style={{ textAlign: styleProps.textAlign }}>
             <h3 className="mb-2" style={styleProps}>{item.content}</h3>
             <div className="space-y-3">
               {(item.props?.fields || ['name', 'email']).map((field: string) => (
-                <div key={field} className="space-y-1">
+                <div key={field} className="space-y-1" style={{ textAlign: 'left' }}>
                   <label className="text-sm font-medium capitalize" style={styleProps}>{field}</label>
                   <input 
                     type={field === 'email' ? 'email' : 'text'} 
                     className="w-full px-3 py-2 border border-gray-300 rounded" 
                     placeholder={`Enter ${field}`} 
                     disabled
+                    style={{ fontFamily: styleProps.fontFamily }}
                   />
                 </div>
               ))}
               <button 
                 className="w-full bg-blue-600 text-white py-2 rounded mt-2"
-                style={styleProps}
+                style={{ ...styleProps, backgroundColor: styleProps.color }}
               >
                 {item.props?.buttonText || 'Submit'}
               </button>
@@ -159,36 +164,48 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.BUTTON:
         return (
-          <button 
-            className={`px-4 py-2 rounded ${
-              item.props?.variant === 'outline' 
-                ? 'border border-blue-600 text-blue-600' 
-                : 'bg-blue-600 text-white'
-            }`}
-            style={styleProps}
-          >
-            {item.content}
-          </button>
+          <div style={{ textAlign: styleProps.textAlign }}>
+            <button 
+              className={`px-4 py-2 rounded ${
+                item.props?.variant === 'outline' 
+                  ? 'border border-blue-600 text-blue-600' 
+                  : 'text-white'
+              }`}
+              style={{ 
+                ...styleProps, 
+                backgroundColor: item.props?.variant === 'outline' ? 'transparent' : styleProps.color || '#3B82F6',
+                borderColor: styleProps.color || '#3B82F6',
+                color: item.props?.variant === 'outline' ? (styleProps.color || '#3B82F6') : '#FFFFFF'
+              }}
+            >
+              {item.content}
+            </button>
+          </div>
         );
       
       case ELEMENT_TYPES.INPUT:
         return (
-          <div className="space-y-1">
+          <div className="space-y-1" style={{ textAlign: styleProps.textAlign }}>
             <label className="text-sm font-medium" style={styleProps}>{item.content}</label>
             <input 
               type={item.props?.type || 'text'} 
               className="w-full px-3 py-2 border border-gray-300 rounded" 
               placeholder={item.props?.placeholder || `Enter ${item.content}`} 
               disabled
+              style={{ fontFamily: styleProps.fontFamily }}
             />
           </div>
         );
 
       case ELEMENT_TYPES.DROPDOWN:
         return (
-          <div className="space-y-1">
+          <div className="space-y-1" style={{ textAlign: styleProps.textAlign }}>
             <label className="text-sm font-medium" style={styleProps}>{item.content}</label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded" disabled>
+            <select 
+              className="w-full px-3 py-2 border border-gray-300 rounded" 
+              disabled
+              style={{ fontFamily: styleProps.fontFamily }}
+            >
               <option>{item.props?.placeholder || 'Select an option'}</option>
               {item.content.split('\n').map((option, i) => (
                 <option key={i} value={option}>{option}</option>
@@ -211,12 +228,12 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.ICON:
         return (
-          <div className="flex justify-center">
+          <div style={{ textAlign: styleProps.textAlign }}>
             <div 
-              className="text-blue-500" 
+              className="inline-block" 
               style={{ 
                 fontSize: `${item.props?.size || 24}px`,
-                color: item.props?.color || '#3B82F6'
+                color: item.props?.color || styleProps.color || '#3B82F6'
               }}
             >
               {item.props?.name || '★'}
@@ -254,7 +271,11 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.IMAGE:
         return (
           <div className="space-y-3">
-            <div className="space-y-1">
+            <TextFormatToolbar 
+              style={textStyle} 
+              onStyleChange={handleStyleChange}
+            />
+            <div className="space-y-1 mt-2">
               <label className="text-sm font-medium">Image URL</label>
               <Input
                 type="text"
@@ -277,14 +298,20 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.VIDEO:
         return (
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Video URL (YouTube or Vimeo)</label>
-            <Input
-              type="text"
-              value={localProps.src || ''}
-              onChange={(e) => setLocalProps({ ...localProps, src: e.target.value })}
-              placeholder="https://www.youtube.com/embed/video_id"
+          <div className="space-y-3">
+            <TextFormatToolbar 
+              style={textStyle} 
+              onStyleChange={handleStyleChange}
             />
+            <div className="space-y-1 mt-2">
+              <label className="text-sm font-medium">Video URL (YouTube or Vimeo)</label>
+              <Input
+                type="text"
+                value={localProps.src || ''}
+                onChange={(e) => setLocalProps({ ...localProps, src: e.target.value })}
+                placeholder="https://www.youtube.com/embed/video_id"
+              />
+            </div>
           </div>
         );
       
@@ -295,7 +322,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
               style={textStyle} 
               onStyleChange={handleStyleChange}
             />
-            <div className="space-y-1">
+            <div className="space-y-1 mt-2">
               <label className="text-sm font-medium">Form Title</label>
               <Input
                 type="text"
@@ -370,6 +397,87 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           </>
         );
       
+      case ELEMENT_TYPES.DIVIDER:
+      case ELEMENT_TYPES.SPACING:
+      case ELEMENT_TYPES.ICON:
+        return (
+          <div className="space-y-3">
+            {(item.type === ELEMENT_TYPES.ICON) && (
+              <TextFormatToolbar 
+                style={textStyle} 
+                onStyleChange={handleStyleChange}
+              />
+            )}
+            {item.type === ELEMENT_TYPES.DIVIDER && (
+              <>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Line Color</label>
+                  <Input
+                    type="color"
+                    value={localProps.color || '#e2e8f0'}
+                    onChange={(e) => setLocalProps({ ...localProps, color: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Height (px)</label>
+                  <Input
+                    type="number"
+                    value={localProps.height || 1}
+                    onChange={(e) => setLocalProps({ ...localProps, height: Number(e.target.value) })}
+                    min={1}
+                    max={20}
+                  />
+                </div>
+              </>
+            )}
+            {item.type === ELEMENT_TYPES.SPACING && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Height (px)</label>
+                <Input
+                  type="number"
+                  value={localProps.height || 20}
+                  onChange={(e) => setLocalProps({ ...localProps, height: Number(e.target.value) })}
+                  min={5}
+                  max={200}
+                />
+              </div>
+            )}
+            {item.type === ELEMENT_TYPES.ICON && (
+              <>
+                <div className="space-y-1 mt-2">
+                  <label className="text-sm font-medium">Icon</label>
+                  <Input
+                    type="text"
+                    value={localProps.name || '★'}
+                    onChange={(e) => setLocalProps({ ...localProps, name: e.target.value })}
+                    placeholder="★"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium">Size (px)</label>
+                  <Input
+                    type="number"
+                    value={localProps.size || 24}
+                    onChange={(e) => setLocalProps({ ...localProps, size: Number(e.target.value) })}
+                    min={8}
+                    max={128}
+                  />
+                </div>
+                {!textStyle.color && (
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">Color</label>
+                    <Input
+                      type="color"
+                      value={localProps.color || '#3B82F6'}
+                      onChange={(e) => setLocalProps({ ...localProps, color: e.target.value })}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+      
       default:
         return (
           <Textarea
@@ -384,7 +492,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
 
   return (
     <div 
-      className={`relative border-2 rounded-md transition-all ${
+      className={`relative border-2 rounded-md transition-all group ${
         isEditing ? 'border-blue-500 shadow-lg' : 'border-transparent hover:border-gray-300'
       }`}
     >
