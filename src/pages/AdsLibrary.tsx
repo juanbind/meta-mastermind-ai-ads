@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle, Heart } from 'lucide-react';
+import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
-import { fetchAds, saveAdToCollection, connectFacebookAds, Ad } from '@/lib/ads';
+import { fetchAds, saveAdToCollection, populateAdLibrary, Ad } from '@/lib/ads';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 
@@ -268,8 +268,8 @@ const AdsLibrary: React.FC = () => {
       page,
       pageSize
     }),
-    // Don't fetch on mount, wait for search or filter
-    enabled: searchQuery.length > 0 || Object.keys(filters).length > 0,
+    // Enable by default to show ads without requiring search
+    enabled: true,
   });
   
   const filterOptions = {
@@ -282,22 +282,15 @@ const AdsLibrary: React.FC = () => {
   };
   
   const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      toast({
-        title: "Search query required",
-        description: "Please enter a keyword or phrase to search for ads.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    toast({
-      title: "Search initiated",
-      description: "Searching for ads related to '" + searchQuery + "'...",
-    });
-    
     setPage(1); // Reset to first page
     refetch();
+    
+    if (searchQuery.trim()) {
+      toast({
+        title: "Search initiated",
+        description: "Searching for ads related to '" + searchQuery + "'...",
+      });
+    }
   };
   
   const handleFilterClick = (filter: string) => {
@@ -332,57 +325,19 @@ const AdsLibrary: React.FC = () => {
     setPage(page + 1);
   };
   
-  const handleConnectFacebook = async () => {
-    try {
-      // In a real implementation, this would use Facebook OAuth
-      // For demo, we'll use a mock integration
-      
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to connect your Facebook account",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      toast({
-        title: "Connecting to Facebook",
-        description: "Please wait while we establish the connection...",
-      });
-      
-      // Mock Facebook connection
-      const result = await connectFacebookAds(
-        "mock_access_token", 
-        "mock_ad_account_id",
-        userData.user.id
-      );
-      
-      toast({
-        title: "Facebook Ads connected!",
-        description: `Successfully imported ${result.ads_count} ads from your account.`,
-      });
-      
-      // Refresh the ads list
-      refetch();
-      
-    } catch (error) {
-      console.error('Error connecting to Facebook:', error);
-      toast({
-        title: "Connection failed",
-        description: "Unable to connect to Facebook Ads. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-  
-  // Display sample data for initial view
+  // Initial data loading
   useEffect(() => {
-    if (!searchQuery && Object.keys(filters).length === 0) {
-      setSearchQuery(''); // Set empty to trigger a search for all ads
-      refetch();
-    }
+    // Populate ad library on first load
+    const loadInitialAds = async () => {
+      try {
+        await populateAdLibrary();
+        refetch();
+      } catch (error) {
+        console.error('Error loading initial ads:', error);
+      }
+    };
+    
+    loadInitialAds();
   }, [refetch]);
   
   return (
@@ -419,13 +374,6 @@ const AdsLibrary: React.FC = () => {
                   onClick={handleSearch}
                 >
                   <Search size={18} className="mr-2" /> Search
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center"
-                  onClick={handleConnectFacebook}
-                >
-                  Connect Facebook
                 </Button>
               </div>
             </div>

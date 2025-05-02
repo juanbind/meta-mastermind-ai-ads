@@ -215,7 +215,30 @@ export async function fetchAdInsights(adId: string) {
   }
 }
 
-// Connect to Facebook Ads
+// Populate the Ad Library with Meta ads (no Facebook account required)
+export async function populateAdLibrary() {
+  try {
+    const response = await fetch(`https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to populate Ad Library');
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('Error populating Ad Library:', error);
+    throw error;
+  }
+}
+
+// Connect to Facebook Ads (kept for backward compatibility but can now be optional)
 export async function connectFacebookAds(accessToken: string, adAccountId: string, userId: string) {
   try {
     const response = await fetch(`https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, {
