@@ -3,3 +3,4 @@ project_id = "mbbfcjdfdkoggherfmff"
 
 [functions.fb-lead-sync]
 verify_jwt = false # Allow public access for Facebook webhook
+

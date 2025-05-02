@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 import { format } from 'date-fns';
 
@@ -127,6 +126,11 @@ export async function fetchContacts(page = 1, pageSize = 10, filters: any = {}) 
 // Create a new contact
 export async function createContact(contactData: Omit<Contact, 'id' | 'created_at' | 'updated_at'>) {
   try {
+    // Ensure last_activity is set
+    if (!contactData.last_activity) {
+      contactData.last_activity = new Date().toISOString();
+    }
+    
     const { data, error } = await supabase
       .from('contacts')
       .insert(contactData)

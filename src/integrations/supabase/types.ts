@@ -73,6 +73,257 @@ export type Database = {
           },
         ]
       }
+      ad_alerts: {
+        Row: {
+          created_at: string | null
+          criteria: Json
+          frequency: string | null
+          id: string
+          is_active: boolean | null
+          last_triggered: string | null
+          name: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          criteria: Json
+          frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered?: string | null
+          name: string
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          criteria?: Json
+          frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered?: string | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ad_collections: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ad_insights: {
+        Row: {
+          ad_id: string | null
+          created_at: string | null
+          data: Json
+          id: string
+          insight_type: string
+          score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          ad_id?: string | null
+          created_at?: string | null
+          data: Json
+          id?: string
+          insight_type: string
+          score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          ad_id?: string | null
+          created_at?: string | null
+          data?: Json
+          id?: string
+          insight_type?: string
+          score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_insights_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ads: {
+        Row: {
+          ad_id: string | null
+          advertiser_id: string | null
+          advertiser_name: string
+          body_text: string | null
+          created_at: string | null
+          creative_type: string | null
+          cta_type: string | null
+          description: string | null
+          engagement: Json | null
+          estimated_duration_days: number | null
+          estimated_metrics: Json | null
+          first_seen: string | null
+          headline: string | null
+          id: string
+          image_url: string | null
+          industry_category: string | null
+          keywords: string[] | null
+          landing_url: string | null
+          language: string | null
+          last_seen_date: string | null
+          last_updated: string | null
+          metadata: Json | null
+          page_id: string | null
+          page_name: string | null
+          platform: string
+          start_date: string | null
+          targeting: Json | null
+          title: string | null
+          user_id: string | null
+          video_url: string | null
+        }
+        Insert: {
+          ad_id?: string | null
+          advertiser_id?: string | null
+          advertiser_name: string
+          body_text?: string | null
+          created_at?: string | null
+          creative_type?: string | null
+          cta_type?: string | null
+          description?: string | null
+          engagement?: Json | null
+          estimated_duration_days?: number | null
+          estimated_metrics?: Json | null
+          first_seen?: string | null
+          headline?: string | null
+          id?: string
+          image_url?: string | null
+          industry_category?: string | null
+          keywords?: string[] | null
+          landing_url?: string | null
+          language?: string | null
+          last_seen_date?: string | null
+          last_updated?: string | null
+          metadata?: Json | null
+          page_id?: string | null
+          page_name?: string | null
+          platform: string
+          start_date?: string | null
+          targeting?: Json | null
+          title?: string | null
+          user_id?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          ad_id?: string | null
+          advertiser_id?: string | null
+          advertiser_name?: string
+          body_text?: string | null
+          created_at?: string | null
+          creative_type?: string | null
+          cta_type?: string | null
+          description?: string | null
+          engagement?: Json | null
+          estimated_duration_days?: number | null
+          estimated_metrics?: Json | null
+          first_seen?: string | null
+          headline?: string | null
+          id?: string
+          image_url?: string | null
+          industry_category?: string | null
+          keywords?: string[] | null
+          landing_url?: string | null
+          language?: string | null
+          last_seen_date?: string | null
+          last_updated?: string | null
+          metadata?: Json | null
+          page_id?: string | null
+          page_name?: string | null
+          platform?: string
+          start_date?: string | null
+          targeting?: Json | null
+          title?: string | null
+          user_id?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      collection_ads: {
+        Row: {
+          ad_id: string | null
+          added_at: string | null
+          collection_id: string | null
+          custom_tags: string[] | null
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          ad_id?: string | null
+          added_at?: string | null
+          collection_id?: string | null
+          custom_tags?: string[] | null
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          ad_id?: string | null
+          added_at?: string | null
+          collection_id?: string | null
+          custom_tags?: string[] | null
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_ads_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_ads_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "ad_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address: Json | null
@@ -273,6 +524,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      facebook_integrations: {
+        Row: {
+          access_token: string
+          account_id: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          account_id: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          account_id?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       feedback: {
         Row: {

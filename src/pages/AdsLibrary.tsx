@@ -1,90 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
+import { fetchAds, saveAdToCollection, connectFacebookAds, Ad } from '@/lib/ads';
 import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 
-interface Ad {
-  id: string;
-  platform: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  advertiser: string;
-  datePosted: string;
-  impressions: string;
-  engagement: string;
-  format: string;
-  adLibraryId?: string;
-}
-
-// Sample mock API for Meta Ads Library
-const fetchMetaAds = async (query: string = '', filters: Record<string, any> = {}) => {
-  // In a real implementation, this would call the Meta Ads Library API
-  // For demo purposes, we'll simulate a fetch with our sample ads
-  console.log('Fetching Meta Ads with query:', query, 'and filters:', filters);
-  
-  // Mock API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // These would be real ads from the Meta Ads Library API
-  const sampleAds: Ad[] = [
-    {
-      id: '1',
-      platform: 'Facebook',
-      title: 'Summer Collection Sale',
-      description: 'Get 50% off on our new summer collection. Limited time offer, shop now!',
-      imageUrl: 'https://placehold.co/600x400/1E88E5/FFFFFF?text=Fashion+Ad',
-      advertiser: 'Fashion Brand Co.',
-      datePosted: '2 days ago',
-      impressions: '10.2k',
-      engagement: '3.4%',
-      format: 'Single Image',
-      adLibraryId: 'fb_123456789'
-    },
-    {
-      id: '2',
-      platform: 'Instagram',
-      title: 'Premium Fitness Program',
-      description: 'Transform your body in 30 days with our expert-led fitness program and nutrition guide.',
-      imageUrl: 'https://placehold.co/600x400/9C27B0/FFFFFF?text=Fitness+Ad',
-      advertiser: 'FitLife Pro',
-      datePosted: '5 days ago',
-      impressions: '24.5k',
-      engagement: '4.8%',
-      format: 'Video',
-      adLibraryId: 'ig_987654321'
-    },
-    // ... keep existing code (additional sample ads)
-  ];
-  
-  // Filter by query if provided
-  let filteredAds = sampleAds;
-  if (query) {
-    const lowerQuery = query.toLowerCase();
-    filteredAds = sampleAds.filter(ad => 
-      ad.title.toLowerCase().includes(lowerQuery) || 
-      ad.description.toLowerCase().includes(lowerQuery) ||
-      ad.advertiser.toLowerCase().includes(lowerQuery)
-    );
-  }
-  
-  // Apply other filters
-  if (filters.platform) {
-    filteredAds = filteredAds.filter(ad => ad.platform === filters.platform);
-  }
-  
-  if (filters.format) {
-    filteredAds = filteredAds.filter(ad => ad.format === filters.format);
-  }
-  
-  // Return the filtered ads
-  return filteredAds;
-};
-
-// Component for filtering ads
+// Filter button component
 const FilterButton: React.FC<{ 
   label: string;
   isActive: boolean;
@@ -142,22 +67,70 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   
   const handleSave = async () => {
     try {
-      // In a real implementation, this would save to a user's collection in the database
+      // Get user's default collection or create one if it doesn't exist
+      const { data: user } = await supabase.auth.getUser();
+      
+      if (!user?.user?.id) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to save ads to your collection",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const { data: collections } = await supabase
+        .from('ad_collections')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('name', 'My Saved Ads')
+        .limit(1);
+        
+      let collectionId: string;
+        
+      if (!collections || collections.length === 0) {
+        // Create default collection
+        const { data: newCollection } = await supabase
+          .from('ad_collections')
+          .insert({
+            name: 'My Saved Ads',
+            description: 'Default collection for saved ads',
+            user_id: user.user.id,
+            is_public: false
+          })
+          .select()
+          .single();
+          
+        if (!newCollection) throw new Error('Failed to create collection');
+        collectionId = newCollection.id;
+      } else {
+        collectionId = collections[0].id;
+      }
+      
       if (saved) {
-        // Remove from saved collection
-        // This would make an API call to remove the ad from the user's saved collection
+        // Remove from collection
+        const { error } = await supabase
+          .from('collection_ads')
+          .delete()
+          .eq('ad_id', ad.id)
+          .eq('collection_id', collectionId);
+          
+        if (error) throw error;
+        
         toast({
           title: "Ad removed from saved",
           description: "Ad removed from your saved collection",
         });
       } else {
-        // Add to saved collection
-        // This would make an API call to add the ad to the user's saved collection
+        // Save to collection
+        await saveAdToCollection(ad.id, collectionId);
+        
         toast({
           title: "Ad saved to library",
           description: "You can find this ad in your saved collection",
         });
       }
+      
       setSaved(!saved);
     } catch (error) {
       console.error('Error saving ad:', error);
@@ -171,13 +144,13 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   
   const handleShare = () => {
     // Create a share link for the ad
-    const shareUrl = `${window.location.origin}/ads/${ad.adLibraryId || ad.id}`;
+    const shareUrl = `${window.location.origin}/ads/${ad.ad_id || ad.id}`;
     
     // Try to use the native share API if available
     if (navigator.share) {
       navigator.share({
-        title: ad.title,
-        text: ad.description,
+        title: ad.title || "Shared Ad",
+        text: ad.description || "",
         url: shareUrl
       }).catch(err => {
         console.error('Error sharing:', err);
@@ -209,7 +182,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100">
       <div className="relative h-64 bg-gray-100">
-        <img src={ad.imageUrl} alt={ad.title} className="w-full h-full object-cover" />
+        <img src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} alt={ad.title || 'Ad'} className="w-full h-full object-cover" />
         <div className="absolute top-3 right-3 flex space-x-2">
           <Button 
             variant="outline" 
@@ -229,7 +202,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
           </Button>
         </div>
         <div className="absolute bottom-3 left-3 bg-black/20 backdrop-blur-sm text-white rounded-full px-2 py-1 text-xs">
-          {ad.format}
+          {ad.creative_type || 'Unknown Format'}
         </div>
       </div>
       
@@ -239,25 +212,36 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
             {ad.platform}
           </span>
           <span className="text-xs text-metamaster-gray-500">
-            {ad.datePosted}
+            {ad.start_date ? new Date(ad.start_date).toLocaleDateString() : 'Unknown date'}
           </span>
         </div>
         
-        <h3 className="font-semibold mb-1 text-metamaster-gray-800">{ad.title}</h3>
-        <p className="text-metamaster-gray-600 text-sm mb-2 line-clamp-2">{ad.description}</p>
+        <h3 className="font-semibold mb-1 text-metamaster-gray-800">{ad.title || ad.headline || 'Untitled Ad'}</h3>
+        <p className="text-metamaster-gray-600 text-sm mb-2 line-clamp-2">{ad.description || ad.body_text || 'No description available'}</p>
         
         <div className="flex items-center text-metamaster-gray-500 mb-3">
-          <span className="text-xs">By {ad.advertiser}</span>
+          <span className="text-xs">By {ad.advertiser_name}</span>
         </div>
         
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="bg-gray-50 p-2 rounded">
             <span className="text-metamaster-gray-500">Impressions</span>
-            <p className="font-semibold text-metamaster-gray-800">{ad.impressions}</p>
+            <p className="font-semibold text-metamaster-gray-800">
+              {ad.estimated_metrics?.impressions_high ? 
+                `${Math.round(ad.estimated_metrics.impressions_low / 1000)}k-${Math.round(ad.estimated_metrics.impressions_high / 1000)}k` : 
+                'Unknown'}
+            </p>
           </div>
           <div className="bg-gray-50 p-2 rounded">
             <span className="text-metamaster-gray-500">Engagement</span>
-            <p className="font-semibold text-metamaster-gray-800">{ad.engagement}</p>
+            <p className="font-semibold text-metamaster-gray-800">
+              {ad.engagement ? 
+                `${typeof ad.engagement === 'string' ? ad.engagement : 
+                  (ad.estimated_metrics?.engagement_rate ? 
+                    `${(ad.estimated_metrics.engagement_rate * 100).toFixed(1)}%` : 
+                    'Unknown')}` : 
+                'Unknown'}
+            </p>
           </div>
         </div>
       </div>
@@ -265,13 +249,28 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   );
 };
 
+// Main component
 const AdsLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [ads, setAds] = useState<Ad[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<Record<string, any>>({});
   const { toast } = useToast();
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(9); // Show 9 ads per page
+
+  // Query for fetching ads
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['ads', searchQuery, filters, page, pageSize],
+    queryFn: () => fetchAds({ 
+      query: searchQuery, 
+      platform: filters['Platform'], 
+      format: filters['Ad Format'],
+      page,
+      pageSize
+    }),
+    // Don't fetch on mount, wait for search or filter
+    enabled: searchQuery.length > 0 || Object.keys(filters).length > 0,
+  });
   
   const filterOptions = {
     "Platform": ["Facebook", "Instagram", "All"],
@@ -282,29 +281,7 @@ const AdsLibrary: React.FC = () => {
     "Running Time": ["Active", "Inactive", "All"]
   };
   
-  // Load ads when component mounts or filters change
-  useEffect(() => {
-    loadAds();
-  }, [filters]);
-  
-  const loadAds = async () => {
-    setIsLoading(true);
-    try {
-      const fetchedAds = await fetchMetaAds(searchQuery, filters);
-      setAds(fetchedAds);
-    } catch (error) {
-      console.error("Error fetching ads:", error);
-      toast({
-        title: "Error fetching ads",
-        description: "There was a problem loading the ads library.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!searchQuery.trim()) {
       toast({
         title: "Search query required",
@@ -319,7 +296,8 @@ const AdsLibrary: React.FC = () => {
       description: "Searching for ads related to '" + searchQuery + "'...",
     });
     
-    await loadAds();
+    setPage(1); // Reset to first page
+    refetch();
   };
   
   const handleFilterClick = (filter: string) => {
@@ -330,57 +308,82 @@ const AdsLibrary: React.FC = () => {
     if (option === "All") {
       // Remove this filter
       const newFilters = { ...filters };
-      delete newFilters[filter.toLowerCase()];
+      delete newFilters[filter];
       setFilters(newFilters);
     } else {
       // Apply this filter
       setFilters({
         ...filters,
-        [filter.toLowerCase()]: option
+        [filter]: option
       });
     }
+    
+    setPage(1); // Reset to first page
     
     toast({
       title: `Filter: ${filter} - ${option}`,
       description: option === "All" ? `Removed ${filter.toLowerCase()} filter` : `Applied filter to show ads by ${option}`,
     });
+    
+    refetch();
   };
   
-  const loadMore = async () => {
-    setIsLoading(true);
-    toast({
-      title: "Loading more ads",
-      description: "Getting additional ads...",
-    });
-    
+  const loadMore = () => {
+    setPage(page + 1);
+  };
+  
+  const handleConnectFacebook = async () => {
     try {
-      // In a real implementation, this would fetch the next page of ads
-      const moreAds = await fetchMetaAds(searchQuery, filters);
+      // In a real implementation, this would use Facebook OAuth
+      // For demo, we'll use a mock integration
       
-      // Add more ads to the existing list
-      // For demo purposes, we're just duplicating the existing ads with new IDs
-      const newAds = moreAds.map(ad => ({
-        ...ad,
-        id: `new-${ad.id}-${Date.now()}`
-      }));
-      
-      setAds([...ads, ...newAds]);
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to connect your Facebook account",
+          variant: "destructive"
+        });
+        return;
+      }
       
       toast({
-        title: "More ads loaded",
-        description: `Loaded ${newAds.length} additional ads`,
+        title: "Connecting to Facebook",
+        description: "Please wait while we establish the connection...",
       });
+      
+      // Mock Facebook connection
+      const result = await connectFacebookAds(
+        "mock_access_token", 
+        "mock_ad_account_id",
+        userData.user.id
+      );
+      
+      toast({
+        title: "Facebook Ads connected!",
+        description: `Successfully imported ${result.ads_count} ads from your account.`,
+      });
+      
+      // Refresh the ads list
+      refetch();
+      
     } catch (error) {
-      console.error("Error loading more ads:", error);
+      console.error('Error connecting to Facebook:', error);
       toast({
-        title: "Error loading more ads",
-        description: "There was a problem loading additional ads.",
-        variant: "destructive",
+        title: "Connection failed",
+        description: "Unable to connect to Facebook Ads. Please try again.",
+        variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
+  
+  // Display sample data for initial view
+  useEffect(() => {
+    if (!searchQuery && Object.keys(filters).length === 0) {
+      setSearchQuery(''); // Set empty to trigger a search for all ads
+      refetch();
+    }
+  }, [refetch]);
   
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
@@ -406,7 +409,7 @@ const AdsLibrary: React.FC = () => {
                   className="pl-10 pr-4 py-2 w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               
@@ -420,12 +423,9 @@ const AdsLibrary: React.FC = () => {
                 <Button 
                   variant="outline" 
                   className="flex items-center"
-                  onClick={() => toast({
-                    title: "Advanced Filters",
-                    description: "Advanced filtering options are now available.",
-                  })}
+                  onClick={handleConnectFacebook}
                 >
-                  <Filter size={16} className="mr-2" /> Advanced Filters
+                  Connect Facebook
                 </Button>
               </div>
             </div>
@@ -435,7 +435,7 @@ const AdsLibrary: React.FC = () => {
                 <FilterButton 
                   key={filter}
                   label={filter}
-                  isActive={activeFilter === filter || filters[filter.toLowerCase()] !== undefined}
+                  isActive={activeFilter === filter || filters[filter] !== undefined}
                   onClick={() => handleFilterClick(filter)}
                   options={filterOptions[filter as keyof typeof filterOptions]}
                   onOptionClick={(option) => handleFilterOptionClick(filter, option)}
@@ -463,9 +463,9 @@ const AdsLibrary: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : ads.length > 0 ? (
+          ) : data?.data && data.data.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ads.map((ad) => (
+              {data.data.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
             </div>
@@ -491,14 +491,16 @@ const AdsLibrary: React.FC = () => {
           )}
           
           {/* Results Found Text */}
-          {ads.length > 0 && !isLoading && (
+          {data?.data && data.data.length > 0 && !isLoading && (
             <div className="mt-6 mb-4">
-              <p className="text-metamaster-gray-600">Showing {ads.length} results</p>
+              <p className="text-metamaster-gray-600">
+                Showing {data.data.length} {data.count && data.count > data.data.length ? `of ${data.count}` : ''} results
+              </p>
             </div>
           )}
           
           {/* Load More Button */}
-          {ads.length > 0 && !isLoading && (
+          {data?.data && data.data.length > 0 && !isLoading && data.count && data.count > data.data.length && (
             <div className="mt-8 text-center">
               <Button 
                 variant="outline" 
