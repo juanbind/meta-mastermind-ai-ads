@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, Edit, Trash, Loader2 } from 'lucide-react';
+import { Copy, Trash2, ChevronUp, ChevronDown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { CanvasItem } from './FunnelCanvas';
+import { ELEMENT_TYPES } from './FunnelElement';
 import TextFormatToolbar from './TextFormatToolbar';
 import ContentBlockRenderer from './ContentBlockRenderer';
-import { ELEMENT_TYPES } from './FunnelElement';
-import { CanvasItem } from './FunnelCanvas';
 
 interface FunnelRenderedElementProps {
   item: CanvasItem;
@@ -17,24 +18,8 @@ interface FunnelRenderedElementProps {
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
-  device: 'mobile' | 'tablet' | 'desktop';
+  device?: 'mobile' | 'tablet' | 'desktop';
 }
-
-// Check if the element type is a content block
-const isContentBlock = (type: string): boolean => {
-  return [
-    ELEMENT_TYPES.HERO_SECTION,
-    ELEMENT_TYPES.FEATURES_BLOCK,
-    ELEMENT_TYPES.TESTIMONIAL_BLOCK,
-    ELEMENT_TYPES.CTA_BLOCK,
-    ELEMENT_TYPES.FAQ_BLOCK,
-    ELEMENT_TYPES.PRICING_BLOCK,
-    ELEMENT_TYPES.CONTACT_BLOCK,
-    ELEMENT_TYPES.SOCIAL_PROOF,
-    ELEMENT_TYPES.COUNTDOWN,
-    ELEMENT_TYPES.TRUST_BADGES
-  ].includes(type);
-};
 
 const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   item,
@@ -45,270 +30,294 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   onRemove,
   onMoveUp,
   onMoveDown,
-  device
+  device = 'desktop'
 }) => {
-  const [editingContent, setEditingContent] = useState(item.content);
-  const [isSaving, setIsSaving] = useState(false);
+  const [content, setContent] = useState(item.content);
+  const [imageUrl, setImageUrl] = useState(item.props?.src || '');
+  const [videoUrl, setVideoUrl] = useState(item.props?.src || '');
+  
+  // For content blocks
+  const isContentBlock = [
+    ELEMENT_TYPES.HERO_SECTION,
+    ELEMENT_TYPES.FEATURES_BLOCK,
+    ELEMENT_TYPES.TESTIMONIAL_BLOCK,
+    ELEMENT_TYPES.CTA_BLOCK,
+    ELEMENT_TYPES.FAQ_BLOCK,
+    ELEMENT_TYPES.PRICING_BLOCK,
+  ].includes(item.type);
   
   const handleSave = () => {
-    setIsSaving(true);
-    try {
-      onSave(editingContent);
-    } finally {
-      setIsSaving(false);
+    let updatedProps = { ...item.props };
+    
+    // Update specific props based on element type
+    if (item.type === ELEMENT_TYPES.IMAGE) {
+      updatedProps = { ...updatedProps, src: imageUrl };
+    } else if (item.type === ELEMENT_TYPES.VIDEO) {
+      updatedProps = { ...updatedProps, src: videoUrl };
+    }
+    
+    onSave(content, updatedProps);
+  };
+  
+  const renderEditableContent = () => {
+    switch (item.type) {
+      case ELEMENT_TYPES.HEADLINE:
+        return (
+          <>
+            <TextFormatToolbar 
+              value={content} 
+              onChange={setContent} 
+            />
+            <Input 
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="font-bold text-lg"
+            />
+          </>
+        );
+      case ELEMENT_TYPES.PARAGRAPH:
+        return (
+          <>
+            <TextFormatToolbar 
+              value={content} 
+              onChange={setContent} 
+            />
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={3}
+            />
+          </>
+        );
+      case ELEMENT_TYPES.BULLET_LIST:
+        return (
+          <>
+            <TextFormatToolbar 
+              value={content} 
+              onChange={setContent} 
+            />
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={4}
+              placeholder="Enter one item per line"
+            />
+            <p className="text-xs text-gray-500 mt-1">Each line will be a bullet point</p>
+          </>
+        );
+      case ELEMENT_TYPES.BUTTON:
+        return (
+          <>
+            <TextFormatToolbar 
+              value={content} 
+              onChange={setContent} 
+            />
+            <Input 
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="mb-2"
+            />
+          </>
+        );
+      case ELEMENT_TYPES.IMAGE:
+        return (
+          <div className="space-y-2">
+            <div>
+              <label className="text-sm font-medium">Image URL</label>
+              <Input 
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            <div className="text-xs text-gray-500">
+              Enter a URL for your image or upload one
+            </div>
+          </div>
+        );
+      case ELEMENT_TYPES.VIDEO:
+        return (
+          <div className="space-y-2">
+            <div>
+              <label className="text-sm font-medium">Video URL</label>
+              <Input 
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://youtube.com/watch?v=..."
+              />
+            </div>
+            <div className="text-xs text-gray-500">
+              Enter a YouTube or Vimeo URL
+            </div>
+          </div>
+        );
+      case ELEMENT_TYPES.HERO_SECTION:
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+      case ELEMENT_TYPES.CTA_BLOCK:
+      case ELEMENT_TYPES.FAQ_BLOCK:
+      case ELEMENT_TYPES.PRICING_BLOCK:
+        return (
+          <div className="space-y-2">
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={10}
+              className="font-mono text-sm"
+            />
+            <div className="text-xs text-gray-500">
+              Edit the JSON configuration above to customize this content block
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={3}
+          />
+        );
     }
   };
   
-  const handleChange = (value: string) => {
-    setEditingContent(value);
+  const renderViewContent = () => {
+    if (isContentBlock) {
+      return (
+        <ContentBlockRenderer 
+          type={item.type} 
+          content={item.content} 
+          props={item.props} 
+          device={device} 
+        />
+      );
+    }
+    
+    switch (item.type) {
+      case ELEMENT_TYPES.HEADLINE:
+        return <h2 className="font-bold text-xl">{item.content}</h2>;
+      case ELEMENT_TYPES.PARAGRAPH:
+        return <p>{item.content}</p>;
+      case ELEMENT_TYPES.BULLET_LIST:
+        return (
+          <ul className="list-disc pl-5">
+            {item.content.split('\n').map((line, index) => (
+              <li key={index}>{line}</li>
+            ))}
+          </ul>
+        );
+      case ELEMENT_TYPES.BUTTON:
+        return (
+          <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
+            {item.content}
+          </Button>
+        );
+      case ELEMENT_TYPES.IMAGE:
+        return (
+          <img 
+            src={item.props?.src || 'https://placehold.co/600x400?text=Image+placeholder'} 
+            alt={item.props?.alt || 'Image'} 
+            className="max-w-full h-auto rounded-md"
+          />
+        );
+      case ELEMENT_TYPES.VIDEO:
+        // Simple video placeholder
+        return (
+          <div 
+            className="w-full aspect-video bg-gray-200 rounded-md flex items-center justify-center"
+            style={{
+              backgroundImage: `url(${item.props?.placeholder || ''})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            {!item.props?.src && (
+              <div className="text-white bg-black/50 px-3 py-1 rounded">
+                Video placeholder
+              </div>
+            )}
+          </div>
+        );
+      case ELEMENT_TYPES.DIVIDER:
+        return <hr className="my-4" />;
+      case ELEMENT_TYPES.SPACING:
+        return <div style={{ height: `${item.props?.height || 20}px` }}></div>;
+      default:
+        return <div>{item.content || 'Element content'}</div>;
+    }
   };
 
-  // Rendering for content blocks
-  if (isContentBlock(item.type)) {
-    return (
-      <div className="group relative border border-transparent hover:border-metamaster-primary rounded-lg transition-colors overflow-hidden">
-        {/* Toolbar for content blocks */}
-        <div className="absolute top-2 right-2 z-10 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm p-1 rounded-md shadow-sm">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onEdit}
-          >
-            <Edit size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onMoveUp}
-          >
-            <ArrowUp size={16} />
-          </Button>
-          <Button
-            variant="ghost" 
-            size="icon"
-            className="h-8 w-8"
-            onClick={onMoveDown}
-          >
-            <ArrowDown size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-            onClick={onRemove}
-          >
-            <Trash size={16} />
-          </Button>
-        </div>
-
-        {/* Content Block Renderer */}
-        <ContentBlockRenderer
-          type={item.type}
-          content={item.content}
-          props={item.props}
-          device={device}
-        />
-      </div>
-    );
-  }
-
-  // Original rendering for basic elements
   return (
-    <div className={cn("relative group border border-gray-200 hover:border-metamaster-primary rounded-lg p-4", 
-      isEditing ? "bg-metamaster-gray-50 border-metamaster-primary" : "")}>
+    <div className="group relative border border-dashed border-gray-300 rounded-md hover:border-metamaster-primary transition-colors p-2">
+      {/* Element actions */}
+      <div className="absolute right-2 top-2 flex space-x-1 bg-white shadow-sm border rounded-md">
+        <Button 
+          variant="ghost"
+          size="icon"
+          onClick={onMoveUp}
+          className="h-6 w-6 rounded-none border-r"
+        >
+          <ChevronUp size={14} />
+        </Button>
+        <Button 
+          variant="ghost"
+          size="icon"
+          onClick={onMoveDown}
+          className="h-6 w-6 rounded-none border-r"
+        >
+          <ChevronDown size={14} />
+        </Button>
+        <Button 
+          variant="ghost"
+          size="icon"
+          onClick={onEdit}
+          className="h-6 w-6 rounded-none border-r"
+        >
+          <Settings size={14} />
+        </Button>
+        <Button 
+          variant="ghost"
+          size="icon"
+          onClick={onRemove}
+          className="h-6 w-6 rounded-none text-red-500 hover:text-red-700"
+        >
+          <Trash2 size={14} />
+        </Button>
+      </div>
       
-      {/* Toolbar for standard elements */}
-      <div className="absolute top-2 right-2 z-10 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {!isEditing ? (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onEdit}
-            >
-              <Edit size={16} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onMoveUp}
-            >
-              <ArrowUp size={16} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onMoveDown}
-            >
-              <ArrowDown size={16} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-              onClick={onRemove}
-            >
-              <Trash size={16} />
-            </Button>
-          </>
+      {/* Element type label */}
+      <div className="absolute left-2 top-2 bg-metamaster-gray-100 px-2 py-1 text-xs rounded">
+        {item.type}
+      </div>
+      
+      {/* Content */}
+      <div className="mt-8">
+        {isEditing ? (
+          <div className="space-y-4">
+            {renderEditableContent()}
+            
+            <div className="flex justify-end space-x-2 pt-2">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+              <Button 
+                size="sm"
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
         ) : (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onCancel}
-              className="text-sm"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleSave}
-              className="text-sm"
-              disabled={isSaving}
-            >
-              {isSaving ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
-              Save
-            </Button>
-          </>
+          <div className="min-h-10">
+            {renderViewContent()}
+          </div>
         )}
       </div>
-      
-      {/* Element Content */}
-      {isEditing ? (
-        <div className="mt-4">
-          {item.type === ELEMENT_TYPES.HEADLINE && (
-            <>
-              <TextFormatToolbar text={editingContent} onTextChange={handleChange} />
-              <div className="mt-2">
-                <textarea
-                  value={editingContent}
-                  onChange={(e) => handleChange(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded min-h-[100px]"
-                  placeholder="Enter headline text..."
-                />
-              </div>
-            </>
-          )}
-          
-          {item.type === ELEMENT_TYPES.PARAGRAPH && (
-            <>
-              <TextFormatToolbar text={editingContent} onTextChange={handleChange} />
-              <div className="mt-2">
-                <textarea
-                  value={editingContent}
-                  onChange={(e) => handleChange(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded min-h-[150px]"
-                  placeholder="Enter paragraph text..."
-                />
-              </div>
-            </>
-          )}
-          
-          {item.type === ELEMENT_TYPES.BULLET_LIST && (
-            <>
-              <TextFormatToolbar text={editingContent} onTextChange={handleChange} />
-              <div className="mt-2">
-                <textarea
-                  value={editingContent}
-                  onChange={(e) => handleChange(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded min-h-[150px]"
-                  placeholder="Enter list items (one per line)..."
-                />
-              </div>
-            </>
-          )}
-          
-          {item.type === ELEMENT_TYPES.BUTTON && (
-            <>
-              <TextFormatToolbar text={editingContent} onTextChange={handleChange} />
-              <div className="mt-2">
-                <input
-                  type="text"
-                  value={editingContent}
-                  onChange={(e) => handleChange(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Button text..."
-                />
-              </div>
-            </>
-          )}
-          
-          {/* Add other element type editors as needed */}
-          
-          {/* Fallback for types without specific editor */}
-          {![
-            ELEMENT_TYPES.HEADLINE,
-            ELEMENT_TYPES.PARAGRAPH,
-            ELEMENT_TYPES.BULLET_LIST,
-            ELEMENT_TYPES.BUTTON,
-            // Add other handled types here
-          ].includes(item.type) && (
-            <div className="mt-2">
-              <textarea
-                value={editingContent}
-                onChange={(e) => handleChange(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded min-h-[100px]"
-                placeholder={`Enter ${item.type} content...`}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div>
-          {item.type === ELEMENT_TYPES.HEADLINE && (
-            <h2 className="text-2xl font-bold">{item.content}</h2>
-          )}
-          
-          {item.type === ELEMENT_TYPES.PARAGRAPH && (
-            <p>{item.content}</p>
-          )}
-          
-          {item.type === ELEMENT_TYPES.BULLET_LIST && (
-            <ul className="list-disc pl-5">
-              {item.content.split('\n').map((listItem, index) => (
-                <li key={index}>{listItem}</li>
-              ))}
-            </ul>
-          )}
-          
-          {item.type === ELEMENT_TYPES.BUTTON && (
-            <Button>{item.content}</Button>
-          )}
-          
-          {item.type === ELEMENT_TYPES.IMAGE && item.props?.src && (
-            <div className="flex justify-center">
-              <img 
-                src={item.props.src} 
-                alt={item.props.alt || 'Image'} 
-                className="max-w-full h-auto" 
-              />
-            </div>
-          )}
-          
-          {/* Add other element type renderers as needed */}
-          
-          {/* Fallback for types without specific renderer */}
-          {![
-            ELEMENT_TYPES.HEADLINE,
-            ELEMENT_TYPES.PARAGRAPH,
-            ELEMENT_TYPES.BULLET_LIST,
-            ELEMENT_TYPES.BUTTON,
-            ELEMENT_TYPES.IMAGE,
-            // Add other handled types here
-          ].includes(item.type) && (
-            <div className="p-4 border border-dashed border-gray-300 rounded text-gray-500 text-center">
-              {item.type} element: {item.content || "[No content]"}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
