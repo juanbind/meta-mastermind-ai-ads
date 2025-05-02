@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -233,6 +232,7 @@ const NewContactDialog: React.FC<{ onContactAdded: () => void }> = ({ onContactA
     setIsSubmitting(true);
     
     try {
+      // Add the last_activity field to fix the TypeScript error
       await createContact({
         first_name: firstName,
         last_name: lastName,
@@ -243,7 +243,8 @@ const NewContactDialog: React.FC<{ onContactAdded: () => void }> = ({ onContactA
         stage: 'lead',
         value: 0,
         tags: [],
-        assigned_to: user?.id || null
+        assigned_to: user?.id || null,
+        last_activity: new Date().toISOString() // Add this line to fix the TypeScript error
       });
       
       toast({
