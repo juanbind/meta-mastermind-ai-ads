@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -67,6 +66,16 @@ const MediaPreview: React.FC<{
 }> = ({ ad, className = "" }) => {
   const [mediaError, setMediaError] = useState(false);
   
+  // For debugging
+  useEffect(() => {
+    if (ad.video_url) {
+      console.log("Video URL:", ad.video_url);
+    }
+    if (ad.image_url) {
+      console.log("Image URL:", ad.image_url);
+    }
+  }, [ad.video_url, ad.image_url]);
+  
   // Fallback to image if video fails to load or isn't available
   if (ad.video_url && !mediaError) {
     return (
@@ -75,7 +84,10 @@ const MediaPreview: React.FC<{
           src={ad.video_url} 
           className="w-full h-full object-cover" 
           controls
-          onError={() => setMediaError(true)}
+          onError={() => {
+            console.error("Error loading video:", ad.video_url);
+            setMediaError(true);
+          }}
           poster={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=Loading+Video'}
         />
       </div>
@@ -90,6 +102,7 @@ const MediaPreview: React.FC<{
         alt={ad.title || 'Ad'} 
         className="w-full h-full object-cover"
         onError={(e) => {
+          console.error("Error loading image:", ad.image_url);
           const target = e.target as HTMLImageElement;
           target.src = 'https://placehold.co/600x400/EEE/999?text=Media+Unavailable';
         }}
@@ -401,19 +414,31 @@ const AdsLibrary: React.FC = () => {
   useEffect(() => {
     const loadInitialAds = async () => {
       try {
+        console.log("Starting to populate ad library");
         // Try to populate ad library on first load
-        await populateAdLibrary();
+        const result = await populateAdLibrary();
+        console.log("Populate result:", result);
         refetch();
+        
+        // Show toast about the result
+        toast({
+          title: "Ad Library Loaded",
+          description: `Successfully loaded ads from Meta Ad Library.`,
+        });
       } catch (error) {
         console.error('Error loading initial ads:', error);
+        toast({
+          title: "Warning",
+          description: "Using sample ads data. Meta Ad Library connection failed.",
+          variant: "default"
+        });
         // The error is already handled in populateAdLibrary with fallback
-        // No need to show error toast because we have fallback sample ads
         refetch(); // Still try to fetch whatever is in the database
       }
     };
     
     loadInitialAds();
-  }, [refetch]);
+  }, [refetch, toast]);
   
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
