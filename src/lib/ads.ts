@@ -15,6 +15,7 @@ export interface Ad {
   image_url: string | null;
   video_url: string | null;
   landing_url: string | null;
+  original_url: string | null; // Added original Meta ad URL
   creative_type: string | null;
   headline: string | null;
   body_text: string | null;

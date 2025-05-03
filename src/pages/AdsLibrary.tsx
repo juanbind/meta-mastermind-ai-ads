@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -56,6 +55,44 @@ const FilterButton: React.FC<{
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+// Media preview component to handle different media types
+const MediaPreview: React.FC<{ 
+  ad: Ad, 
+  className?: string 
+}> = ({ ad, className = "" }) => {
+  const [mediaError, setMediaError] = useState(false);
+  
+  // Fallback to image if video fails to load or isn't available
+  if (ad.video_url && !mediaError) {
+    return (
+      <div className={`relative ${className}`}>
+        <video 
+          src={ad.video_url} 
+          className="w-full h-full object-cover" 
+          controls
+          onError={() => setMediaError(true)}
+          poster={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=Loading+Video'}
+        />
+      </div>
+    );
+  }
+  
+  // Image display with error handling
+  return (
+    <div className={`relative ${className}`}>
+      <img 
+        src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} 
+        alt={ad.title || 'Ad'} 
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = 'https://placehold.co/600x400/EEE/999?text=Media+Unavailable';
+        }}
+      />
     </div>
   );
 };
@@ -143,23 +180,37 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   };
   
   const handleShare = () => {
-    // Create a share link for the ad
-    const shareUrl = `${window.location.origin}/ads/${ad.ad_id || ad.id}`;
+    // Generate Meta ad URL based on platform and IDs
+    let metaAdUrl = '';
+    
+    if (ad.original_url) {
+      // Use the original URL if available
+      metaAdUrl = ad.original_url;
+    } else if (ad.ad_id && ad.platform.toLowerCase().includes('facebook')) {
+      // Generate Facebook Ad Library URL
+      metaAdUrl = `https://www.facebook.com/ads/library/?id=${ad.ad_id}`;
+    } else if (ad.ad_id && ad.platform.toLowerCase().includes('instagram')) {
+      // Generate Instagram Ad URL
+      metaAdUrl = `https://www.facebook.com/ads/library/?id=${ad.ad_id}`; // Instagram ads also use Facebook Ad Library
+    } else {
+      // Fallback to internal URL
+      metaAdUrl = `${window.location.origin}/ads/${ad.ad_id || ad.id}`;
+    }
     
     // Try to use the native share API if available
     if (navigator.share) {
       navigator.share({
         title: ad.title || "Shared Ad",
         text: ad.description || "",
-        url: shareUrl
+        url: metaAdUrl
       }).catch(err => {
         console.error('Error sharing:', err);
         // Fallback to copying to clipboard
-        copyToClipboard(shareUrl);
+        copyToClipboard(metaAdUrl);
       });
     } else {
       // Fallback to copying to clipboard
-      copyToClipboard(shareUrl);
+      copyToClipboard(metaAdUrl);
     }
   };
   
@@ -167,7 +218,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
     navigator.clipboard.writeText(text).then(() => {
       toast({
         title: "Share link copied",
-        description: "Ad share link has been copied to your clipboard",
+        description: "Original Meta ad link has been copied to your clipboard",
       });
     }).catch(err => {
       console.error('Error copying to clipboard:', err);
@@ -182,7 +233,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100">
       <div className="relative h-64 bg-gray-100">
-        <img src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} alt={ad.title || 'Ad'} className="w-full h-full object-cover" />
+        <MediaPreview ad={ad} className="h-full" />
         <div className="absolute top-3 right-3 flex space-x-2">
           <Button 
             variant="outline" 
