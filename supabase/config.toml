@@ -6,3 +6,4 @@ verify_jwt = false # Allow public access for Facebook webhook
 
 [functions.fb-ad-sync]
 verify_jwt = false # Allow public access for ad library population
+timeout_seconds = 60 # Increase timeout for ad syncing

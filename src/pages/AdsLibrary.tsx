@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -307,10 +308,12 @@ const AdsLibrary: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, any>>({});
   const { toast } = useToast();
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(9); // Show 9 ads per page
+  const [pageSize] = useState(12); // Show 12 ads per page
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Query for fetching ads
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch, isError } = useQuery({
     queryKey: ['ads', searchQuery, filters, page, pageSize],
     queryFn: () => fetchAds({ 
       query: searchQuery, 
@@ -321,6 +324,17 @@ const AdsLibrary: React.FC = () => {
     }),
     // Enable by default to show ads without requiring search
     enabled: true,
+    retry: 2,
+    // Handle errors better
+    onError: (error: any) => {
+      console.error('Error fetching ads:', error);
+      setLoadError(error.message || 'Failed to load ads');
+      toast({
+        title: "Error",
+        description: "There was an issue loading ads. Please try again.",
+        variant: "destructive"
+      });
+    }
   });
   
   const filterOptions = {
@@ -334,6 +348,7 @@ const AdsLibrary: React.FC = () => {
   
   const handleSearch = () => {
     setPage(1); // Reset to first page
+    setLoadError(null);
     refetch();
     
     if (searchQuery.trim()) {
@@ -372,19 +387,26 @@ const AdsLibrary: React.FC = () => {
     refetch();
   };
   
-  const loadMore = () => {
+  const loadMore = async () => {
+    if (isLoadingMore || (data?.isLastPage)) return;
+    
+    setIsLoadingMore(true);
     setPage(page + 1);
+    setIsLoadingMore(false);
   };
   
-  // Initial data loading
+  // Initial data loading with better error handling
   useEffect(() => {
-    // Populate ad library on first load
     const loadInitialAds = async () => {
       try {
+        // Try to populate ad library on first load
         await populateAdLibrary();
         refetch();
       } catch (error) {
         console.error('Error loading initial ads:', error);
+        // The error is already handled in populateAdLibrary with fallback
+        // No need to show error toast because we have fallback sample ads
+        refetch(); // Still try to fetch whatever is in the database
       }
     };
     
@@ -443,8 +465,30 @@ const AdsLibrary: React.FC = () => {
             </div>
           </div>
           
+          {/* Error state */}
+          {loadError && !isLoading && (
+            <div className="bg-white rounded-xl p-6 shadow-md border border-red-100 text-center mb-8">
+              <div className="flex flex-col items-center justify-center">
+                <AlertCircle size={48} className="text-red-500 mb-4" />
+                <h3 className="text-xl font-bold text-metamaster-gray-800 mb-2">Error Loading Ads</h3>
+                <p className="text-metamaster-gray-600 mb-6 max-w-md mx-auto">
+                  {loadError}
+                </p>
+                <Button 
+                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
+                  onClick={() => {
+                    setLoadError(null);
+                    refetch();
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+          
           {/* Ads Grid */}
-          {isLoading ? (
+          {isLoading && !data ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((_, index) => (
                 <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
@@ -499,14 +543,15 @@ const AdsLibrary: React.FC = () => {
           )}
           
           {/* Load More Button */}
-          {data?.data && data.data.length > 0 && !isLoading && data.count && data.count > data.data.length && (
+          {data?.data && data.data.length > 0 && !isLoading && data.count && data.count > data.data.length && !data.isLastPage && (
             <div className="mt-8 text-center">
               <Button 
                 variant="outline" 
                 className="px-8"
                 onClick={loadMore}
+                disabled={isLoadingMore || (data?.isLastPage)}
               >
-                Load More
+                {isLoadingMore ? "Loading..." : "Load More"}
               </Button>
             </div>
           )}
