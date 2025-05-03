@@ -312,7 +312,7 @@ const AdsLibrary: React.FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Query for fetching ads
+  // Query for fetching ads - fixed to use correct react-query v5 syntax
   const { data, isLoading, refetch, isError } = useQuery({
     queryKey: ['ads', searchQuery, filters, page, pageSize],
     queryFn: () => fetchAds({ 
@@ -325,15 +325,17 @@ const AdsLibrary: React.FC = () => {
     // Enable by default to show ads without requiring search
     enabled: true,
     retry: 2,
-    // Handle errors better
-    onError: (error: any) => {
-      console.error('Error fetching ads:', error);
-      setLoadError(error.message || 'Failed to load ads');
-      toast({
-        title: "Error",
-        description: "There was an issue loading ads. Please try again.",
-        variant: "destructive"
-      });
+    // Fix: onError moved to meta or onSettled with correct syntax in v5
+    meta: {
+      onError: (error: any) => {
+        console.error('Error fetching ads:', error);
+        setLoadError(error.message || 'Failed to load ads');
+        toast({
+          title: "Error",
+          description: "There was an issue loading ads. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   });
   
