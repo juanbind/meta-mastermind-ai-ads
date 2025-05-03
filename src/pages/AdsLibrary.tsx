@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -321,11 +322,11 @@ const AdsLibrary: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, any>>({});
   const { toast } = useToast();
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(12); // Show 12 ads per page
+  const [pageSize] = useState(24); // Show 24 ads per page
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Query for fetching ads - fixed to use correct react-query v5 syntax
+  // Query for fetching ads - using correct React Query v5 syntax
   const { data, isLoading, refetch, isError } = useQuery({
     queryKey: ['ads', searchQuery, filters, page, pageSize],
     queryFn: () => fetchAds({ 
@@ -338,7 +339,6 @@ const AdsLibrary: React.FC = () => {
     // Enable by default to show ads without requiring search
     enabled: true,
     retry: 2,
-    // Fix: onError moved to meta or onSettled with correct syntax in v5
     meta: {
       onError: (error: any) => {
         console.error('Error fetching ads:', error);
@@ -407,6 +407,7 @@ const AdsLibrary: React.FC = () => {
     
     setIsLoadingMore(true);
     setPage(page + 1);
+    await refetch();
     setIsLoadingMore(false);
   };
   
@@ -418,13 +419,18 @@ const AdsLibrary: React.FC = () => {
         // Try to populate ad library on first load
         const result = await populateAdLibrary();
         console.log("Populate result:", result);
-        refetch();
         
-        // Show toast about the result
-        toast({
-          title: "Ad Library Loaded",
-          description: `Successfully loaded ads from Meta Ad Library.`,
-        });
+        if (result && result.success) {
+          refetch();
+          
+          // Show toast about the result
+          toast({
+            title: "Ad Library Loaded",
+            description: `Successfully loaded ${result.ads_count} ads from Meta Ad Library.`,
+          });
+        } else {
+          throw new Error("Failed to populate ad library");
+        }
       } catch (error) {
         console.error('Error loading initial ads:', error);
         toast({
@@ -534,7 +540,7 @@ const AdsLibrary: React.FC = () => {
               ))}
             </div>
           ) : data?.data && data.data.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {data.data.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}

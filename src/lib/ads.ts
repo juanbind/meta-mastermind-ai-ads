@@ -68,15 +68,17 @@ export async function fetchAds(options: {
   page?: number;
   pageSize?: number;
 }) {
-  const { query, platform, format, page = 1, pageSize = 12 } = options;
+  const { query, platform, format, page = 1, pageSize = 24 } = options;
   try {
     console.log(`Fetching ads with options:`, options);
     
     let queryBuilder = supabase.from('ads').select('*', { count: 'exact' });
     
-    // Apply search query
+    // Apply search query across multiple fields
     if (query) {
-      queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%,advertiser_name.ilike.%${query}%`);
+      queryBuilder = queryBuilder.or(
+        `title.ilike.%${query}%,description.ilike.%${query}%,advertiser_name.ilike.%${query}%,body_text.ilike.%${query}%,headline.ilike.%${query}%`
+      );
     }
     
     // Apply platform filter
@@ -92,12 +94,10 @@ export async function fetchAds(options: {
     // Apply pagination
     const from = (page - 1) * pageSize;
     
-    // We don't limit the 'to' value with range to avoid "range not satisfiable" errors
-    // when there are fewer results than expected
+    // Execute the query with pagination
     const { data, error, count } = await queryBuilder
       .order('created_at', { ascending: false })
-      .range(from, from + pageSize - 1)
-      .limit(pageSize);
+      .range(from, from + pageSize - 1);
       
     console.log(`Query returned ${data?.length || 0} ads, count: ${count || 'unknown'}`);
     
@@ -109,8 +109,7 @@ export async function fetchAds(options: {
         // Try again with first page
         const firstPageResults = await queryBuilder
           .order('created_at', { ascending: false })
-          .range(0, pageSize - 1)
-          .limit(pageSize);
+          .range(0, pageSize - 1);
           
         return {
           data: firstPageResults.data as Ad[],
@@ -123,12 +122,15 @@ export async function fetchAds(options: {
       throw error;
     }
     
+    // Check if we've reached the last page
+    const isLastPage = !data || data.length < pageSize || (count !== null && from + data.length >= count);
+    
     return { 
       data: data as Ad[], 
       count: count || 0, 
       page, 
       pageSize,
-      isLastPage: data.length < pageSize || (count && from + data.length >= count)
+      isLastPage
     };
   } catch (error) {
     console.error('Error fetching ads:', error);
@@ -243,62 +245,96 @@ export async function fetchAdInsights(adId: string) {
   }
 }
 
-// Populate the Ad Library with Meta ads (no Facebook account required)
+// Populate the Ad Library with Meta ads
 export async function populateAdLibrary() {
   try {
     console.log("Starting populateAdLibrary function");
-    // Instead of relying solely on the edge function which is failing,
-    // we'll first check what's already in the database
-    const { data: existingAds, error: existingAdsError } = await supabase
+    
+    // Check existing ads count before making the call
+    const { data: existingAdsCount, error: countError } = await supabase
       .from('ads')
-      .select('count')
-      .limit(1)
-      .single();
+      .select('count');
       
-    if (existingAdsError && existingAdsError.code !== 'PGRST116') {
-      console.error('Error checking existing ads:', existingAdsError);
+    if (countError) {
+      console.error("Error checking ads count:", countError);
+    } else {
+      console.log(`Found ${existingAdsCount[0]?.count || 0} existing ads`);
     }
     
-    // If we already have ads in the database, we don't need to fetch again
-    if (existingAds && existingAds.count > 0) {
-      console.log(`Found ${existingAds.count} existing ads in the database`);
-      return { success: true, message: `Using ${existingAds.count} existing ads` };
-    }
-    
-    // Try to fetch from the edge function, but handle failure gracefully
-    try {
-      console.log("No existing ads found, calling edge function to populate");
-      const response = await fetch(`https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Set a timeout to avoid waiting too long
-        signal: AbortSignal.timeout(30000) // 30 second timeout
-      });
-      
-      if (!response.ok) {
-        console.error(`Edge function error: ${response.status}`);
-        throw new Error(`Failed to connect to edge function: ${response.status}`);
+    // If we have less than 100 ads, call the edge function to populate more
+    if (!existingAdsCount || existingAdsCount[0]?.count < 100) {
+      try {
+        console.log("Calling edge function to populate ad library");
+        
+        // Use AbortSignal for better timeout control
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+        
+        const response = await fetch(
+          `https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, 
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal
+          }
+        );
+        
+        // Clear the timeout
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Edge function returned error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log("Edge function result:", result);
+        return result;
+      } catch (fetchError) {
+        console.error("Error connecting to edge function:", fetchError);
+        
+        if (fetchError.name === 'AbortError') {
+          console.log("Edge function request timed out, falling back to fetching existing ads");
+        }
+        
+        // If edge function fails but we have some existing ads, still return success
+        if (existingAdsCount && existingAdsCount[0]?.count > 0) {
+          return { 
+            success: true, 
+            message: `Using ${existingAdsCount[0].count} existing ads (edge function unavailable)`,
+            ads_count: existingAdsCount[0].count
+          };
+        } else {
+          // Emergency backup: insert minimal sample ads directly from here
+          await insertSampleAds();
+          return { 
+            success: true, 
+            message: 'Using sample ads data (edge function unavailable)', 
+            ads_count: 12 
+          };
+        }
       }
-      
-      const result = await response.json();
-      console.log("Edge function result:", result);
-      return result;
-    } catch (fetchError) {
-      console.error('Error connecting to edge function:', fetchError);
-      
-      // If fetching fails, insert some local sample data as fallback
-      console.log("Falling back to sample data");
-      await insertSampleAds();
-      return { success: true, message: 'Using sample ads data (edge function unavailable)' };
+    } else {
+      // We already have enough ads in the database
+      console.log(`Using ${existingAdsCount[0].count} existing ads in database`);
+      return { 
+        success: true, 
+        message: `Using ${existingAdsCount[0].count} existing ads`, 
+        ads_count: existingAdsCount[0].count 
+      };
     }
   } catch (error) {
     console.error('Error populating Ad Library:', error);
-    // Even if everything fails, try to insert sample data
+    
+    // Final fallback
     try {
       await insertSampleAds();
-      return { success: true, message: 'Using sample ads data (after error recovery)' };
+      return { 
+        success: true, 
+        message: 'Using sample ads data (after error recovery)', 
+        ads_count: 12 
+      };
     } catch (fallbackError) {
       console.error('Error inserting sample ads:', fallbackError);
       throw error; // Throw original error if fallback also fails
@@ -353,22 +389,6 @@ async function insertSampleAds() {
         impressions_low: 40000,
         impressions_high: 70000,
         engagement_rate: 0.025
-      }
-    },
-    {
-      platform: 'Instagram',
-      advertiser_name: 'Luxury Travel',
-      title: 'Escape to Paradise',
-      description: 'Book your dream vacation to exotic locations with our luxury travel packages.',
-      creative_type: 'Video',
-      video_url: 'https://assets.mixkit.co/videos/preview/mixkit-man-doing-tricks-on-a-skateboard-1241-large.mp4',
-      image_url: 'https://images.unsplash.com/photo-1602002418082-dd0e2857e0a0?w=800&auto=format&fit=crop',
-      start_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      original_url: 'https://www.facebook.com/ads/library/?id=423456789',
-      estimated_metrics: {
-        impressions_low: 60000,
-        impressions_high: 90000,
-        engagement_rate: 0.047
       }
     }
   ];
