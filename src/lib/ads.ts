@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 
 // Interface definitions for type safety
@@ -60,7 +59,7 @@ export interface AdAlert {
   user_id: string;
 }
 
-// Fetch ads with filters
+// Fetch ads with filters and improved error handling
 export async function fetchAds(options: {
   query?: string;
   platform?: string;
@@ -245,7 +244,7 @@ export async function fetchAdInsights(adId: string) {
   }
 }
 
-// Populate the Ad Library with Meta ads
+// Populate the Ad Library with Meta ads - improved to handle Meta API issues
 export async function populateAdLibrary() {
   try {
     console.log("Starting populateAdLibrary function");
@@ -261,157 +260,57 @@ export async function populateAdLibrary() {
       console.log(`Found ${existingAdsCount[0]?.count || 0} existing ads`);
     }
     
-    // If we have less than 100 ads, call the edge function to populate more
-    if (!existingAdsCount || existingAdsCount[0]?.count < 100) {
-      try {
-        console.log("Calling edge function to populate ad library");
-        
-        // Use AbortSignal for better timeout control
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
-        
-        const response = await fetch(
-          `https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, 
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            signal: controller.signal
-          }
-        );
-        
-        // Clear the timeout
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          throw new Error(`Edge function returned error: ${response.status}`);
+    // Always call the edge function to ensure we have the latest ads
+    try {
+      console.log("Calling edge function to populate ad library");
+      
+      // Use AbortSignal for better timeout control
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      
+      const response = await fetch(
+        `https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal
         }
-        
-        const result = await response.json();
-        console.log("Edge function result:", result);
-        return result;
-      } catch (fetchError) {
-        console.error("Error connecting to edge function:", fetchError);
-        
-        if (fetchError.name === 'AbortError') {
-          console.log("Edge function request timed out, falling back to fetching existing ads");
-        }
-        
-        // If edge function fails but we have some existing ads, still return success
-        if (existingAdsCount && existingAdsCount[0]?.count > 0) {
-          return { 
-            success: true, 
-            message: `Using ${existingAdsCount[0].count} existing ads (edge function unavailable)`,
-            ads_count: existingAdsCount[0].count
-          };
-        } else {
-          // Emergency backup: insert minimal sample ads directly from here
-          await insertSampleAds();
-          return { 
-            success: true, 
-            message: 'Using sample ads data (edge function unavailable)', 
-            ads_count: 12 
-          };
-        }
+      );
+      
+      // Clear the timeout
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`Edge function returned error: ${response.status}`);
       }
-    } else {
-      // We already have enough ads in the database
-      console.log(`Using ${existingAdsCount[0].count} existing ads in database`);
-      return { 
-        success: true, 
-        message: `Using ${existingAdsCount[0].count} existing ads`, 
-        ads_count: existingAdsCount[0].count 
-      };
+      
+      const result = await response.json();
+      console.log("Edge function result:", result);
+      return result;
+    } catch (fetchError) {
+      console.error("Error connecting to edge function:", fetchError);
+      
+      if (fetchError.name === 'AbortError') {
+        console.log("Edge function request timed out, falling back to fetching existing ads");
+      }
+      
+      // If edge function fails but we have some existing ads, still return success
+      if (existingAdsCount && existingAdsCount[0]?.count > 0) {
+        return { 
+          success: true, 
+          message: `Using ${existingAdsCount[0].count} existing ads (edge function unavailable)`,
+          ads_count: existingAdsCount[0].count
+        };
+      } else {
+        throw new Error("Unable to populate ad library and no existing ads found");
+      }
     }
   } catch (error) {
     console.error('Error populating Ad Library:', error);
-    
-    // Final fallback
-    try {
-      await insertSampleAds();
-      return { 
-        success: true, 
-        message: 'Using sample ads data (after error recovery)', 
-        ads_count: 12 
-      };
-    } catch (fallbackError) {
-      console.error('Error inserting sample ads:', fallbackError);
-      throw error; // Throw original error if fallback also fails
-    }
+    throw error;
   }
-}
-
-// Insert sample ads as fallback when edge function fails
-async function insertSampleAds() {
-  const sampleAds = [
-    {
-      platform: 'Facebook',
-      advertiser_name: 'Fitness Revolution',
-      title: 'Transform Your Body in 30 Days',
-      description: 'Join our proven fitness program and see results in just one month!',
-      creative_type: 'Single Image',
-      image_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop',
-      start_date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-      original_url: 'https://www.facebook.com/ads/library/?id=123456789',
-      estimated_metrics: {
-        impressions_low: 15000,
-        impressions_high: 25000,
-        engagement_rate: 0.042
-      }
-    },
-    {
-      platform: 'Instagram',
-      advertiser_name: 'Fashion Style Co',
-      title: 'Summer Collection Launch',
-      description: 'Discover our new sustainable summer collection. Use code SUMMER20 for 20% off your first order!',
-      creative_type: 'Carousel',
-      image_url: 'https://images.unsplash.com/photo-1523359346063-d879354c0ea5?w=800&auto=format&fit=crop',
-      start_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      original_url: 'https://www.facebook.com/ads/library/?id=223456789',
-      estimated_metrics: {
-        impressions_low: 30000,
-        impressions_high: 50000,
-        engagement_rate: 0.038
-      }
-    },
-    {
-      platform: 'Facebook',
-      advertiser_name: 'Tech Innovations',
-      title: 'The Future of Smart Homes',
-      description: 'Control your entire home from your phone with our new integrated smart system.',
-      creative_type: 'Video',
-      video_url: 'https://assets.mixkit.co/videos/preview/mixkit-young-woman-talking-on-video-call-with-a-laptop-at-39894-large.mp4',
-      image_url: 'https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=800&auto=format&fit=crop',
-      start_date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-      original_url: 'https://www.facebook.com/ads/library/?id=323456789',
-      estimated_metrics: {
-        impressions_low: 40000,
-        impressions_high: 70000,
-        engagement_rate: 0.025
-      }
-    }
-  ];
-  
-  // Delete any existing ads to avoid duplication
-  try {
-    await supabase.from('ads').delete().not('id', 'is', null);
-  } catch (deleteError) {
-    console.log('Could not delete existing ads, continuing anyway:', deleteError);
-  }
-  
-  // Insert new sample ads
-  for (const ad of sampleAds) {
-    try {
-      await supabase
-        .from('ads')
-        .insert(ad);
-    } catch (error) {
-      console.error('Error inserting sample ad:', error);
-    }
-  }
-  
-  console.log('Added sample ads as fallback');
 }
 
 // Connect to Facebook Ads (kept for backward compatibility but can now be optional)

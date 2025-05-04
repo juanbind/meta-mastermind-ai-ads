@@ -207,6 +207,7 @@ export type Database = {
           last_seen_date: string | null
           last_updated: string | null
           metadata: Json | null
+          original_url: string | null
           page_id: string | null
           page_name: string | null
           platform: string
@@ -239,6 +240,7 @@ export type Database = {
           last_seen_date?: string | null
           last_updated?: string | null
           metadata?: Json | null
+          original_url?: string | null
           page_id?: string | null
           page_name?: string | null
           platform: string
@@ -271,6 +273,7 @@ export type Database = {
           last_seen_date?: string | null
           last_updated?: string | null
           metadata?: Json | null
+          original_url?: string | null
           page_id?: string | null
           page_name?: string | null
           platform?: string

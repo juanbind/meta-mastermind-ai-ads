@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle } from 'lucide-react';
+import { Search, Filter, ChevronDown, Share, BookmarkPlus, AlertCircle, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/components/ui/use-toast';
@@ -60,36 +59,34 @@ const FilterButton: React.FC<{
   );
 };
 
-// Media preview component to handle different media types
+// Media preview component to handle different media types with better error handling
 const MediaPreview: React.FC<{ 
   ad: Ad, 
   className?: string 
 }> = ({ ad, className = "" }) => {
   const [mediaError, setMediaError] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   
-  // For debugging
-  useEffect(() => {
-    if (ad.video_url) {
-      console.log("Video URL:", ad.video_url);
-    }
-    if (ad.image_url) {
-      console.log("Image URL:", ad.image_url);
-    }
-  }, [ad.video_url, ad.image_url]);
-  
-  // Fallback to image if video fails to load or isn't available
+  // Enhanced fallback to handle various media scenarios
   if (ad.video_url && !mediaError) {
     return (
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className} bg-gray-100`}>
+        {!isVideoLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader size={24} className="animate-spin text-metamaster-primary" />
+          </div>
+        )}
         <video 
           src={ad.video_url} 
-          className="w-full h-full object-cover" 
+          className={`w-full h-full object-cover ${isVideoLoaded ? '' : 'opacity-0'}`}
           controls
+          onLoadedData={() => setIsVideoLoaded(true)}
           onError={() => {
             console.error("Error loading video:", ad.video_url);
             setMediaError(true);
           }}
-          poster={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=Loading+Video'}
+          poster={ad.image_url || undefined}
         />
       </div>
     );
@@ -97,15 +94,22 @@ const MediaPreview: React.FC<{
   
   // Image display with error handling
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className} bg-gray-100`}>
+      {!isImageLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Loader size={24} className="animate-spin text-metamaster-primary" />
+        </div>
+      )}
       <img 
         src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} 
-        alt={ad.title || 'Ad'} 
-        className="w-full h-full object-cover"
+        alt={ad.title || ad.advertiser_name || 'Ad'} 
+        className={`w-full h-full object-cover ${isImageLoaded ? '' : 'opacity-0'}`}
+        onLoad={() => setIsImageLoaded(true)}
         onError={(e) => {
           console.error("Error loading image:", ad.image_url);
           const target = e.target as HTMLImageElement;
-          target.src = 'https://placehold.co/600x400/EEE/999?text=Media+Unavailable';
+          target.src = 'https://placehold.co/600x400/EEE/999?text=No+Preview+Available';
+          setIsImageLoaded(true);
         }}
       />
     </div>
@@ -246,7 +250,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
   };
   
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100">
+    <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
       <div className="relative h-64 bg-gray-100">
         <MediaPreview ad={ad} className="h-full" />
         <div className="absolute top-3 right-3 flex space-x-2">
@@ -282,7 +286,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
           </span>
         </div>
         
-        <h3 className="font-semibold mb-1 text-metamaster-gray-800">{ad.title || ad.headline || 'Untitled Ad'}</h3>
+        <h3 className="font-semibold mb-1 text-metamaster-gray-800 line-clamp-2">{ad.title || ad.headline || 'Untitled Ad'}</h3>
         <p className="text-metamaster-gray-600 text-sm mb-2 line-clamp-2">{ad.description || ad.body_text || 'No description available'}</p>
         
         <div className="flex items-center text-metamaster-gray-500 mb-3">
@@ -325,6 +329,7 @@ const AdsLibrary: React.FC = () => {
   const [pageSize] = useState(24); // Show 24 ads per page
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false);
 
   // Query for fetching ads - using correct React Query v5 syntax
   const { data, isLoading, refetch, isError } = useQuery({
@@ -414,6 +419,10 @@ const AdsLibrary: React.FC = () => {
   // Initial data loading with better error handling
   useEffect(() => {
     const loadInitialAds = async () => {
+      if (isInitialDataLoaded) return; // Prevent multiple calls
+      
+      setIsInitialDataLoaded(true);
+      
       try {
         console.log("Starting to populate ad library");
         // Try to populate ad library on first load
@@ -425,8 +434,8 @@ const AdsLibrary: React.FC = () => {
           
           // Show toast about the result
           toast({
-            title: "Ad Library Loaded",
-            description: `Successfully loaded ${result.ads_count} ads from Meta Ad Library.`,
+            title: "Meta Ad Library Loaded",
+            description: `Successfully loaded ${result.ads_count} ads${result.source ? ' from ' + result.source : ''}.`,
           });
         } else {
           throw new Error("Failed to populate ad library");
@@ -435,11 +444,11 @@ const AdsLibrary: React.FC = () => {
         console.error('Error loading initial ads:', error);
         toast({
           title: "Warning",
-          description: "Using sample ads data. Meta Ad Library connection failed.",
+          description: "Using cached ad data. Meta Ad Library connection failed.",
           variant: "default"
         });
-        // The error is already handled in populateAdLibrary with fallback
-        refetch(); // Still try to fetch whatever is in the database
+        // Try to fetch whatever is in the database
+        refetch();
       }
     };
     
@@ -454,7 +463,7 @@ const AdsLibrary: React.FC = () => {
           {/* Page Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2 text-metamaster-gray-800">Meta Ads Library</h1>
-            <p className="text-metamaster-gray-600">Search, analyze and save high-performing ads across Meta platforms</p>
+            <p className="text-metamaster-gray-600">Search, analyze and save high-performing ads from the Meta Ad Library</p>
           </div>
           
           {/* Search & Filters */}
@@ -498,6 +507,14 @@ const AdsLibrary: React.FC = () => {
             </div>
           </div>
           
+          {/* Loading state */}
+          {isLoading && !data && (
+            <div className="text-center py-12">
+              <Loader size={48} className="animate-spin text-metamaster-primary mx-auto mb-4" />
+              <p className="text-metamaster-gray-600">Loading ads from Meta Ad Library...</p>
+            </div>
+          )}
+          
           {/* Error state */}
           {loadError && !isLoading && (
             <div className="bg-white rounded-xl p-6 shadow-md border border-red-100 text-center mb-8">
@@ -521,31 +538,13 @@ const AdsLibrary: React.FC = () => {
           )}
           
           {/* Ads Grid */}
-          {isLoading && !data ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 animate-pulse">
-                  <div className="h-64 bg-gray-200"></div>
-                  <div className="p-4">
-                    <div className="h-4 w-1/4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 w-1/2 bg-gray-200 rounded mb-4"></div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="h-12 bg-gray-100 rounded"></div>
-                      <div className="h-12 bg-gray-100 rounded"></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : data?.data && data.data.length > 0 ? (
+          {!isLoading && data?.data && data.data.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {data.data.map((ad) => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
             </div>
-          ) : (
+          ) : (!isLoading && !loadError) ? (
             <div className="bg-white rounded-xl p-10 shadow-md border border-gray-100 text-center">
               <div className="flex flex-col items-center justify-center">
                 <AlertCircle size={48} className="text-metamaster-gray-400 mb-4" />
@@ -556,15 +555,16 @@ const AdsLibrary: React.FC = () => {
                 <Button 
                   className="bg-metamaster-primary hover:bg-metamaster-secondary"
                   onClick={() => {
-                    setSearchQuery('fitness');
-                    handleSearch();
+                    setSearchQuery('');
+                    setFilters({});
+                    refetch();
                   }}
                 >
-                  Try Sample Search
+                  View All Ads
                 </Button>
               </div>
             </div>
-          )}
+          ) : null}
           
           {/* Results Found Text */}
           {data?.data && data.data.length > 0 && !isLoading && (
@@ -584,7 +584,12 @@ const AdsLibrary: React.FC = () => {
                 onClick={loadMore}
                 disabled={isLoadingMore || (data?.isLastPage)}
               >
-                {isLoadingMore ? "Loading..." : "Load More"}
+                {isLoadingMore ? (
+                  <>
+                    <Loader size={16} className="animate-spin mr-2" />
+                    Loading...
+                  </>
+                ) : "Load More"}
               </Button>
             </div>
           )}
