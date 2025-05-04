@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
+import { useNavigate } from 'react-router-dom';
 
 const StatCard: React.FC<{ title: string; value: string; change?: string; icon: React.ReactNode; isPositive?: boolean }> = ({
   title,
@@ -61,11 +62,12 @@ const RecentAd: React.FC<{ title: string; image: string; engagement: string; dat
   );
 };
 
-const ActionCard: React.FC<{ title: string; description: string; buttonText: string; icon: React.ReactNode }> = ({
+const ActionCard: React.FC<{ title: string; description: string; buttonText: string; icon: React.ReactNode; onClick: () => void }> = ({
   title,
   description,
   buttonText,
-  icon
+  icon,
+  onClick
 }) => {
   return (
     <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
@@ -76,7 +78,7 @@ const ActionCard: React.FC<{ title: string; description: string; buttonText: str
         <div>
           <h3 className="font-bold mb-2 text-metamaster-gray-800">{title}</h3>
           <p className="text-metamaster-gray-600 text-sm mb-4">{description}</p>
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button variant="outline" size="sm" className="flex items-center" onClick={onClick}>
             {buttonText}
             <ChevronRight size={16} className="ml-1" />
           </Button>
@@ -87,6 +89,8 @@ const ActionCard: React.FC<{ title: string; description: string; buttonText: str
 };
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
@@ -132,13 +136,24 @@ const Dashboard: React.FC = () => {
               <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
                 <h3 className="font-bold text-lg mb-4 text-metamaster-gray-800">Quick Actions</h3>
                 <div className="space-y-4">
-                  <Button className="w-full bg-metamaster-primary hover:bg-metamaster-secondary justify-start">
+                  <Button 
+                    className="w-full bg-metamaster-primary hover:bg-metamaster-secondary justify-start"
+                    onClick={() => navigate('/ads-library')}
+                  >
                     <Search size={18} className="mr-2" /> Search FB Ads Library
                   </Button>
-                  <Button variant="outline" className="w-full justify-start text-metamaster-gray-800">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start text-metamaster-gray-800"
+                    onClick={() => navigate('/ai-tools')}
+                  >
                     <Zap size={18} className="mr-2" /> Create AI Campaign
                   </Button>
-                  <Button variant="outline" className="w-full justify-start text-metamaster-gray-800">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start text-metamaster-gray-800"
+                    onClick={() => navigate('/ads-library')}
+                  >
                     <TrendingUp size={18} className="mr-2" /> Track New Competitor
                   </Button>
                 </div>
@@ -182,7 +197,10 @@ const Dashboard: React.FC = () => {
               <div className="bg-gradient-to-r from-metamaster-primary to-metamaster-secondary rounded-xl p-6 shadow-md text-white">
                 <h3 className="font-bold text-lg mb-2">Discover Winning Ads</h3>
                 <p className="opacity-80 mb-4">Analyze the top performing Facebook ads in your niche and leverage their strategies.</p>
-                <Button className="bg-white text-metamaster-primary hover:bg-opacity-90">
+                <Button 
+                  className="bg-white text-metamaster-primary hover:bg-opacity-90"
+                  onClick={() => navigate('/ads-library')}
+                >
                   Start Exploring
                 </Button>
               </div>
@@ -193,6 +211,7 @@ const Dashboard: React.FC = () => {
                   description="Use our drag & drop builder to create high-converting funnels in minutes."
                   buttonText="Build Funnel"
                   icon={<Zap size={18} />}
+                  onClick={() => navigate('/funnel-builder')}
                 />
                 
                 <ActionCard
@@ -200,6 +219,7 @@ const Dashboard: React.FC = () => {
                   description="Answer a few questions and let AI create the perfect campaign structure."
                   buttonText="Start Generator"
                   icon={<BarChart size={18} />}
+                  onClick={() => navigate('/ai-tools')}
                 />
               </div>
             </div>
@@ -208,7 +228,12 @@ const Dashboard: React.FC = () => {
             <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg text-metamaster-gray-800">Recently Saved Ads</h3>
-                <Button variant="ghost" size="sm" className="text-metamaster-primary">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-metamaster-primary"
+                  onClick={() => navigate('/ads-library')}
+                >
                   View All
                 </Button>
               </div>
@@ -217,7 +242,11 @@ const Dashboard: React.FC = () => {
                 <Search size={48} className="text-metamaster-gray-300 mb-3" />
                 <p className="text-metamaster-gray-600 mb-2">No ads saved yet</p>
                 <p className="text-metamaster-gray-400 text-sm mb-4">Start exploring the ads library to save ads</p>
-                <Button variant="outline" className="text-metamaster-gray-800">
+                <Button 
+                  variant="outline" 
+                  className="text-metamaster-gray-800"
+                  onClick={() => navigate('/ads-library')}
+                >
                   Browse Ad Library
                 </Button>
               </div>

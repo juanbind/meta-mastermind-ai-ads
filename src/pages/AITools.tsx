@@ -81,6 +81,7 @@ const AITools: React.FC = () => {
       comingSoon: false
     },
     {
+      id: "ad-copy",
       title: "Ad Copy Generator",
       description: "Create compelling ad copy that converts using our advanced AI model trained on high-performing ads.",
       icon: <MessageSquare size={24} />,
@@ -88,6 +89,7 @@ const AITools: React.FC = () => {
       comingSoon: true
     },
     {
+      id: "campaign-analyzer",
       title: "Campaign Analyzer",
       description: "Get AI-powered insights and recommendations to improve your campaign performance.",
       icon: <Brain size={24} />,
@@ -95,6 +97,7 @@ const AITools: React.FC = () => {
       comingSoon: true
     },
     {
+      id: "creative-generator",
       title: "Creative Generator",
       description: "Generate scroll-stopping ad creative concepts based on your product and target audience.",
       icon: <Sparkles size={24} />,
@@ -102,6 +105,7 @@ const AITools: React.FC = () => {
       comingSoon: true
     },
     {
+      id: "funnel-optimizer",
       title: "Funnel Optimizer",
       description: "AI analysis of your funnel to identify bottlenecks and suggest optimizations.",
       icon: <Zap size={24} />,
@@ -109,6 +113,7 @@ const AITools: React.FC = () => {
       comingSoon: true
     },
     {
+      id: "landing-page",
       title: "Landing Page Builder",
       description: "Generate high-converting landing pages with AI-optimized copy and layout.",
       icon: <FileCode size={24} />,
@@ -135,8 +140,8 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
-                comingSoon={'id' in tool ? false : true}
-                onAction={() => 'id' in tool ? openTool(tool.id as string) : undefined}
+                comingSoon={'id' in tool ? (tool.id === 'media-buyer' ? false : true) : true}
+                onAction={() => 'id' in tool ? openTool(tool.id) : undefined}
               />
             ))}
           </div>
