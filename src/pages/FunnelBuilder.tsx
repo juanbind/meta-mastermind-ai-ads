@@ -26,7 +26,8 @@ import {
   Clock,
   Shield,
   Award,
-  MessageSquare
+  MessageSquare,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
@@ -36,6 +37,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import FunnelElement from '@/components/funnel/FunnelElement';
 import FunnelCanvas, { CanvasItem } from '@/components/funnel/FunnelCanvas';
 import { ELEMENT_TYPES } from '@/components/funnel/FunnelElement';
@@ -622,6 +624,15 @@ const FunnelBuilder: React.FC = () => {
         <Sidebar />
         <div className="md:ml-64 pt-8">
           <div className="container mx-auto px-4 pb-12">
+            {/* Coming Soon Alert */}
+            <Alert variant="warning" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Coming Soon</AlertTitle>
+              <AlertDescription>
+                The Funnel Builder is currently in development. Some features may be limited or not fully functional yet.
+              </AlertDescription>
+            </Alert>
+            
             {/* Page Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold mb-2 text-metamaster-gray-800">Funnel Builder</h1>
