@@ -244,7 +244,7 @@ export async function fetchAdInsights(adId: string) {
   }
 }
 
-// Populate the Ad Library with Meta ads - improved to handle Meta API issues
+// Populate the Ad Library with Meta ads - improved to prioritize real ads
 export async function populateAdLibrary() {
   try {
     console.log("Starting populateAdLibrary function");
@@ -264,9 +264,9 @@ export async function populateAdLibrary() {
     try {
       console.log("Calling edge function to populate ad library");
       
-      // Use AbortSignal for better timeout control
+      // Use AbortSignal for better timeout control - increased to 5 minutes
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
       
       const response = await fetch(
         `https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, 
@@ -288,6 +288,11 @@ export async function populateAdLibrary() {
       
       const result = await response.json();
       console.log("Edge function result:", result);
+      
+      if (result.source && result.source.includes("Sample")) {
+        console.warn("Warning: Using sample data because real Meta Ad Library API data was unavailable");
+      }
+      
       return result;
     } catch (fetchError) {
       console.error("Error connecting to edge function:", fetchError);

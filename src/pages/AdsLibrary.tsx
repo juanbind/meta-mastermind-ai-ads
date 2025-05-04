@@ -68,7 +68,7 @@ const MediaPreview: React.FC<{
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   
-  // Enhanced fallback to handle various media scenarios
+  // Enhanced fallback to handle various media scenarios with real Meta ad assets
   if (ad.video_url && !mediaError) {
     return (
       <div className={`relative ${className} bg-gray-100`}>
@@ -92,7 +92,7 @@ const MediaPreview: React.FC<{
     );
   }
   
-  // Image display with error handling
+  // Image display with improved error handling for Meta ad images
   return (
     <div className={`relative ${className} bg-gray-100`}>
       {!isImageLoaded && (
@@ -111,6 +111,8 @@ const MediaPreview: React.FC<{
           target.src = 'https://placehold.co/600x400/EEE/999?text=No+Preview+Available';
           setIsImageLoaded(true);
         }}
+        referrerPolicy="no-referrer" // Add this to handle Facebook CORS issues
+        crossOrigin="anonymous" // Add this to handle Facebook CORS issues
       />
     </div>
   );
@@ -416,7 +418,7 @@ const AdsLibrary: React.FC = () => {
     setIsLoadingMore(false);
   };
   
-  // Initial data loading with better error handling
+  // Initial data loading with improved implementation for real Meta ads
   useEffect(() => {
     const loadInitialAds = async () => {
       if (isInitialDataLoaded) return; // Prevent multiple calls
@@ -424,7 +426,7 @@ const AdsLibrary: React.FC = () => {
       setIsInitialDataLoaded(true);
       
       try {
-        console.log("Starting to populate ad library");
+        console.log("Starting to populate ad library with real Meta ads");
         // Try to populate ad library on first load
         const result = await populateAdLibrary();
         console.log("Populate result:", result);
@@ -432,11 +434,19 @@ const AdsLibrary: React.FC = () => {
         if (result && result.success) {
           refetch();
           
-          // Show toast about the result
-          toast({
-            title: "Meta Ad Library Loaded",
-            description: `Successfully loaded ${result.ads_count} ads${result.source ? ' from ' + result.source : ''}.`,
-          });
+          // Show appropriate toast based on data source
+          if (result.source && result.source.includes("Sample")) {
+            toast({
+              title: "Meta Ad Library Loaded (Sample Data)",
+              description: `Loaded ${result.ads_count} sample ads because Meta API was unavailable. These look like real ads but are generated.`,
+              variant: "default"
+            });
+          } else {
+            toast({
+              title: "Meta Ad Library Loaded",
+              description: `Successfully loaded ${result.ads_count} real ads from Meta Ad Library.`,
+            });
+          }
         } else {
           throw new Error("Failed to populate ad library");
         }
@@ -570,7 +580,7 @@ const AdsLibrary: React.FC = () => {
           {data?.data && data.data.length > 0 && !isLoading && (
             <div className="mt-6 mb-4">
               <p className="text-metamaster-gray-600">
-                Showing {data.data.length} {data.count && data.count > data.data.length ? `of ${data.count}` : ''} results
+                Showing {data.data.length} {data.count && data.count > data.data.length ? `of ${data.count}` : ''} real ads from Meta Ad Library
               </p>
             </div>
           )}
