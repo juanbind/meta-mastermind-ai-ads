@@ -1,9 +1,12 @@
 
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
-import { Zap, Brain, Sparkles, FileCode, MessageSquare } from 'lucide-react';
+import { Zap, Brain, Sparkles, FileCode, MessageSquare, TrendingUp, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
+import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface ToolCardProps {
   title: string;
@@ -11,9 +14,10 @@ interface ToolCardProps {
   icon: React.ReactNode;
   buttonText: string;
   comingSoon?: boolean;
+  onAction: () => void;
 }
 
-const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonText, comingSoon = true }) => {
+const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonText, comingSoon = true, onAction }) => {
   const { toast } = useToast();
   
   const handleToolClick = () => {
@@ -23,10 +27,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
         description: "This tool will be available in an upcoming update. Stay tuned!",
       });
     } else {
-      toast({
-        title: `${title} activated`,
-        description: "Tool is now ready to use.",
-      });
+      onAction();
     }
   };
   
@@ -59,36 +60,60 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
 };
 
 const AITools: React.FC = () => {
+  const navigate = useNavigate();
+  const [activeToolDialog, setActiveToolDialog] = React.useState<string | null>(null);
+
+  const openTool = (toolId: string) => {
+    setActiveToolDialog(toolId);
+  };
+
+  const closeTool = () => {
+    setActiveToolDialog(null);
+  };
+
   const tools = [
+    {
+      id: "media-buyer",
+      title: "AI Media Buyer",
+      description: "Create optimized ad campaigns, targeting strategies, and budget allocations using AI algorithms trained on high-performing campaigns.",
+      icon: <Target size={24} />,
+      buttonText: "Plan Campaign",
+      comingSoon: false
+    },
     {
       title: "Ad Copy Generator",
       description: "Create compelling ad copy that converts using our advanced AI model trained on high-performing ads.",
       icon: <MessageSquare size={24} />,
-      buttonText: "Generate Copy"
+      buttonText: "Generate Copy",
+      comingSoon: true
     },
     {
       title: "Campaign Analyzer",
       description: "Get AI-powered insights and recommendations to improve your campaign performance.",
       icon: <Brain size={24} />,
-      buttonText: "Analyze Campaign"
+      buttonText: "Analyze Campaign",
+      comingSoon: true
     },
     {
       title: "Creative Generator",
       description: "Generate scroll-stopping ad creative concepts based on your product and target audience.",
       icon: <Sparkles size={24} />,
-      buttonText: "Generate Creative"
+      buttonText: "Generate Creative",
+      comingSoon: true
     },
     {
       title: "Funnel Optimizer",
       description: "AI analysis of your funnel to identify bottlenecks and suggest optimizations.",
       icon: <Zap size={24} />,
-      buttonText: "Optimize Funnel"
+      buttonText: "Optimize Funnel",
+      comingSoon: true
     },
     {
       title: "Landing Page Builder",
       description: "Generate high-converting landing pages with AI-optimized copy and layout.",
       icon: <FileCode size={24} />,
-      buttonText: "Build Page"
+      buttonText: "Build Page",
+      comingSoon: true
     }
   ];
 
@@ -110,12 +135,20 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
-                comingSoon={true}
+                comingSoon={'id' in tool ? false : true}
+                onAction={() => 'id' in tool ? openTool(tool.id as string) : undefined}
               />
             ))}
           </div>
         </div>
       </div>
+
+      {/* AI Media Buyer Dialog */}
+      <Dialog open={activeToolDialog === "media-buyer"} onOpenChange={() => closeTool()}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <AIMediaBuyer onClose={closeTool} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
