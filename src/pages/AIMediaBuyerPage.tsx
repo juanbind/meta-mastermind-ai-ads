@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +19,7 @@ import {
   Settings
 } from 'lucide-react';
 import AIMediaBuyerEnhanced from '@/components/ai-tools/AIMediaBuyerEnhanced';
+import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
 
 const AIMediaBuyerPage: React.FC = () => {
   const { toast } = useToast();
@@ -31,6 +31,7 @@ const AIMediaBuyerPage: React.FC = () => {
   });
   const [fbAccessToken, setFbAccessToken] = useState('');
   const [fbAdAccountId, setFbAdAccountId] = useState('');
+  const [activeMainTab, setActiveMainTab] = useState('campaigns');
 
   // Connect to Facebook Ad Account
   const handleConnectFacebook = () => {
@@ -86,10 +87,13 @@ const AIMediaBuyerPage: React.FC = () => {
             <p className="text-metamaster-gray-600">Create optimized ad campaigns using AI algorithms trained on high-performing campaigns.</p>
           </div>
           
-          <Tabs defaultValue="campaign" className="space-y-6">
-            <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              <TabsTrigger value="campaign" className="flex items-center justify-center gap-2">
+          <Tabs defaultValue="campaigns" value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-6">
+            <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
+              <TabsTrigger value="campaigns" className="flex items-center justify-center gap-2">
                 <Target size={16} /> Campaigns
+              </TabsTrigger>
+              <TabsTrigger value="ad-copy" className="flex items-center justify-center gap-2">
+                <FileText size={16} /> Ad Copy
               </TabsTrigger>
               <TabsTrigger value="automation" className="flex items-center justify-center gap-2">
                 <ZapOff size={16} /> Automations
@@ -106,7 +110,7 @@ const AIMediaBuyerPage: React.FC = () => {
             </TabsList>
             
             {/* Campaign Creation Tab */}
-            <TabsContent value="campaign" className="space-y-6">
+            <TabsContent value="campaigns" className="space-y-6">
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
                 <div className="mb-6">
@@ -160,35 +164,12 @@ const AIMediaBuyerPage: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+            </TabsContent>
+            
+            {/* Ad Copy Generator Tab */}
+            <TabsContent value="ad-copy" className="space-y-6">
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                <h2 className="text-xl font-semibold mb-4">Ad Copy Generator</h2>
-                <p className="text-gray-600 mb-4">
-                  Write high-converting ad copy based on your product pages, past ads, or specific requirements.
-                </p>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Product URL or Description
-                    </label>
-                    <Textarea 
-                      placeholder="Enter your product URL, paste previous ad content, or describe what you want"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm">Promotional</Button>
-                    <Button variant="outline" size="sm">Educational</Button>
-                    <Button variant="outline" size="sm">Testimonial-Based</Button>
-                    <Button variant="outline" size="sm">Problem-Solution</Button>
-                  </div>
-                  
-                  <Button className="mt-2">
-                    Generate Ad Copy
-                  </Button>
-                </div>
+                <AdCopyGenerator />
               </div>
             </TabsContent>
             

@@ -36,9 +36,29 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    // Campaign basics
     campaignName: '',
     objective: 'conversions',
+    
+    // Business information
+    businessName: '',
+    businessType: '',
+    businessDescription: '',
+    businessWebsite: '',
+    
+    // Target audience
     targetAudience: '',
+    targetLocation: '',
+    ageRangeMin: '18',
+    ageRangeMax: '65',
+    gender: 'all',
+    
+    // Ideal customer profile
+    customerInterests: '',
+    customerBehaviors: '',
+    customerPainPoints: '',
+    
+    // Budget & settings
     budget: '',
     stopLossThreshold: '200',
     enableStopLoss: true,
@@ -61,33 +81,75 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     { value: 'sales', label: 'Sales' }
   ];
 
+  const businessTypes = [
+    { value: 'ecommerce', label: 'E-commerce' },
+    { value: 'service', label: 'Service-based' },
+    { value: 'saas', label: 'SaaS' },
+    { value: 'local', label: 'Local Business' },
+    { value: 'education', label: 'Education' },
+    { value: 'health', label: 'Healthcare' },
+    { value: 'other', label: 'Other' }
+  ];
+
+  const genderOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' }
+  ];
+
   const handleStepChange = (newStep: number) => {
     // Validate form fields before proceeding
-    if (step === 1 && !formData.campaignName) {
-      toast({
-        title: "Campaign name required",
-        description: "Please enter a name for your campaign",
-        variant: "destructive",
-      });
-      return;
+    if (step === 1) {
+      if (!formData.campaignName) {
+        toast({
+          title: "Campaign name required",
+          description: "Please enter a name for your campaign",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!formData.businessName || !formData.businessType) {
+        toast({
+          title: "Business information required",
+          description: "Please enter your business name and type",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     
-    if (step === 2 && !formData.targetAudience) {
-      toast({
-        title: "Target audience required",
-        description: "Please describe your target audience",
-        variant: "destructive",
-      });
-      return;
+    if (step === 2) {
+      if (!formData.targetAudience || !formData.targetLocation) {
+        toast({
+          title: "Target information required",
+          description: "Please provide target audience and location details",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     
-    if (step === 3 && !formData.budget) {
-      toast({
-        title: "Budget required",
-        description: "Please enter your campaign budget",
-        variant: "destructive",
-      });
-      return;
+    if (step === 3) {
+      if (!formData.customerInterests) {
+        toast({
+          title: "Customer profile required",
+          description: "Please provide at least some customer interests",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    if (step === 4) {
+      if (!formData.budget) {
+        toast({
+          title: "Budget required",
+          description: "Please enter your campaign budget",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     
     setStep(newStep);
@@ -172,6 +234,8 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       case 1:
         return (
           <div className="space-y-4">
+            <h3 className="font-medium text-lg">Campaign & Business Information</h3>
+            
             <div>
               <label htmlFor="campaignName" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
                 Campaign Name
@@ -184,6 +248,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 placeholder="Enter campaign name"
               />
             </div>
+            
             <div>
               <label htmlFor="objective" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
                 Campaign Objective
@@ -204,6 +269,68 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div>
+              <label htmlFor="businessName" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Business Name
+              </label>
+              <Input
+                id="businessName"
+                name="businessName"
+                value={formData.businessName}
+                onChange={handleInputChange}
+                placeholder="Enter your business name"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="businessType" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Business Type
+              </label>
+              <Select
+                value={formData.businessType}
+                onValueChange={(value) => handleSelectChange('businessType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select business type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {businessTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label htmlFor="businessDescription" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Business Description
+              </label>
+              <Textarea
+                id="businessDescription"
+                name="businessDescription"
+                value={formData.businessDescription}
+                onChange={handleInputChange}
+                placeholder="Briefly describe your business, products, or services"
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="businessWebsite" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Business Website
+              </label>
+              <Input
+                id="businessWebsite"
+                name="businessWebsite"
+                value={formData.businessWebsite}
+                onChange={handleInputChange}
+                placeholder="Enter your business website URL"
+              />
+            </div>
+            
             <div className="flex justify-end">
               <Button
                 onClick={() => handleStepChange(2)}
@@ -214,22 +341,92 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         );
+        
       case 2:
         return (
           <div className="space-y-4">
+            <h3 className="font-medium text-lg">Target Audience</h3>
+            
             <div>
               <label htmlFor="targetAudience" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
-                Target Audience
+                Target Audience Description
               </label>
               <Textarea
                 id="targetAudience"
                 name="targetAudience"
                 value={formData.targetAudience}
                 onChange={handleInputChange}
-                placeholder="Describe your target audience (e.g., age, interests, behaviors)"
-                className="min-h-[100px]"
+                placeholder="Describe your target audience (e.g., professionals in finance, parents with young children)"
+                className="min-h-[80px]"
               />
             </div>
+            
+            <div>
+              <label htmlFor="targetLocation" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Target Location
+              </label>
+              <Input
+                id="targetLocation"
+                name="targetLocation"
+                value={formData.targetLocation}
+                onChange={handleInputChange}
+                placeholder="Enter location(s) to target (e.g., New York City, California)"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="ageRangeMin" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                  Age Range (Minimum)
+                </label>
+                <Input
+                  id="ageRangeMin"
+                  name="ageRangeMin"
+                  type="number"
+                  min="13"
+                  max="65"
+                  value={formData.ageRangeMin}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="ageRangeMax" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                  Age Range (Maximum)
+                </label>
+                <Input
+                  id="ageRangeMax"
+                  name="ageRangeMax"
+                  type="number"
+                  min="13"
+                  max="65"
+                  value={formData.ageRangeMax}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label htmlFor="gender" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Gender
+              </label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleSelectChange('gender', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender targeting" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
             <div className="flex justify-between">
               <Button
                 variant="outline"
@@ -246,9 +443,76 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         );
+        
       case 3:
         return (
           <div className="space-y-4">
+            <h3 className="font-medium text-lg">Ideal Customer Profile</h3>
+            
+            <div>
+              <label htmlFor="customerInterests" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Customer Interests
+              </label>
+              <Textarea
+                id="customerInterests"
+                name="customerInterests"
+                value={formData.customerInterests}
+                onChange={handleInputChange}
+                placeholder="What interests, hobbies, or topics is your ideal customer passionate about?"
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="customerBehaviors" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Customer Behaviors
+              </label>
+              <Textarea
+                id="customerBehaviors"
+                name="customerBehaviors"
+                value={formData.customerBehaviors}
+                onChange={handleInputChange}
+                placeholder="What actions does your ideal customer take online? (e.g., frequent online shoppers, watches DIY videos)"
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="customerPainPoints" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Customer Pain Points
+              </label>
+              <Textarea
+                id="customerPainPoints"
+                name="customerPainPoints"
+                value={formData.customerPainPoints}
+                onChange={handleInputChange}
+                placeholder="What problems or challenges does your ideal customer face that your product/service solves?"
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => handleStepChange(2)}
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={() => handleStepChange(4)}
+                className="bg-metamaster-primary hover:bg-metamaster-secondary"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        );
+        
+      case 4:
+        return (
+          <div className="space-y-4">
+            <h3 className="font-medium text-lg">Budget & Configuration</h3>
+            
             <div>
               <label htmlFor="budget" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
                 Daily Budget
@@ -358,7 +622,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               <div className="flex justify-between">
                 <Button
                   variant="outline"
-                  onClick={() => handleStepChange(2)}
+                  onClick={() => handleStepChange(3)}
                 >
                   Previous
                 </Button>
@@ -373,6 +637,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         );
+        
       default:
         return null;
     }
@@ -423,6 +688,10 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 <div className={`flex-1 h-0.5 mx-2 ${step > 2 ? 'bg-metamaster-primary' : 'bg-metamaster-gray-200'}`}></div>
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${step >= 3 ? 'bg-metamaster-primary text-white' : 'bg-white text-metamaster-gray-400'}`}>
                   3
+                </div>
+                <div className={`flex-1 h-0.5 mx-2 ${step > 3 ? 'bg-metamaster-primary' : 'bg-metamaster-gray-200'}`}></div>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${step >= 4 ? 'bg-metamaster-primary text-white' : 'bg-white text-metamaster-gray-400'}`}>
+                  4
                 </div>
               </div>
             </div>
