@@ -257,7 +257,7 @@ const AIMediaBuyerPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Switch id="auto-scale" />
-                    <label htmlFor="auto-scale">Scale winning ad sets (ROAS > 3x)</label>
+                    <label htmlFor="auto-scale">Scale winning ad sets (ROAS &gt; 3x)</label>
                   </div>
                   
                   <div className="flex items-center space-x-2">

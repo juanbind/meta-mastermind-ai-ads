@@ -56,6 +56,7 @@ const Sidebar: React.FC = () => {
     { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder' },
     { to: '/crm', icon: <Users size={20} />, label: 'CRM' },
     { to: '/ai-tools', icon: <Zap size={20} />, label: 'AI Tools' },
+    { to: '/ai-tools/media-buyer', icon: <BarChart size={20} />, label: 'AI Media Buyer' },
     { to: '/creatives', icon: <Image size={20} />, label: 'Creatives' },
     { to: '/reports', icon: <BarChart size={20} />, label: 'Reports' },
     { to: '/templates', icon: <FileText size={20} />, label: 'Templates' },
