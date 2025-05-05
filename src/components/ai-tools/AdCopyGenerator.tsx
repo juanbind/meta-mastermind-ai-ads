@@ -50,19 +50,19 @@ const AdCopyGenerator: React.FC = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2500));
       
-      // Mock generated copy (would be AI-generated in production)
-      const mockCopyResults = [
-        `"${adType}" ad: Experience the difference with our premium solution designed specifically for your needs. Limited time offer available now!`,
-        `"${adType}" ad: Why settle for less when you can have the best? Our customers report 85% higher satisfaction after switching to our product.`,
-        `"${adType}" ad: Transform your approach with our innovative solution. See results in just days, not weeks or months!`
-      ];
+      // In a real implementation, this would call the backend AI service
+      // Instead of using mock data, it would use real generated content
+      setGeneratedCopy([
+        `"${adType}" ad: This would be a real AI-generated ad based on your input.`,
+        `"${adType}" ad: Connect your AI service to generate real ad copy here.`,
+        `"${adType}" ad: Implement backend API to generate custom ad copy for your business.`
+      ]);
       
-      setGeneratedCopy(mockCopyResults);
       setActiveTab('results');
       
       toast({
         title: "Ad copy generated",
-        description: "Check out your new high-converting ad copy",
+        description: "Check out your new ad copy",
       });
     } catch (error) {
       toast({

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -246,19 +247,11 @@ const AIMediaBuyerPage: React.FC = () => {
                     <label htmlFor="auto-reduce">Reduce budget for underperforming ad sets</label>
                   </div>
                   
-                  <div className="p-4 border border-blue-100 bg-blue-50 rounded-lg mt-4">
-                    <h4 className="font-medium text-blue-800 mb-2">Budget Adjustment Recommendation</h4>
-                    <p className="text-sm text-blue-700 mb-2">
-                      Based on the last 7 days of performance data, we recommend:
-                    </p>
-                    <ul className="text-sm text-blue-700 list-disc pl-5 mb-3">
-                      <li>Increase "Summer Collection" ad set budget by 20%</li>
-                      <li>Decrease "Spring Sale" ad set budget by 15%</li>
-                    </ul>
-                    <Button size="sm" onClick={handleBudgetConfirmation}>
-                      Confirm Budget Changes
+                  {fbConnected && (
+                    <Button size="sm" onClick={handleBudgetConfirmation} className="mt-4">
+                      Configure Budget Rules
                     </Button>
-                  </div>
+                  )}
                 </div>
               </div>
               
@@ -303,98 +296,42 @@ const AIMediaBuyerPage: React.FC = () => {
             <TabsContent value="performance" className="space-y-6">
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Campaign Performance</h2>
-                <p className="text-gray-600 mb-4">
-                  Monitor your campaign performance in real-time and receive AI-powered recommendations.
-                </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-500">Total Spend</p>
-                      <PieChart size={18} className="text-metamaster-primary" />
-                    </div>
-                    <p className="text-2xl font-bold mt-2">$1,245.67</p>
-                    <p className="text-green-600 text-sm">+12% vs last week</p>
+                {!fbConnected ? (
+                  <div className="p-8 text-center">
+                    <TrendingUp size={48} className="mx-auto text-gray-300 mb-4" />
+                    <p className="text-lg font-medium text-gray-600 mb-2">No performance data available</p>
+                    <p className="text-gray-500 mb-6">Connect your ad accounts to view performance metrics</p>
+                    <Button 
+                      onClick={() => setActiveMainTab('settings')}
+                      variant="outline"
+                    >
+                      Connect Ad Accounts
+                    </Button>
                   </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-500">ROAS</p>
-                      <TrendingUp size={18} className="text-metamaster-primary" />
-                    </div>
-                    <p className="text-2xl font-bold mt-2">2.7x</p>
-                    <p className="text-green-600 text-sm">+0.3 vs last week</p>
+                ) : (
+                  <div className="p-8 text-center">
+                    <BarChart3 size={48} className="mx-auto text-gray-300 mb-4" />
+                    <p className="text-lg font-medium text-gray-600 mb-2">Performance data will appear here</p>
+                    <p className="text-gray-500 mb-6">Your real campaign data will display once your campaigns are active</p>
                   </div>
-                  
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-500">Total Conversions</p>
-                      <BarChart3 size={18} className="text-metamaster-primary" />
-                    </div>
-                    <p className="text-2xl font-bold mt-2">86</p>
-                    <p className="text-green-600 text-sm">+24% vs last week</p>
-                  </div>
-                </div>
-                
-                <div className="p-4 border border-blue-100 bg-blue-50 rounded-lg mb-4">
-                  <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                    <MessageSquare size={18} /> AI Recommendations
-                  </h4>
-                  <ul className="text-sm text-blue-700 list-disc pl-5">
-                    <li>Try adjusting placement to include more Stories format based on current performance</li>
-                    <li>Your lookalike audience 3% is outperforming the 1% audience - consider reallocating budget</li>
-                    <li>Video creatives are showing 32% higher engagement than image ads</li>
-                  </ul>
-                </div>
-                
-                <div className="p-4 border border-amber-100 bg-amber-50 rounded-lg">
-                  <h4 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
-                    <AlertTriangle size={18} /> Active Alerts
-                  </h4>
-                  <ul className="text-sm text-amber-700 list-disc pl-5">
-                    <li>Ad "Summer Collection Promo" rejected - Policy violation detected</li>
-                    <li>"Spring Sale" ad set showing signs of fatigue - Consider refreshing creatives</li>
-                  </ul>
-                </div>
+                )}
               </div>
               
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Targeting Optimization</h2>
-                <p className="text-gray-600 mb-4">
-                  AI-powered targeting recommendations based on your campaign performance.
-                </p>
                 
-                <div className="space-y-4">
-                  <div className="p-4 border border-green-100 bg-green-50 rounded-lg">
-                    <h4 className="font-medium text-green-800">Audience Recommendations</h4>
-                    <p className="text-sm text-green-700 mt-1 mb-2">
-                      Based on your best performing campaigns, we recommend these changes:
-                    </p>
-                    <ul className="text-sm text-green-700 list-disc pl-5">
-                      <li>Create a new lookalike audience based on recent purchasers (30-day window)</li>
-                      <li>Expand age range to include 45-54 demographics</li>
-                      <li>Add interest targeting for "outdoor activities" and "sustainable products"</li>
-                    </ul>
-                    <Button size="sm" className="mt-3">
-                      Apply These Changes
-                    </Button>
+                {!fbConnected ? (
+                  <div className="p-6 text-center">
+                    <Target size={36} className="mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">Connect your ad accounts to receive AI-powered targeting recommendations</p>
                   </div>
-                  
-                  <div className="p-4 border border-purple-100 bg-purple-50 rounded-lg">
-                    <h4 className="font-medium text-purple-800">Placement Optimization</h4>
-                    <p className="text-sm text-purple-700 mt-1 mb-2">
-                      Your ads are performing best in these placements:
-                    </p>
-                    <ul className="text-sm text-purple-700 list-disc pl-5">
-                      <li>Instagram Stories (42% of conversions)</li>
-                      <li>Facebook Feed (31% of conversions)</li>
-                      <li>Instagram Feed (18% of conversions)</li>
-                    </ul>
-                    <Button size="sm" className="mt-3">
-                      Optimize Placements
-                    </Button>
+                ) : (
+                  <div className="p-6 text-center">
+                    <Target size={36} className="mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">Targeting recommendations will appear here once your campaigns have sufficient data</p>
                   </div>
-                </div>
+                )}
               </div>
             </TabsContent>
             
@@ -406,159 +343,96 @@ const AIMediaBuyerPage: React.FC = () => {
                   Generate detailed performance reports with actionable insights.
                 </p>
                 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
-                      <FileText size={24} />
-                      <span>Daily Report</span>
-                    </Button>
-                    
-                    <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
-                      <FileText size={24} />
-                      <span>Weekly Report</span>
-                    </Button>
-                    
-                    <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
-                      <FileText size={24} />
-                      <span>Monthly Report</span>
-                    </Button>
+                {!fbConnected ? (
+                  <div className="p-6 text-center">
+                    <FileText size={36} className="mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">Connect your ad accounts to generate reports</p>
                   </div>
-                  
-                  <div className="p-4 border border-gray-200 rounded-lg mt-4">
-                    <h4 className="font-medium mb-2">Custom Report</h4>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Report Name
-                        </label>
-                        <Input placeholder="E.g., Q3 Performance Summary" />
-                      </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
+                        <FileText size={24} />
+                        <span>Daily Report</span>
+                      </Button>
                       
-                      <div className="grid grid-cols-2 gap-3">
+                      <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
+                        <FileText size={24} />
+                        <span>Weekly Report</span>
+                      </Button>
+                      
+                      <Button variant="outline" className="flex items-center justify-center gap-2 h-24 flex-col">
+                        <FileText size={24} />
+                        <span>Monthly Report</span>
+                      </Button>
+                    </div>
+                    
+                    <div className="p-4 border border-gray-200 rounded-lg mt-4">
+                      <h4 className="font-medium mb-2">Custom Report</h4>
+                      
+                      <div className="space-y-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Start Date
+                            Report Name
                           </label>
-                          <Input type="date" />
+                          <Input placeholder="E.g., Q3 Performance Summary" />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Start Date
+                            </label>
+                            <Input type="date" />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              End Date
+                            </label>
+                            <Input type="date" />
+                          </div>
                         </div>
                         
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            End Date
+                            Metrics to Include
                           </label>
-                          <Input type="date" />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Metrics to Include
-                        </label>
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-spend" defaultChecked />
-                            <label htmlFor="include-spend">Ad Spend</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-roas" defaultChecked />
-                            <label htmlFor="include-roas">ROAS</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-cpc" defaultChecked />
-                            <label htmlFor="include-cpc">CPC</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-ctr" defaultChecked />
-                            <label htmlFor="include-ctr">CTR</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-conv" defaultChecked />
-                            <label htmlFor="include-conv">Conversions</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch id="include-freq" defaultChecked />
-                            <label htmlFor="include-freq">Frequency</label>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-spend" defaultChecked />
+                              <label htmlFor="include-spend">Ad Spend</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-roas" defaultChecked />
+                              <label htmlFor="include-roas">ROAS</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-cpc" defaultChecked />
+                              <label htmlFor="include-cpc">CPC</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-ctr" defaultChecked />
+                              <label htmlFor="include-ctr">CTR</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-conv" defaultChecked />
+                              <label htmlFor="include-conv">Conversions</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Switch id="include-freq" defaultChecked />
+                              <label htmlFor="include-freq">Frequency</label>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <Button>
-                        Generate Custom Report
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                <h2 className="text-xl font-semibold mb-4">Advanced Analytics</h2>
-                <p className="text-gray-600 mb-4">
-                  Connect with your store or CRM to track advanced eCommerce metrics.
-                </p>
-                
-                <div className="space-y-4">
-                  <div className="p-4 border border-blue-100 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-800 mb-2">Connected Data Sources</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                      <div className="p-3 border border-blue-200 rounded-md bg-white">
-                        <div className="font-medium">Shopify Store</div>
-                        <p className="text-sm text-gray-600">Connected: Yes</p>
-                        <Button size="sm" variant="outline" className="mt-2">Manage</Button>
-                      </div>
-                      
-                      <div className="p-3 border border-blue-200 rounded-md bg-white">
-                        <div className="font-medium">Google Analytics</div>
-                        <p className="text-sm text-gray-600">Connected: Yes</p>
-                        <Button size="sm" variant="outline" className="mt-2">Manage</Button>
-                      </div>
-                      
-                      <div className="p-3 border border-gray-200 rounded-md bg-white">
-                        <div className="font-medium">CRM</div>
-                        <p className="text-sm text-gray-600">Connected: No</p>
-                        <Button size="sm" variant="outline" className="mt-2">Connect</Button>
+                        
+                        <Button>
+                          Generate Custom Report
+                        </Button>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-medium mb-2">eCommerce Metrics</h4>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Average Order Value</span>
-                          <span className="font-medium">$87.35</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Customer Acquisition Cost</span>
-                          <span className="font-medium">$32.18</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Lifetime Value</span>
-                          <span className="font-medium">$210.45</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-medium mb-2">Attribution Insights</h4>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">First Click</span>
-                          <span className="font-medium">23%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Last Click</span>
-                          <span className="font-medium">45%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Linear</span>
-                          <span className="font-medium">32%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </TabsContent>
             
@@ -581,7 +455,11 @@ const AIMediaBuyerPage: React.FC = () => {
                             {fbConnected ? "Connected" : "Not connected"}
                           </div>
                         </div>
-                        <Button size="sm" variant={fbConnected ? "outline" : "default"}>
+                        <Button 
+                          size="sm" 
+                          variant={fbConnected ? "outline" : "default"}
+                          onClick={() => fbConnected ? setFbConnected(false) : setActiveMainTab('campaigns')}
+                        >
                           {fbConnected ? "Disconnect" : "Connect"}
                         </Button>
                       </div>

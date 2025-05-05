@@ -39,8 +39,9 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentDevice, setCurrentDevice] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
+  const [variables, setVariables] = useState<{name: string, value: string}[]>([]);
   const { toast } = useToast();
-
+  
   // Load funnel data if funnelId is provided
   useEffect(() => {
     const loadFunnelData = async () => {
@@ -173,6 +174,152 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
             }
           ]
         });
+      // Text & Typography elements
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        return 'Hello {{name}}, welcome to our {{product}}!';
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
+        return JSON.stringify({
+          text: 'Styled with custom fonts',
+          fontFamily: 'Arial',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#333333'
+        });
+        
+      // Media & Visuals elements
+      case ELEMENT_TYPES.IMAGE_BLOCK:
+        return JSON.stringify({
+          src: 'https://placehold.co/600x400?text=Your+Image+Here',
+          alt: 'Image description',
+          caption: 'Image caption'
+        });
+      case ELEMENT_TYPES.VIDEO_EMBED:
+        return JSON.stringify({
+          type: 'youtube', // youtube, vimeo, wistia
+          videoId: 'dQw4w9WgXcQ',
+          title: 'Video title'
+        });
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+        return JSON.stringify({
+          images: [
+            {
+              src: 'https://placehold.co/600x400?text=Slide+1',
+              alt: 'Slide 1'
+            },
+            {
+              src: 'https://placehold.co/600x400?text=Slide+2',
+              alt: 'Slide 2'
+            },
+            {
+              src: 'https://placehold.co/600x400?text=Slide+3',
+              alt: 'Slide 3'
+            }
+          ]
+        });
+        
+      // Interactive Components
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        return JSON.stringify({
+          question: 'Choose your preferred option:',
+          options: ['Option A', 'Option B', 'Option C'],
+          allowMultiple: false
+        });
+      case ELEMENT_TYPES.DATE_PICKER:
+        return JSON.stringify({
+          label: 'Select a date:',
+          placeholder: 'MM/DD/YYYY',
+          required: false
+        });
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return JSON.stringify({
+          label: 'Upload your file:',
+          acceptedFileTypes: '.pdf,.doc,.docx,.jpg,.png',
+          maxFileSize: 5, // MB
+          instructions: 'Max file size: 5MB'
+        });
+        
+      // Forms & Data Collection
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return JSON.stringify({
+          title: 'Contact Information',
+          fields: [
+            {
+              type: 'text',
+              name: 'name',
+              label: 'Full Name',
+              placeholder: 'John Doe',
+              required: true
+            },
+            {
+              type: 'email',
+              name: 'email',
+              label: 'Email Address',
+              placeholder: 'john@example.com',
+              required: true
+            },
+            {
+              type: 'phone',
+              name: 'phone',
+              label: 'Phone Number',
+              placeholder: '(123) 456-7890',
+              required: false
+            }
+          ],
+          submitButtonText: 'Submit'
+        });
+      case ELEMENT_TYPES.PHONE_INPUT:
+        return JSON.stringify({
+          label: 'Phone Number',
+          placeholder: 'Enter your phone number',
+          required: true,
+          includeCountryCode: true
+        });
+        
+      // Layout & Design elements
+      case ELEMENT_TYPES.SECTION_TEMPLATE:
+        return JSON.stringify({
+          type: 'two-column',
+          title: 'Section Title',
+          leftContent: 'Content for left column goes here.',
+          rightContent: 'Content for right column goes here.'
+        });
+      case ELEMENT_TYPES.CARD:
+        return JSON.stringify({
+          title: 'Card Title',
+          content: 'Card content goes here.',
+          image: 'https://placehold.co/600x400?text=Card+Image',
+          buttonText: 'Learn More'
+        });
+      case ELEMENT_TYPES.BACKGROUND:
+        return JSON.stringify({
+          type: 'color', // color, image, gradient
+          value: '#f5f5f5', // color hex or image URL
+          gradientDirection: 'to bottom', // for gradients
+          gradientColors: ['#ffffff', '#f0f0f0'] // for gradients
+        });
+        
+      // Navigation & Progress
+      case ELEMENT_TYPES.PROGRESS_BAR:
+        return JSON.stringify({
+          currentStep: 1,
+          totalSteps: 5,
+          labels: ['Start', 'Personal Info', 'Preferences', 'Review', 'Submit'],
+          showLabels: true
+        });
+        
+      // Advanced Features
+      case ELEMENT_TYPES.HTML_BLOCK:
+        return '<div class="custom-html">This is custom HTML content</div>';
+      case ELEMENT_TYPES.CONDITIONAL_BLOCK:
+        return JSON.stringify({
+          condition: {
+            variable: 'subscription_type',
+            operator: 'equals',
+            value: 'premium'
+          },
+          content: 'This content only shows for premium subscribers.',
+          elseContent: 'This content shows for non-premium subscribers.'
+        });
       case ELEMENT_TYPES.CTA_BLOCK:
         return JSON.stringify({
           headline: 'Ready to Get Started?',
@@ -289,7 +436,168 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
       case ELEMENT_TYPES.ICON:
         return { name: 'star', color: '#3B82F6', size: 24 };
       
-      // New content block props
+      // Text & Typography
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        return {
+          style: { 
+            fontSize: '16px',
+            color: '#333333',
+            fontWeight: 'normal'
+          },
+          variables: [] // List of available variables
+        };
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
+        return {
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '16px',
+          fontWeight: 'normal',
+          color: '#333333',
+          alignment: 'left',
+          lineHeight: 1.5
+        };
+      
+      // Media & Visuals
+      case ELEMENT_TYPES.IMAGE_BLOCK:
+        return {
+          maxWidth: '100%',
+          alignment: 'center',
+          borderRadius: '0px',
+          shadow: false,
+          responsive: true,
+          aspectRatio: '16:9'
+        };
+      case ELEMENT_TYPES.VIDEO_EMBED:
+        return {
+          autoplay: false,
+          controls: true,
+          muted: false,
+          loop: false,
+          thumbnail: '',
+          responsive: true,
+          aspectRatio: '16:9',
+          lazyLoad: true
+        };
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+        return {
+          autoplay: true,
+          showNavigation: true,
+          showDots: true,
+          infinite: true,
+          speed: 500,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          adaptiveHeight: true
+        };
+      
+      // Interactive Components
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        return {
+          style: 'radio', // 'radio', 'checkbox', 'button'
+          required: false,
+          storeAs: '',
+          inline: false
+        };
+      case ELEMENT_TYPES.DATE_PICKER:
+        return {
+          minDate: '',
+          maxDate: '',
+          format: 'MM/DD/YYYY',
+          storeAs: '',
+          required: false,
+          showClearButton: true
+        };
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return {
+          multiple: false,
+          maxFiles: 1,
+          maxSizeMB: 5,
+          storeAs: '',
+          acceptedFileTypes: ['.pdf', '.doc', '.docx', '.jpg', '.png'],
+          showFilePreview: true
+        };
+      
+      // Forms & Data Collection
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return {
+          layout: 'vertical', // 'vertical', 'horizontal', 'inline'
+          spacing: 'md',
+          submitButtonAlignment: 'left',
+          submitButtonColor: 'primary',
+          successMessage: 'Form submitted successfully!',
+          redirectOnSubmit: false,
+          redirectUrl: '',
+          storeSubmissions: true,
+          integrations: [] // CRM, email marketing, etc.
+        };
+      case ELEMENT_TYPES.PHONE_INPUT:
+        return {
+          defaultCountry: 'US',
+          showFlags: true,
+          onlyCountries: [],
+          preferredCountries: ['US', 'CA', 'GB'],
+          required: false,
+          validationPattern: '',
+          storeAs: ''
+        };
+      
+      // Layout & Design
+      case ELEMENT_TYPES.SECTION_TEMPLATE:
+        return {
+          padding: '40px',
+          margin: '0px',
+          borderRadius: '0px',
+          backgroundColor: '#ffffff',
+          backgroundImage: '',
+          minHeight: '300px',
+          contentWidth: 'container',
+          verticalAlignment: 'center',
+          responsiveReorder: true
+        };
+      case ELEMENT_TYPES.CARD:
+        return {
+          padding: '20px',
+          borderRadius: '8px',
+          backgroundColor: '#ffffff',
+          shadow: true,
+          hoverEffect: true,
+          aspectRatio: '',
+          maxWidth: '100%'
+        };
+      case ELEMENT_TYPES.BACKGROUND:
+        return {
+          blur: 0,
+          overlay: false,
+          overlayColor: 'rgba(0,0,0,0.5)',
+          parallax: false,
+          fixed: false
+        };
+      
+      // Navigation & Progress
+      case ELEMENT_TYPES.PROGRESS_BAR:
+        return {
+          type: 'steps', // 'steps', 'bar', 'percentage'
+          activeColor: '#3B82F6',
+          inactiveColor: '#e5e7eb',
+          showPercentage: true,
+          animation: true,
+          animationDuration: 0.5,
+          responsive: true
+        };
+      
+      // Advanced Features
+      case ELEMENT_TYPES.HTML_BLOCK:
+        return {
+          containerClasses: '',
+          containerStyle: {},
+          sanitize: true
+        };
+      case ELEMENT_TYPES.CONDITIONAL_BLOCK:
+        return {
+          logicType: 'show', // 'show', 'hide'
+          conditions: []
+        };
+      
+      // Content Blocks (default props)
       case ELEMENT_TYPES.HERO_SECTION:
         return { 
           bgType: 'color', // 'color', 'image', 'video'
@@ -441,6 +749,30 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
       autoSave(newItems);
       return newItems;
     });
+  };
+
+  // Add a variable to the funnel
+  const addVariable = (name: string, value: string) => {
+    setVariables(prev => [...prev, { name, value }]);
+  };
+
+  // Update a variable in the funnel
+  const updateVariable = (index: number, name: string, value: string) => {
+    setVariables(prev => {
+      const updated = [...prev];
+      updated[index] = { name, value };
+      return updated;
+    });
+  };
+
+  // Process dynamic text by replacing variables
+  const processDynamicText = (text: string) => {
+    let processedText = text;
+    variables.forEach(variable => {
+      const regex = new RegExp(`{{${variable.name}}}`, 'g');
+      processedText = processedText.replace(regex, variable.value);
+    });
+    return processedText;
   };
 
   // Add auto-save functionality with debounce
