@@ -1,15 +1,24 @@
 
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { User, Bell, Lock, CreditCard, Users, Briefcase, Mail, Settings as SettingsIcon } from 'lucide-react';
+import { User, Bell, Lock, CreditCard, Users, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [email, setEmail] = useState(user?.email || '');
+  
+  const handleSaveChanges = () => {
+    toast({
+      title: "Settings updated",
+      description: "Your profile information has been updated successfully.",
+    });
+  };
   
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
@@ -113,7 +122,10 @@ const Settings: React.FC = () => {
                     </div>
                     
                     <div className="pt-4 border-t border-gray-100">
-                      <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
+                      <Button 
+                        className="bg-metamaster-primary hover:bg-metamaster-secondary"
+                        onClick={handleSaveChanges}
+                      >
                         Save Changes
                       </Button>
                     </div>
@@ -300,11 +312,11 @@ const Settings: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="h-8 w-8 rounded-full bg-metamaster-primary text-white flex items-center justify-center">
-                                  {fullName?.charAt(0) || 'U'}
+                                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                                 </div>
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{fullName || 'Current User'}</div>
-                                  <div className="text-sm text-gray-500">{email || 'user@example.com'}</div>
+                                  <div className="text-sm font-medium text-gray-900">{user?.user_metadata?.full_name || 'Current User'}</div>
+                                  <div className="text-sm text-gray-500">{user?.email || 'user@example.com'}</div>
                                 </div>
                               </div>
                             </td>

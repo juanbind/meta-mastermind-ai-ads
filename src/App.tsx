@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,8 @@ import Reports from "./pages/Reports";
 import Templates from "./pages/Templates";
 import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
+import Creatives from "./pages/Creatives";
+import AIMediaBuyerPage from "./pages/AIMediaBuyerPage";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -66,12 +67,26 @@ const App = () => (
               </AuthCheck>
             } />
             
-            {/* New Routes */}
+            {/* AI Tools Routes */}
             <Route path="/ai-tools" element={
               <AuthCheck>
                 <AITools />
               </AuthCheck>
             } />
+            <Route path="/ai-tools/media-buyer" element={
+              <AuthCheck>
+                <AIMediaBuyerPage />
+              </AuthCheck>
+            } />
+            
+            {/* New Creatives Route */}
+            <Route path="/creatives" element={
+              <AuthCheck>
+                <Creatives />
+              </AuthCheck>
+            } />
+            
+            {/* Other Routes */}
             <Route path="/reports" element={
               <AuthCheck>
                 <Reports />

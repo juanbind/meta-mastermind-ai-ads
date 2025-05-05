@@ -3,10 +3,8 @@ import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Zap, Brain, Sparkles, FileCode, MessageSquare, TrendingUp, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface ToolCardProps {
   title: string;
@@ -61,15 +59,6 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
 
 const AITools: React.FC = () => {
   const navigate = useNavigate();
-  const [activeToolDialog, setActiveToolDialog] = React.useState<string | null>(null);
-
-  const openTool = (toolId: string) => {
-    setActiveToolDialog(toolId);
-  };
-
-  const closeTool = () => {
-    setActiveToolDialog(null);
-  };
 
   const tools = [
     {
@@ -122,6 +111,12 @@ const AITools: React.FC = () => {
     }
   ];
 
+  const handleToolClick = (toolId: string) => {
+    if (toolId === 'media-buyer') {
+      navigate('/ai-tools/media-buyer');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
@@ -140,20 +135,13 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
-                comingSoon={'id' in tool ? (tool.id === 'media-buyer' ? false : true) : true}
-                onAction={() => 'id' in tool ? openTool(tool.id) : undefined}
+                comingSoon={tool.id !== 'media-buyer'}
+                onAction={() => handleToolClick(tool.id)}
               />
             ))}
           </div>
         </div>
       </div>
-
-      {/* AI Media Buyer Dialog */}
-      <Dialog open={activeToolDialog === "media-buyer"} onOpenChange={() => closeTool()}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-          <AIMediaBuyer onClose={closeTool} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
