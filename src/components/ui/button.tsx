@@ -3,7 +3,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
-import { Loader2 } from "lucide-react"
+import { Loader2, Check, XIcon } from "lucide-react"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 button-press hover-lift",
@@ -65,9 +65,26 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props 
   }, ref) => {
     const Comp = asChild ? Slot : "button"
-
+    
     // Compute disabled state
     const isDisabled = disabled || loading || state === "loading"
+    
+    // Handle state-specific icons
+    const renderStateIcon = () => {
+      if (loading || state === "loading") {
+        return <Loader2 className="h-4 w-4 animate-spin" />
+      }
+      
+      if (state === "success") {
+        return <Check className="h-4 w-4" />
+      }
+      
+      if (state === "error") {
+        return <XIcon className="h-4 w-4" />
+      }
+      
+      return startIcon
+    }
     
     return (
       <Comp
@@ -76,9 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         {...props}
       >
-        {loading || state === "loading" ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : startIcon}
+        {renderStateIcon()}
         
         {children}
         

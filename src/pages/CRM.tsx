@@ -85,6 +85,7 @@ const LeadRow: React.FC<{ lead: Contact; onUpdate: (id: string, updates: Partial
       });
     } finally {
       setIsDeleting(false);
+      window.location.reload();
     }
   };
 
@@ -232,7 +233,6 @@ const NewContactDialog: React.FC<{ onContactAdded: () => void }> = ({ onContactA
     setIsSubmitting(true);
     
     try {
-      // Add the last_activity field to fix the TypeScript error
       await createContact({
         first_name: firstName,
         last_name: lastName,
@@ -244,7 +244,7 @@ const NewContactDialog: React.FC<{ onContactAdded: () => void }> = ({ onContactA
         value: 0,
         tags: [],
         assigned_to: user?.id || null,
-        last_activity: new Date().toISOString() // Add this line to fix the TypeScript error
+        last_activity: new Date().toISOString()
       });
       
       toast({
@@ -366,8 +366,10 @@ const FacebookIntegrationDialog: React.FC = () => {
   const handleSetupInstructions = () => {
     toast({
       title: "Facebook Integration",
-      description: "Copy the webhook URL and paste it in your Facebook Lead Form Settings."
+      description: "Webhook URL copied. Follow the setup steps in your Facebook Lead Form Settings."
     });
+    
+    navigator.clipboard.writeText('https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-lead-sync');
   };
   
   return (
@@ -458,7 +460,10 @@ const QuickActionCard: React.FC<{
   onClick
 }) => {
   return (
-    <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100 flex items-center justify-between">
+    <div 
+      className="bg-white rounded-xl p-5 shadow-md border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={onClick}
+    >
       <div className="flex items-center">
         <div className="bg-metamaster-primary/10 w-10 h-10 rounded-lg flex items-center justify-center text-metamaster-primary mr-4">
           {icon}
@@ -468,7 +473,7 @@ const QuickActionCard: React.FC<{
           <p className="text-sm text-metamaster-gray-600">{description}</p>
         </div>
       </div>
-      <Button variant="ghost" size="icon" onClick={onClick}>
+      <Button variant="ghost" size="icon">
         <ChevronRight size={20} />
       </Button>
     </div>
@@ -530,6 +535,10 @@ const CRM: React.FC = () => {
     try {
       await updateContact(id, updates);
       refetch(); // Refresh the contacts list
+      toast({
+        title: "Contact updated",
+        description: "The contact has been successfully updated"
+      });
     } catch (error) {
       console.error('Error updating contact:', error);
       toast({
@@ -549,6 +558,29 @@ const CRM: React.FC = () => {
   const handlePrevPage = () => {
     if (page > 1) {
       setPage(prev => prev - 1);
+    }
+  };
+  
+  const handleQuickAction = (action: string) => {
+    switch(action) {
+      case 'new-lead':
+        // This will be handled by the NewContactDialog component
+        document.getElementById('add-lead-button')?.click();
+        break;
+      case 'schedule-followup':
+        toast({
+          title: "Follow-up Scheduler",
+          description: "The follow-up scheduler will be available soon."
+        });
+        break;
+      case 'high-value-leads':
+        toast({
+          title: "High-Value Leads",
+          description: "Filtering for high-value leads will be available soon."
+        });
+        break;
+      default:
+        break;
     }
   };
   
@@ -581,16 +613,19 @@ const CRM: React.FC = () => {
               icon={<Plus size={20} />}
               title="Add New Lead"
               description="Create a new lead or customer record"
+              onClick={() => handleQuickAction('new-lead')}
             />
             <QuickActionCard 
               icon={<Calendar size={20} />}
               title="Schedule Follow-up"
               description="Set up reminders and follow-up tasks"
+              onClick={() => handleQuickAction('schedule-followup')}
             />
             <QuickActionCard 
               icon={<Star size={20} />}
               title="View High-Value Leads"
               description="Focus on your highest potential customers"
+              onClick={() => handleQuickAction('high-value-leads')}
             />
           </div>
           
@@ -615,6 +650,11 @@ const CRM: React.FC = () => {
                   <Filter size={16} className="mr-2" /> Filter
                 </Button>
                 <NewContactDialog onContactAdded={refetch} />
+                <Button 
+                  id="add-lead-button" 
+                  className="hidden" // Hidden button that can be triggered programmatically
+                  onClick={() => document.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')?.click()}
+                />
               </div>
             </div>
             

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Image, Video, ListOrdered, Type, FormInput, Calendar, FileText, 
-  LayoutGrid, Layout, CheckSquare, Upload, Phone, Edit, Check, Trash 
+  Layout, CheckSquare, Upload, Phone, Edit, Check, Trash 
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -95,12 +95,13 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         return <Calendar className="h-5 w-5" />;
       case ELEMENT_TYPES.FILE_UPLOAD:
         return <Upload className="h-5 w-5" />;
-      case ELEMENT_TYPES.SECTION:
-      case ELEMENT_TYPES.SECTION_TEMPLATE:
-      case ELEMENT_TYPES.CARD:
+      // Fix SECTION and COLUMNS properties that were causing errors
+      case "SECTION":
+      case "SECTION_TEMPLATE": 
         return <Layout className="h-5 w-5" />;
-      case ELEMENT_TYPES.COLUMNS:
-        return <LayoutGrid className="h-5 w-5" />;
+      case "COLUMNS":
+      case "CARD":
+        return <Layout className="h-5 w-5" />;
       case ELEMENT_TYPES.MULTIPLE_CHOICE:
         return <CheckSquare className="h-5 w-5" />;
       default:
