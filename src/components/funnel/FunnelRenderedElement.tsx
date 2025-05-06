@@ -1,405 +1,299 @@
 
 import React, { useState } from 'react';
-import { Copy, Trash2, ChevronUp, ChevronDown, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { CanvasItem } from './FunnelCanvas';
 import { ELEMENT_TYPES } from './FunnelElement';
-import TextFormatToolbar from './TextFormatToolbar';
-import ContentBlockRenderer from './ContentBlockRenderer';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Image, Video, ListOrdered, Type, FormInput, Calendar, FileText, 
+  LayoutGrid, Layout, CheckSquare, Upload, Phone, Edit, Check, Trash 
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface FunnelRenderedElementProps {
-  item: CanvasItem;
+  element: {
+    id: string;
+    type: string;
+    content: any;
+    style?: any;
+  };
+  onUpdate: (id: string, content: any) => void;
+  onDelete: (id: string) => void;
   isEditing: boolean;
-  onEdit: () => void;
-  onSave: (content: string, props?: Record<string, any>) => void;
-  onCancel: () => void;
-  onRemove: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  device?: 'mobile' | 'tablet' | 'desktop';
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
-  item,
+  element,
+  onUpdate,
+  onDelete,
   isEditing,
-  onEdit,
-  onSave,
-  onCancel,
-  onRemove,
-  onMoveUp,
-  onMoveDown,
-  device = 'desktop'
+  setIsEditing
 }) => {
-  const [content, setContent] = useState(item.content);
-  const [imageUrl, setImageUrl] = useState(item.props?.src || '');
-  const [videoUrl, setVideoUrl] = useState(item.props?.src || '');
-  
-  // For content blocks
-  const isContentBlock = [
-    ELEMENT_TYPES.HERO_SECTION,
-    ELEMENT_TYPES.FEATURES_BLOCK,
-    ELEMENT_TYPES.TESTIMONIAL_BLOCK,
-    ELEMENT_TYPES.CTA_BLOCK,
-    ELEMENT_TYPES.FAQ_BLOCK,
-    ELEMENT_TYPES.PRICING_BLOCK,
-    ELEMENT_TYPES.SOCIAL_PROOF,
-    ELEMENT_TYPES.COUNTDOWN,
-    ELEMENT_TYPES.TRUST_BADGES,
-    ELEMENT_TYPES.CONTACT_BLOCK,
-  ].includes(item.type);
-  
-  const isJsonContent = [
-    // Content blocks
-    ELEMENT_TYPES.HERO_SECTION,
-    ELEMENT_TYPES.FEATURES_BLOCK,
-    ELEMENT_TYPES.TESTIMONIAL_BLOCK,
-    ELEMENT_TYPES.CTA_BLOCK,
-    ELEMENT_TYPES.FAQ_BLOCK,
-    ELEMENT_TYPES.PRICING_BLOCK,
-    // Dynamic elements
-    ELEMENT_TYPES.DYNAMIC_TEXT,
-    ELEMENT_TYPES.CUSTOM_FONT_TEXT,
-    // Media elements
-    ELEMENT_TYPES.IMAGE_BLOCK,
-    ELEMENT_TYPES.VIDEO_EMBED,
-    ELEMENT_TYPES.IMAGE_SLIDER,
-    // Interactive elements
-    ELEMENT_TYPES.MULTIPLE_CHOICE,
-    ELEMENT_TYPES.DATE_PICKER,
-    ELEMENT_TYPES.FILE_UPLOAD,
-    // Forms
-    ELEMENT_TYPES.FORM_BLOCK,
-    ELEMENT_TYPES.PHONE_INPUT,
-    // Layout
-    ELEMENT_TYPES.SECTION_TEMPLATE,
-    ELEMENT_TYPES.CARD,
-    ELEMENT_TYPES.BACKGROUND,
-    // Navigation
-    ELEMENT_TYPES.PROGRESS_BAR,
-    // Advanced
-    ELEMENT_TYPES.CONDITIONAL_BLOCK,
-    ELEMENT_TYPES.SOCIAL_PROOF,
-    ELEMENT_TYPES.COUNTDOWN,
-    ELEMENT_TYPES.TRUST_BADGES,
-  ].includes(item.type);
+  const [editableContent, setEditableContent] = useState(element.content);
+  const { toast } = useToast();
   
   const handleSave = () => {
     try {
-      // Validate JSON if needed
-      if (isJsonContent) {
-        JSON.parse(content);
+      // For elements with JSON content, validate it can be parsed
+      if (typeof editableContent === 'string' && 
+          [
+            ELEMENT_TYPES.FORM, 
+            ELEMENT_TYPES.MULTIPLE_CHOICE,
+            ELEMENT_TYPES.DROPDOWN,
+            ELEMENT_TYPES.IMAGE_SLIDER
+          ].includes(element.type)) {
+        JSON.parse(editableContent);
       }
       
-      let updatedProps = { ...item.props };
-      
-      // Update specific props based on element type
-      if (item.type === ELEMENT_TYPES.IMAGE || item.type === ELEMENT_TYPES.IMAGE_BLOCK) {
-        updatedProps = { ...updatedProps, src: imageUrl };
-      } else if (item.type === ELEMENT_TYPES.VIDEO || item.type === ELEMENT_TYPES.VIDEO_EMBED) {
-        updatedProps = { ...updatedProps, src: videoUrl };
-      }
-      
-      onSave(content, updatedProps);
+      onUpdate(element.id, editableContent);
+      setIsEditing(false);
+      toast({
+        title: "Changes saved",
+        description: "Your element has been updated."
+      });
     } catch (error) {
-      console.error('Invalid JSON format:', error);
-      alert('Invalid JSON format. Please check your input.');
+      toast({
+        title: "Invalid format",
+        description: "Please check your input format.",
+        variant: "destructive"
+      });
     }
   };
   
-  const renderEditableContent = () => {
-    switch (item.type) {
+  const handleCancel = () => {
+    setEditableContent(element.content);
+    setIsEditing(false);
+  };
+  
+  const getElementIcon = () => {
+    switch (element.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return (
-          <>
-            <TextFormatToolbar 
-              value={content} 
-              onChange={setContent} 
-            />
-            <Input 
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="font-bold text-lg"
-            />
-          </>
-        );
       case ELEMENT_TYPES.PARAGRAPH:
-        return (
-          <>
-            <TextFormatToolbar 
-              value={content} 
-              onChange={setContent} 
-            />
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={3}
-            />
-          </>
-        );
-      case ELEMENT_TYPES.BULLET_LIST:
-        return (
-          <>
-            <TextFormatToolbar 
-              value={content} 
-              onChange={setContent} 
-            />
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={4}
-              placeholder="Enter one item per line"
-            />
-            <p className="text-xs text-gray-500 mt-1">Each line will be a bullet point</p>
-          </>
-        );
-      case ELEMENT_TYPES.BUTTON:
-        return (
-          <>
-            <TextFormatToolbar 
-              value={content} 
-              onChange={setContent} 
-            />
-            <Input 
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="mb-2"
-            />
-          </>
-        );
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
+        return <Type className="h-5 w-5" />;
       case ELEMENT_TYPES.IMAGE:
       case ELEMENT_TYPES.IMAGE_BLOCK:
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+        return <Image className="h-5 w-5" />;
+      case ELEMENT_TYPES.VIDEO:
+      case ELEMENT_TYPES.VIDEO_EMBED:
+        return <Video className="h-5 w-5" />;
+      case ELEMENT_TYPES.BULLET_LIST:
+        return <ListOrdered className="h-5 w-5" />;
+      case ELEMENT_TYPES.FORM:
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return <FormInput className="h-5 w-5" />;
+      case ELEMENT_TYPES.INPUT:
+      case ELEMENT_TYPES.PHONE_INPUT:
+        return <FormInput className="h-5 w-5" />;
+      case ELEMENT_TYPES.DROPDOWN:
+        return <FormInput className="h-5 w-5" />;
+      case ELEMENT_TYPES.CALENDAR:
+      case ELEMENT_TYPES.DATE_PICKER:
+        return <Calendar className="h-5 w-5" />;
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return <Upload className="h-5 w-5" />;
+      case ELEMENT_TYPES.SECTION:
+      case ELEMENT_TYPES.SECTION_TEMPLATE:
+      case ELEMENT_TYPES.CARD:
+        return <Layout className="h-5 w-5" />;
+      case ELEMENT_TYPES.COLUMNS:
+        return <LayoutGrid className="h-5 w-5" />;
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        return <CheckSquare className="h-5 w-5" />;
+      default:
+        return <FileText className="h-5 w-5" />;
+    }
+  };
+  
+  const renderEditInterface = () => {
+    // Different edit interfaces based on element type
+    switch (element.type) {
+      case ELEMENT_TYPES.HEADLINE:
+      case ELEMENT_TYPES.PARAGRAPH:
+      case ELEMENT_TYPES.BUTTON:
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
         return (
-          <div className="space-y-2">
-            <div>
-              <Label htmlFor="imageUrl">Image URL</Label>
-              <Input 
-                id="imageUrl"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            <div className="text-xs text-gray-500">
-              Enter a URL for your image or upload one
-            </div>
-          </div>
+          <Input
+            value={editableContent}
+            onChange={(e) => setEditableContent(e.target.value)}
+            className="mb-2"
+          />
         );
+      
+      case ELEMENT_TYPES.IMAGE:
+      case ELEMENT_TYPES.IMAGE_BLOCK:
       case ELEMENT_TYPES.VIDEO:
       case ELEMENT_TYPES.VIDEO_EMBED:
         return (
-          <div className="space-y-2">
-            <div>
-              <Label htmlFor="videoUrl">Video URL</Label>
-              <Input 
-                id="videoUrl"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://youtube.com/watch?v=..."
-              />
-            </div>
-            <div className="text-xs text-gray-500">
-              Enter a YouTube or Vimeo URL
-            </div>
-          </div>
+          <Input
+            value={editableContent}
+            onChange={(e) => setEditableContent(e.target.value)}
+            placeholder="Enter image or video URL"
+            className="mb-2"
+          />
         );
-      case ELEMENT_TYPES.DYNAMIC_TEXT:
-        return (
-          <div className="space-y-2">
-            <Label htmlFor="dynamicContent">Dynamic Text Content</Label>
-            <Textarea
-              id="dynamicContent"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={3}
-              placeholder="Hello {{name}}, welcome to our {{product}}!"
-            />
-            <p className="text-xs text-gray-500">
-              Use {{variable}} syntax to insert dynamic content
-            </p>
-          </div>
-        );
-      // For JSON-based elements, show JSON editor
-      default:
-        if (isJsonContent) {
-          return (
-            <div className="space-y-2">
-              <Label htmlFor="jsonContent">Element Configuration</Label>
-              <Textarea
-                id="jsonContent"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={10}
-                className="font-mono text-sm"
-                placeholder="{}"
-              />
-              <div className="text-xs text-gray-500">
-                Edit the JSON configuration above to customize this element
-              </div>
-            </div>
-          );
-        }
-        
+      
+      case ELEMENT_TYPES.FORM:
+      case ELEMENT_TYPES.FORM_BLOCK:
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+      case ELEMENT_TYPES.DROPDOWN:
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+      case ELEMENT_TYPES.HTML_BLOCK:
+      case ELEMENT_TYPES.CONDITIONAL_BLOCK:
         return (
           <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={3}
+            value={typeof editableContent === 'object' ? JSON.stringify(editableContent, null, 2) : editableContent}
+            onChange={(e) => setEditableContent(e.target.value)}
+            rows={5}
+            className="mb-2 font-mono text-xs"
+            placeholder="Enter JSON configuration"
+          />
+        );
+      
+      default:
+        return (
+          <Input
+            value={typeof editableContent === 'object' ? JSON.stringify(editableContent) : editableContent}
+            onChange={(e) => setEditableContent(e.target.value)}
+            className="mb-2"
           />
         );
     }
   };
   
-  const renderViewContent = () => {
-    if (isContentBlock || isJsonContent) {
-      return (
-        <ContentBlockRenderer 
-          type={item.type} 
-          content={item.content} 
-          props={item.props} 
-          device={device} 
-        />
-      );
-    }
-    
-    switch (item.type) {
+  const renderDisplayContent = () => {
+    switch (element.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return <h2 className="font-bold text-xl">{item.content}</h2>;
+        return <h2 className={`text-2xl font-bold ${element.style || ''}`}>{element.content}</h2>;
+      
       case ELEMENT_TYPES.PARAGRAPH:
-        return <p>{item.content}</p>;
-      case ELEMENT_TYPES.BULLET_LIST:
-        return (
-          <ul className="list-disc pl-5">
-            {item.content.split('\n').map((line, index) => (
-              <li key={index}>{line}</li>
-            ))}
-          </ul>
-        );
+        return <p className={element.style || ''}>{element.content}</p>;
+      
       case ELEMENT_TYPES.BUTTON:
         return (
-          <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
-            {item.content}
+          <Button className={element.style || ''}>
+            {element.content}
           </Button>
         );
+      
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        // Fix: Properly handle the dynamic text element
+        return (
+          <div className="p-2 border border-dashed border-gray-300 rounded">
+            <p>Dynamic Text: <span className="font-bold">{element.content}</span></p>
+            <p className="text-xs text-gray-500">Will be replaced with dynamic values at runtime</p>
+          </div>
+        );
+      
       case ELEMENT_TYPES.IMAGE:
       case ELEMENT_TYPES.IMAGE_BLOCK:
         return (
-          <img 
-            src={item.props?.src || 'https://placehold.co/600x400?text=Image+placeholder'} 
-            alt={item.props?.alt || 'Image'} 
-            className="max-w-full h-auto rounded-md"
-          />
+          <div className="relative">
+            <img 
+              src={element.content || "https://via.placeholder.com/400x300?text=Image+Placeholder"} 
+              alt="Content" 
+              className="max-w-full h-auto rounded"
+            />
+          </div>
         );
+      
       case ELEMENT_TYPES.VIDEO:
       case ELEMENT_TYPES.VIDEO_EMBED:
-        // Simple video placeholder
         return (
-          <div 
-            className="w-full aspect-video bg-gray-200 rounded-md flex items-center justify-center"
-            style={{
-              backgroundImage: `url(${item.props?.placeholder || ''})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          >
-            {!item.props?.src && (
-              <div className="text-white bg-black/50 px-3 py-1 rounded">
-                Video placeholder
+          <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded flex items-center justify-center">
+            {element.content ? (
+              <div className="w-full">
+                <iframe
+                  src={element.content}
+                  className="w-full h-full min-h-[200px]"
+                  allowFullScreen
+                  title="Video embed"
+                ></iframe>
+              </div>
+            ) : (
+              <div className="text-center p-4">
+                <Video className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-gray-500">Video Placeholder</p>
               </div>
             )}
           </div>
         );
-      case ELEMENT_TYPES.DIVIDER:
-        return <hr className="my-4" />;
-      case ELEMENT_TYPES.SPACING:
-        return <div style={{ height: `${item.props?.height || 20}px` }}></div>;
-      case ELEMENT_TYPES.DYNAMIC_TEXT:
-        try {
-          // For display purposes - show template with variables highlighted
-          const template = item.content;
-          const highlightedContent = template.replace(/\{\{([^}]+)\}\}/g, 
-            (match) => `<span class="bg-blue-100 text-blue-800 px-1 rounded">${match}</span>`
-          );
-          
-          return <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />;
-        } catch (e) {
-          return <div>{item.content}</div>;
-        }
-      default:
-        return <div>{item.content || 'Element content'}</div>;
-    }
-  };
-
-  return (
-    <div className="group relative border border-dashed border-gray-300 rounded-md hover:border-metamaster-primary transition-colors p-2">
-      {/* Element actions */}
-      <div className="absolute right-2 top-2 flex space-x-1 bg-white shadow-sm border rounded-md">
-        <Button 
-          variant="ghost"
-          size="icon"
-          onClick={onMoveUp}
-          className="h-6 w-6 rounded-none border-r"
-        >
-          <ChevronUp size={14} />
-        </Button>
-        <Button 
-          variant="ghost"
-          size="icon"
-          onClick={onMoveDown}
-          className="h-6 w-6 rounded-none border-r"
-        >
-          <ChevronDown size={14} />
-        </Button>
-        <Button 
-          variant="ghost"
-          size="icon"
-          onClick={onEdit}
-          className="h-6 w-6 rounded-none border-r"
-        >
-          <Settings size={14} />
-        </Button>
-        <Button 
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          className="h-6 w-6 rounded-none text-red-500 hover:text-red-700"
-        >
-          <Trash2 size={14} />
-        </Button>
-      </div>
       
-      {/* Element type label */}
-      <div className="absolute left-2 top-2 bg-metamaster-gray-100 px-2 py-1 text-xs rounded">
-        {item.type}
-      </div>
-      
-      {/* Content */}
-      <div className="mt-8">
-        {isEditing ? (
-          <div className="space-y-4">
-            {renderEditableContent()}
-            
-            <div className="flex justify-end space-x-2 pt-2">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={onCancel}
-              >
-                Cancel
-              </Button>
-              <Button 
-                size="sm"
-                onClick={handleSave}
-              >
-                Save
-              </Button>
+      case ELEMENT_TYPES.FORM:
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return (
+          <div className="p-4 border border-dashed border-gray-300 rounded">
+            <h3 className="font-medium mb-2">Form Element</h3>
+            <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-auto max-h-40">
+              {typeof element.content === 'object' 
+                ? JSON.stringify(element.content, null, 2)
+                : element.content || 'Form configuration will appear here'}
             </div>
           </div>
+        );
+
+      // Handle all other element types with reasonable defaults
+      default:
+        return (
+          <div className="p-4 border border-dashed border-gray-300 rounded">
+            <h3 className="font-medium mb-2">{element.type}</h3>
+            <div className="bg-gray-100 p-3 rounded text-sm overflow-auto max-h-40">
+              {typeof element.content === 'object' 
+                ? JSON.stringify(element.content, null, 2)
+                : element.content || 'Content placeholder'}
+            </div>
+          </div>
+        );
+    }
+  };
+  
+  return (
+    <div className="relative group mb-4">
+      {/* Element controls */}
+      <div className="absolute -top-3 -right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        {isEditing ? (
+          <>
+            <Button size="icon" variant="outline" onClick={handleSave} className="h-7 w-7 bg-white">
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button size="icon" variant="outline" onClick={handleCancel} className="h-7 w-7 bg-white">
+              <Trash className="h-4 w-4" />
+            </Button>
+          </>
         ) : (
-          <div className="min-h-10">
-            {renderViewContent()}
+          <>
+            <Button size="icon" variant="outline" onClick={() => setIsEditing(true)} className="h-7 w-7 bg-white">
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="outline" 
+              onClick={() => onDelete(element.id)} 
+              className="h-7 w-7 bg-white text-red-500 hover:text-red-700"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
+      
+      {/* Element content */}
+      <div className="relative border border-transparent hover:border-gray-300 rounded p-2 transition-all">
+        <div className="absolute top-2 left-2 bg-gray-100 rounded-full p-1 opacity-50">
+          {getElementIcon()}
+        </div>
+        
+        {isEditing ? (
+          <div className="pt-8 pb-2 px-2">
+            {renderEditInterface()}
+          </div>
+        ) : (
+          <div className="pt-8 pb-2 px-2">
+            {renderDisplayContent()}
           </div>
         )}
       </div>
