@@ -6,31 +6,35 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Image, Video, ListOrdered, Type, FormInput, Calendar, FileText, 
-  Layout, CheckSquare, Upload, Phone, Edit, Check, Trash 
+  Layout, CheckSquare, Upload, Phone, Edit, Check, Trash, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CanvasItem } from './FunnelCanvas';
 
 interface FunnelRenderedElementProps {
-  element: {
-    id: string;
-    type: string;
-    content: any;
-    style?: any;
-  };
-  onUpdate: (id: string, content: any) => void;
-  onDelete: (id: string) => void;
+  item: CanvasItem;
   isEditing: boolean;
-  setIsEditing: (isEditing: boolean) => void;
+  onEdit: () => void;
+  onSave: (content: any, props?: any) => void;
+  onCancel: () => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  device: 'mobile' | 'tablet' | 'desktop';
 }
 
 const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
-  element,
-  onUpdate,
-  onDelete,
+  item,
   isEditing,
-  setIsEditing
+  onEdit,
+  onSave,
+  onCancel,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+  device
 }) => {
-  const [editableContent, setEditableContent] = useState(element.content);
+  const [editableContent, setEditableContent] = useState(item.content);
   const { toast } = useToast();
   
   const handleSave = () => {
@@ -42,12 +46,11 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             ELEMENT_TYPES.MULTIPLE_CHOICE,
             ELEMENT_TYPES.DROPDOWN,
             ELEMENT_TYPES.IMAGE_SLIDER
-          ].includes(element.type)) {
+          ].includes(item.type)) {
         JSON.parse(editableContent);
       }
       
-      onUpdate(element.id, editableContent);
-      setIsEditing(false);
+      onSave(editableContent, item.props);
       toast({
         title: "Changes saved",
         description: "Your element has been updated."
@@ -61,13 +64,8 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     }
   };
   
-  const handleCancel = () => {
-    setEditableContent(element.content);
-    setIsEditing(false);
-  };
-  
   const getElementIcon = () => {
-    switch (element.type) {
+    switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
       case ELEMENT_TYPES.PARAGRAPH:
       case ELEMENT_TYPES.DYNAMIC_TEXT:
@@ -95,7 +93,6 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         return <Calendar className="h-5 w-5" />;
       case ELEMENT_TYPES.FILE_UPLOAD:
         return <Upload className="h-5 w-5" />;
-      // Fix SECTION and COLUMNS properties that were causing errors
       case "SECTION":
       case "SECTION_TEMPLATE": 
         return <Layout className="h-5 w-5" />;
@@ -111,7 +108,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   
   const renderEditInterface = () => {
     // Different edit interfaces based on element type
-    switch (element.type) {
+    switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
       case ELEMENT_TYPES.PARAGRAPH:
       case ELEMENT_TYPES.BUTTON:
@@ -167,17 +164,17 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   };
   
   const renderDisplayContent = () => {
-    switch (element.type) {
+    switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
-        return <h2 className={`text-2xl font-bold ${element.style || ''}`}>{element.content}</h2>;
+        return <h2 className={`text-2xl font-bold ${item.props?.style || ''}`}>{item.content}</h2>;
       
       case ELEMENT_TYPES.PARAGRAPH:
-        return <p className={element.style || ''}>{element.content}</p>;
+        return <p className={item.props?.style || ''}>{item.content}</p>;
       
       case ELEMENT_TYPES.BUTTON:
         return (
-          <Button className={element.style || ''}>
-            {element.content}
+          <Button className={item.props?.style || ''}>
+            {item.content}
           </Button>
         );
       
@@ -185,7 +182,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         // Fix: Properly handle the dynamic text element
         return (
           <div className="p-2 border border-dashed border-gray-300 rounded">
-            <p>Dynamic Text: <span className="font-bold">{element.content}</span></p>
+            <p>Dynamic Text: <span className="font-bold">{item.content}</span></p>
             <p className="text-xs text-gray-500">Will be replaced with dynamic values at runtime</p>
           </div>
         );
@@ -195,7 +192,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         return (
           <div className="relative">
             <img 
-              src={element.content || "https://via.placeholder.com/400x300?text=Image+Placeholder"} 
+              src={item.content || "https://via.placeholder.com/400x300?text=Image+Placeholder"} 
               alt="Content" 
               className="max-w-full h-auto rounded"
             />
@@ -206,10 +203,10 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       case ELEMENT_TYPES.VIDEO_EMBED:
         return (
           <div className="aspect-w-16 aspect-h-9 bg-gray-100 rounded flex items-center justify-center">
-            {element.content ? (
+            {item.content ? (
               <div className="w-full">
                 <iframe
-                  src={element.content}
+                  src={item.content}
                   className="w-full h-full min-h-[200px]"
                   allowFullScreen
                   title="Video embed"
@@ -230,9 +227,9 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           <div className="p-4 border border-dashed border-gray-300 rounded">
             <h3 className="font-medium mb-2">Form Element</h3>
             <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-auto max-h-40">
-              {typeof element.content === 'object' 
-                ? JSON.stringify(element.content, null, 2)
-                : element.content || 'Form configuration will appear here'}
+              {typeof item.content === 'object' 
+                ? JSON.stringify(item.content, null, 2)
+                : item.content || 'Form configuration will appear here'}
             </div>
           </div>
         );
@@ -241,11 +238,11 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       default:
         return (
           <div className="p-4 border border-dashed border-gray-300 rounded">
-            <h3 className="font-medium mb-2">{element.type}</h3>
+            <h3 className="font-medium mb-2">{item.type}</h3>
             <div className="bg-gray-100 p-3 rounded text-sm overflow-auto max-h-40">
-              {typeof element.content === 'object' 
-                ? JSON.stringify(element.content, null, 2)
-                : element.content || 'Content placeholder'}
+              {typeof item.content === 'object' 
+                ? JSON.stringify(item.content, null, 2)
+                : item.content || 'Content placeholder'}
             </div>
           </div>
         );
@@ -261,22 +258,38 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             <Button size="icon" variant="outline" onClick={handleSave} className="h-7 w-7 bg-white">
               <Check className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="outline" onClick={handleCancel} className="h-7 w-7 bg-white">
+            <Button size="icon" variant="outline" onClick={onCancel} className="h-7 w-7 bg-white">
               <Trash className="h-4 w-4" />
             </Button>
           </>
         ) : (
           <>
-            <Button size="icon" variant="outline" onClick={() => setIsEditing(true)} className="h-7 w-7 bg-white">
+            <Button size="icon" variant="outline" onClick={onEdit} className="h-7 w-7 bg-white">
               <Edit className="h-4 w-4" />
             </Button>
             <Button 
               size="icon" 
               variant="outline" 
-              onClick={() => onDelete(element.id)} 
+              onClick={onRemove} 
               className="h-7 w-7 bg-white text-red-500 hover:text-red-700"
             >
               <Trash className="h-4 w-4" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="outline" 
+              onClick={onMoveUp} 
+              className="h-7 w-7 bg-white"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="outline" 
+              onClick={onMoveDown} 
+              className="h-7 w-7 bg-white"
+            >
+              <ArrowDown className="h-4 w-4" />
             </Button>
           </>
         )}
