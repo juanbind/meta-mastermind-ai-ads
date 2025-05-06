@@ -37,6 +37,36 @@ export const ELEMENT_TYPES = {
   SOCIAL_PROOF: 'social-proof',
   COUNTDOWN: 'countdown',
   TRUST_BADGES: 'trust-badges',
+  
+  // Text & Typography elements
+  DYNAMIC_TEXT: 'dynamic-text',
+  CUSTOM_FONT_TEXT: 'custom-font-text',
+  
+  // Media & Visuals elements
+  IMAGE_BLOCK: 'image-block',
+  VIDEO_EMBED: 'video-embed',
+  IMAGE_SLIDER: 'image-slider',
+  
+  // Interactive Components
+  MULTIPLE_CHOICE: 'multiple-choice',
+  DATE_PICKER: 'date-picker',
+  FILE_UPLOAD: 'file-upload',
+  
+  // Forms & Data Collection
+  FORM_BLOCK: 'form-block',
+  PHONE_INPUT: 'phone-input',
+  
+  // Layout & Design
+  SECTION_TEMPLATE: 'section-template',
+  CARD: 'card',
+  BACKGROUND: 'background',
+  
+  // Navigation & Progress
+  PROGRESS_BAR: 'progress-bar',
+  
+  // Advanced Features
+  HTML_BLOCK: 'html-block',
+  CONDITIONAL_BLOCK: 'conditional-block'
 };
 
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
