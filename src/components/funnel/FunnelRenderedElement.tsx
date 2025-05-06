@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ELEMENT_TYPES } from './FunnelElement';
 import { Button } from '@/components/ui/button';
@@ -10,8 +9,9 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CanvasItem } from './FunnelCanvas';
+import ContentBlockRenderer from './ContentBlockRenderer';
 
-interface FunnelRenderedElementProps {
+export interface FunnelRenderedElementProps {
   item: CanvasItem;
   isEditing: boolean;
   onEdit: () => void;
@@ -45,7 +45,16 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             ELEMENT_TYPES.FORM, 
             ELEMENT_TYPES.MULTIPLE_CHOICE,
             ELEMENT_TYPES.DROPDOWN,
-            ELEMENT_TYPES.IMAGE_SLIDER
+            ELEMENT_TYPES.IMAGE_SLIDER,
+            ELEMENT_TYPES.HERO_SECTION,
+            ELEMENT_TYPES.FEATURES_BLOCK,
+            ELEMENT_TYPES.TESTIMONIAL_BLOCK,
+            ELEMENT_TYPES.CTA_BLOCK,
+            ELEMENT_TYPES.FAQ_BLOCK,
+            ELEMENT_TYPES.PRICING_BLOCK,
+            ELEMENT_TYPES.SOCIAL_PROOF,
+            ELEMENT_TYPES.COUNTDOWN,
+            ELEMENT_TYPES.TRUST_BADGES
           ].includes(item.type)) {
         JSON.parse(editableContent);
       }
@@ -152,6 +161,25 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           />
         );
       
+      case ELEMENT_TYPES.HERO_SECTION:
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+      case ELEMENT_TYPES.CTA_BLOCK:
+      case ELEMENT_TYPES.FAQ_BLOCK:
+      case ELEMENT_TYPES.PRICING_BLOCK:
+      case ELEMENT_TYPES.SOCIAL_PROOF:
+      case ELEMENT_TYPES.COUNTDOWN:
+      case ELEMENT_TYPES.TRUST_BADGES:
+        return (
+          <Textarea
+            value={typeof editableContent === 'object' ? JSON.stringify(editableContent, null, 2) : editableContent}
+            onChange={(e) => setEditableContent(e.target.value)}
+            rows={5}
+            className="mb-2 font-mono text-xs"
+            placeholder="Enter JSON configuration"
+          />
+        );
+      
       default:
         return (
           <Input
@@ -164,6 +192,34 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   };
   
   const renderDisplayContent = () => {
+    // Content blocks that should use ContentBlockRenderer
+    const contentBlocks = [
+      ELEMENT_TYPES.HERO_SECTION,
+      ELEMENT_TYPES.FEATURES_BLOCK,
+      ELEMENT_TYPES.TESTIMONIAL_BLOCK,
+      ELEMENT_TYPES.CTA_BLOCK,
+      ELEMENT_TYPES.FAQ_BLOCK,
+      ELEMENT_TYPES.PRICING_BLOCK,
+      ELEMENT_TYPES.SOCIAL_PROOF,
+      ELEMENT_TYPES.COUNTDOWN,
+      ELEMENT_TYPES.TRUST_BADGES
+    ];
+
+    // Render using ContentBlockRenderer if it's a content block
+    if (contentBlocks.includes(item.type)) {
+      try {
+        return <ContentBlockRenderer type={item.type} content={item.content} props={item.props} device={device} />;
+      } catch (error) {
+        console.error("Error rendering content block:", error);
+        return (
+          <div className="p-4 bg-red-50 border border-red-200 rounded">
+            <p className="text-red-700">Error rendering {item.type}</p>
+          </div>
+        );
+      }
+    }
+
+    // For regular elements, use the existing switch case
     switch (item.type) {
       case ELEMENT_TYPES.HEADLINE:
         return <h2 className={`text-2xl font-bold ${item.props?.style || ''}`}>{item.content}</h2>;
@@ -223,18 +279,116 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       
       case ELEMENT_TYPES.FORM:
       case ELEMENT_TYPES.FORM_BLOCK:
+        const formContent = typeof item.content === 'string' ? item.content : JSON.stringify(item.content, null, 2);
         return (
           <div className="p-4 border border-dashed border-gray-300 rounded">
             <h3 className="font-medium mb-2">Form Element</h3>
-            <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-auto max-h-40">
-              {typeof item.content === 'object' 
-                ? JSON.stringify(item.content, null, 2)
-                : item.content || 'Form configuration will appear here'}
+            <div className="flex flex-col gap-2 mb-4">
+              <Input placeholder="Name" className="w-full" />
+              <Input placeholder="Email" type="email" className="w-full" />
+              <Button>Submit</Button>
+            </div>
+            <div className="bg-gray-100 p-3 rounded text-xs font-mono overflow-auto max-h-40 mt-4">
+              {formContent || 'Form configuration'}
             </div>
           </div>
         );
+      
+      case ELEMENT_TYPES.BULLET_LIST:
+        const items = typeof item.content === 'string' ? item.content.split('\n') : [];
+        return (
+          <ul className="list-disc pl-5">
+            {items.map((listItem, index) => (
+              <li key={index}>{listItem}</li>
+            ))}
+          </ul>
+        );
+      
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        try {
+          const mcContent = typeof item.content === 'string' 
+            ? JSON.parse(item.content) 
+            : item.content;
+          
+          return (
+            <div className="p-4 border border-dashed border-gray-300 rounded">
+              <h3 className="font-medium mb-2">{mcContent.question || "Multiple Choice"}</h3>
+              <div className="space-y-2">
+                {mcContent.options?.map((option: string, idx: number) => (
+                  <div key={idx} className="flex items-center">
+                    <input 
+                      type={mcContent.allowMultiple ? "checkbox" : "radio"} 
+                      id={`option-${idx}`}
+                      name="option"
+                      className="mr-2"
+                    />
+                    <label htmlFor={`option-${idx}`}>{option}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        } catch (error) {
+          return <div className="p-2 text-red-500">Invalid multiple choice format</div>;
+        }
+      
+      case ELEMENT_TYPES.DROPDOWN:
+        try {
+          const options = typeof item.content === 'string' 
+            ? item.content.split('\n')
+            : Array.isArray(item.content) ? item.content : [];
+          
+          return (
+            <div className="p-2">
+              <select className="w-full border border-gray-300 rounded p-2">
+                <option value="" disabled selected>Select an option</option>
+                {options.map((option, idx) => (
+                  <option key={idx} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          );
+        } catch (error) {
+          return <div className="p-2 text-red-500">Invalid dropdown format</div>;
+        }
+      
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return (
+          <div className="p-4 border border-dashed border-gray-300 rounded">
+            <h3 className="font-medium mb-2">File Upload</h3>
+            <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
+              </div>
+              <input type="file" className="hidden" />
+            </label>
+          </div>
+        );
+      
+      case ELEMENT_TYPES.CALENDAR:
+      case ELEMENT_TYPES.DATE_PICKER:
+        return (
+          <div className="p-4 border border-dashed border-gray-300 rounded">
+            <h3 className="font-medium mb-2">Date Selection</h3>
+            <div className="relative">
+              <Input 
+                type="date" 
+                className="w-full p-2"
+                placeholder={item.content || "Select a date"} 
+              />
+              <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            </div>
+          </div>
+        );
+      
+      case ELEMENT_TYPES.DIVIDER:
+        return <hr className="my-4 border-t border-gray-200" />;
+      
+      case ELEMENT_TYPES.SPACING:
+        const height = item.props?.height || 20;
+        return <div style={{ height: `${height}px` }}></div>;
 
-      // Handle all other element types with reasonable defaults
       default:
         return (
           <div className="p-4 border border-dashed border-gray-300 rounded">
