@@ -8,6 +8,7 @@ import { CanvasItem } from './FunnelCanvas';
 import { ELEMENT_TYPES } from './FunnelElement';
 import TextFormatToolbar from './TextFormatToolbar';
 import ContentBlockRenderer from './ContentBlockRenderer';
+import { Label } from '@/components/ui/label';
 
 interface FunnelRenderedElementProps {
   item: CanvasItem;
@@ -44,19 +45,68 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     ELEMENT_TYPES.CTA_BLOCK,
     ELEMENT_TYPES.FAQ_BLOCK,
     ELEMENT_TYPES.PRICING_BLOCK,
+    ELEMENT_TYPES.SOCIAL_PROOF,
+    ELEMENT_TYPES.COUNTDOWN,
+    ELEMENT_TYPES.TRUST_BADGES,
+    ELEMENT_TYPES.CONTACT_BLOCK,
+  ].includes(item.type);
+  
+  const isJsonContent = [
+    // Content blocks
+    ELEMENT_TYPES.HERO_SECTION,
+    ELEMENT_TYPES.FEATURES_BLOCK,
+    ELEMENT_TYPES.TESTIMONIAL_BLOCK,
+    ELEMENT_TYPES.CTA_BLOCK,
+    ELEMENT_TYPES.FAQ_BLOCK,
+    ELEMENT_TYPES.PRICING_BLOCK,
+    // Dynamic elements
+    ELEMENT_TYPES.DYNAMIC_TEXT,
+    ELEMENT_TYPES.CUSTOM_FONT_TEXT,
+    // Media elements
+    ELEMENT_TYPES.IMAGE_BLOCK,
+    ELEMENT_TYPES.VIDEO_EMBED,
+    ELEMENT_TYPES.IMAGE_SLIDER,
+    // Interactive elements
+    ELEMENT_TYPES.MULTIPLE_CHOICE,
+    ELEMENT_TYPES.DATE_PICKER,
+    ELEMENT_TYPES.FILE_UPLOAD,
+    // Forms
+    ELEMENT_TYPES.FORM_BLOCK,
+    ELEMENT_TYPES.PHONE_INPUT,
+    // Layout
+    ELEMENT_TYPES.SECTION_TEMPLATE,
+    ELEMENT_TYPES.CARD,
+    ELEMENT_TYPES.BACKGROUND,
+    // Navigation
+    ELEMENT_TYPES.PROGRESS_BAR,
+    // Advanced
+    ELEMENT_TYPES.CONDITIONAL_BLOCK,
+    ELEMENT_TYPES.SOCIAL_PROOF,
+    ELEMENT_TYPES.COUNTDOWN,
+    ELEMENT_TYPES.TRUST_BADGES,
   ].includes(item.type);
   
   const handleSave = () => {
-    let updatedProps = { ...item.props };
-    
-    // Update specific props based on element type
-    if (item.type === ELEMENT_TYPES.IMAGE) {
-      updatedProps = { ...updatedProps, src: imageUrl };
-    } else if (item.type === ELEMENT_TYPES.VIDEO) {
-      updatedProps = { ...updatedProps, src: videoUrl };
+    try {
+      // Validate JSON if needed
+      if (isJsonContent) {
+        JSON.parse(content);
+      }
+      
+      let updatedProps = { ...item.props };
+      
+      // Update specific props based on element type
+      if (item.type === ELEMENT_TYPES.IMAGE || item.type === ELEMENT_TYPES.IMAGE_BLOCK) {
+        updatedProps = { ...updatedProps, src: imageUrl };
+      } else if (item.type === ELEMENT_TYPES.VIDEO || item.type === ELEMENT_TYPES.VIDEO_EMBED) {
+        updatedProps = { ...updatedProps, src: videoUrl };
+      }
+      
+      onSave(content, updatedProps);
+    } catch (error) {
+      console.error('Invalid JSON format:', error);
+      alert('Invalid JSON format. Please check your input.');
     }
-    
-    onSave(content, updatedProps);
   };
   
   const renderEditableContent = () => {
@@ -120,11 +170,13 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           </>
         );
       case ELEMENT_TYPES.IMAGE:
+      case ELEMENT_TYPES.IMAGE_BLOCK:
         return (
           <div className="space-y-2">
             <div>
-              <label className="text-sm font-medium">Image URL</label>
+              <Label htmlFor="imageUrl">Image URL</Label>
               <Input 
+                id="imageUrl"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://example.com/image.jpg"
@@ -136,11 +188,13 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           </div>
         );
       case ELEMENT_TYPES.VIDEO:
+      case ELEMENT_TYPES.VIDEO_EMBED:
         return (
           <div className="space-y-2">
             <div>
-              <label className="text-sm font-medium">Video URL</label>
+              <Label htmlFor="videoUrl">Video URL</Label>
               <Input 
+                id="videoUrl"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="https://youtube.com/watch?v=..."
@@ -151,26 +205,43 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             </div>
           </div>
         );
-      case ELEMENT_TYPES.HERO_SECTION:
-      case ELEMENT_TYPES.FEATURES_BLOCK:
-      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
-      case ELEMENT_TYPES.CTA_BLOCK:
-      case ELEMENT_TYPES.FAQ_BLOCK:
-      case ELEMENT_TYPES.PRICING_BLOCK:
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
         return (
           <div className="space-y-2">
+            <Label htmlFor="dynamicContent">Dynamic Text Content</Label>
             <Textarea
+              id="dynamicContent"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={10}
-              className="font-mono text-sm"
+              rows={3}
+              placeholder="Hello {{name}}, welcome to our {{product}}!"
             />
-            <div className="text-xs text-gray-500">
-              Edit the JSON configuration above to customize this content block
-            </div>
+            <p className="text-xs text-gray-500">
+              Use {{variable}} syntax to insert dynamic content
+            </p>
           </div>
         );
+      // For JSON-based elements, show JSON editor
       default:
+        if (isJsonContent) {
+          return (
+            <div className="space-y-2">
+              <Label htmlFor="jsonContent">Element Configuration</Label>
+              <Textarea
+                id="jsonContent"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={10}
+                className="font-mono text-sm"
+                placeholder="{}"
+              />
+              <div className="text-xs text-gray-500">
+                Edit the JSON configuration above to customize this element
+              </div>
+            </div>
+          );
+        }
+        
         return (
           <Textarea
             value={content}
@@ -182,7 +253,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   };
   
   const renderViewContent = () => {
-    if (isContentBlock) {
+    if (isContentBlock || isJsonContent) {
       return (
         <ContentBlockRenderer 
           type={item.type} 
@@ -213,6 +284,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           </Button>
         );
       case ELEMENT_TYPES.IMAGE:
+      case ELEMENT_TYPES.IMAGE_BLOCK:
         return (
           <img 
             src={item.props?.src || 'https://placehold.co/600x400?text=Image+placeholder'} 
@@ -221,6 +293,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           />
         );
       case ELEMENT_TYPES.VIDEO:
+      case ELEMENT_TYPES.VIDEO_EMBED:
         // Simple video placeholder
         return (
           <div 
@@ -242,6 +315,18 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         return <hr className="my-4" />;
       case ELEMENT_TYPES.SPACING:
         return <div style={{ height: `${item.props?.height || 20}px` }}></div>;
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        try {
+          // For display purposes - show template with variables highlighted
+          const template = item.content;
+          const highlightedContent = template.replace(/\{\{([^}]+)\}\}/g, 
+            (match) => `<span class="bg-blue-100 text-blue-800 px-1 rounded">${match}</span>`
+          );
+          
+          return <div dangerouslySetInnerHTML={{ __html: highlightedContent }} />;
+        } catch (e) {
+          return <div>{item.content}</div>;
+        }
       default:
         return <div>{item.content || 'Element content'}</div>;
     }
