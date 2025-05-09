@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -13,11 +12,18 @@ import {
   Zap,
   Menu,
   X,
-  Image
+  Image,
+  AlertCircle
 } from 'lucide-react';
 import Logo from './Logo';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SidebarLinkProps {
   to: string;
@@ -25,10 +31,10 @@ interface SidebarLinkProps {
   label: string;
   isActive: boolean;
   onClick?: () => void;
-  tag?: string;
+  isComingSoon?: boolean;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, onClick, tag }) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, onClick, isComingSoon }) => {
   return (
     <Link
       to={to}
@@ -41,10 +47,22 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, on
     >
       <div className="flex-shrink-0">{icon}</div>
       <span className="font-medium">{label}</span>
-      {tag && (
-        <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full ml-2">
-          {tag}
-        </span>
+      
+      {isComingSoon && (
+        <div className="ml-auto">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center justify-center">
+                  <AlertCircle className="h-4 w-4 text-amber-500 fill-amber-500/30" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Coming Soon</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       )}
     </Link>
   );
@@ -59,7 +77,7 @@ const Sidebar: React.FC = () => {
   const links = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Dashboard' },
     { to: '/ads-library', icon: <Search size={20} />, label: 'Ad Library' },
-    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder', tag: 'Coming Soon' },
+    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder', isComingSoon: true },
     { to: '/crm', icon: <Users size={20} />, label: 'CRM' },
     { to: '/ai-tools', icon: <Zap size={20} />, label: 'AI Tools' },
     { to: '/ai-tools/media-buyer', icon: <BarChart size={20} />, label: 'AI Media Buyer' },
@@ -103,7 +121,7 @@ const Sidebar: React.FC = () => {
               icon={link.icon}
               label={link.label}
               isActive={currentPath === link.to}
-              tag={link.tag}
+              isComingSoon={link.isComingSoon}
             />
           ))}
         </div>
@@ -152,7 +170,7 @@ const Sidebar: React.FC = () => {
                   label={link.label}
                   isActive={currentPath === link.to}
                   onClick={closeMobileMenu}
-                  tag={link.tag}
+                  isComingSoon={link.isComingSoon}
                 />
               ))}
             </div>
