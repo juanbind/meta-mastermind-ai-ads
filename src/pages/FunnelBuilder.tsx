@@ -1041,7 +1041,8 @@ const FunnelBuilder: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
             <LogicRuleBuilder 
               funnelId={activeFunnel?.id || ''} 
-              pages={pages.map(page => ({ id: page.id, name: page.name }))} 
+              pages={funnelPages.map(page => ({ id: page.id, name: page.name }))} 
+              elements={getAllElementsForLogic()}
             />
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog,
@@ -179,14 +180,14 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, el
               <label htmlFor="element" className="text-right">
                 Element
               </label>
-              <Select onValueChange={(value) => setSelectedElement(value)} defaultValue={selectedElement} className="col-span-3">
-                <SelectTrigger>
+              <Select onValueChange={(value) => setSelectedElement(value)} defaultValue={selectedElement}>
+                <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select an element" />
                 </SelectTrigger>
                 <SelectContent>
                   {elements.map((element: any) => (
                     <SelectItem key={element.id} value={element.id}>
-                      {element.name}
+                      {element.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -204,8 +205,8 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, el
               <label htmlFor="conditionOperator" className="text-right">
                 Condition Operator
               </label>
-              <Select onValueChange={(value) => setConditionOperator(value)} defaultValue={conditionOperator} className="col-span-3">
-                <SelectTrigger>
+              <Select onValueChange={(value) => setConditionOperator(value)} defaultValue={conditionOperator}>
+                <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select an operator" />
                 </SelectTrigger>
                 <SelectContent>
@@ -229,8 +230,8 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, el
               <label htmlFor="actionType" className="text-right">
                 Action Type
               </label>
-              <Select onValueChange={(value) => setActionType(value)} defaultValue={actionType} className="col-span-3">
-                <SelectTrigger>
+              <Select onValueChange={(value) => setActionType(value)} defaultValue={actionType}>
+                <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select an action" />
                 </SelectTrigger>
                 <SelectContent>
@@ -245,8 +246,8 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, el
               <label htmlFor="actionTarget" className="text-right">
                 Action Target
               </label>
-               <Select onValueChange={(value) => setActionTarget(value)} defaultValue={actionTarget} className="col-span-3">
-                <SelectTrigger>
+               <Select onValueChange={(value) => setActionTarget(value)} defaultValue={actionTarget}>
+                <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a page" />
                 </SelectTrigger>
                 <SelectContent>
