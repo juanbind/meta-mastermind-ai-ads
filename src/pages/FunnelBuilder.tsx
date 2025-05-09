@@ -1040,9 +1040,8 @@ const FunnelBuilder: React.FC = () => {
           
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
             <LogicRuleBuilder 
-              funnelId={activeFunnel.id}
-              elements={getAllElementsForLogic()}
-              pages={funnelPages.map(page => ({ id: page.id, name: page.name }))}
+              funnelId={activeFunnel?.id || ''} 
+              pages={pages.map(page => ({ id: page.id, name: page.name }))} 
             />
           </div>
         </div>
@@ -1502,7 +1501,7 @@ const FunnelBuilder: React.FC = () => {
                     ) : funnels.length === 0 ? (
                       <div className="text-center py-12 bg-white rounded-xl border border-gray-100 shadow-sm">
                         <div className="max-w-md mx-auto">
-                          <LayoutGrid size={64} className="mx-auto mb-4 text-metamaster-gray-400" />
+                          <LayoutGrid size={64} className="mx-auto mb-2 text-metamaster-gray-400" />
                           <h3 className="text-xl font-bold mb-2">No funnels yet</h3>
                           <p className="text-metamaster-gray-500 mb-6">
                             Create your first funnel or use one of our templates to get started quickly.
