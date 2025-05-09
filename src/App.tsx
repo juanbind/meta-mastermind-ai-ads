@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,82 +35,91 @@ const ScrollToTop = () => {
 
 const queryClient = new QueryClient();
 
+// Create a component for protected routes that will be wrapped with AuthProvider
+const ProtectedRoutes = () => (
+  <AuthProvider>
+    <Routes>
+      <Route path="/dashboard" element={
+        <AuthCheck>
+          <Dashboard />
+        </AuthCheck>
+      } />
+      <Route path="/ads-library" element={
+        <AuthCheck>
+          <AdsLibrary />
+        </AuthCheck>
+      } />
+      <Route path="/creatives" element={
+        <AuthCheck>
+          <Creatives />
+        </AuthCheck>
+      } />
+      <Route path="/ai-tools/media-buyer" element={
+        <AuthCheck>
+          <AIMediaBuyerPage />
+        </AuthCheck>
+      } />
+      <Route path="/crm" element={
+        <AuthCheck>
+          <CRM />
+        </AuthCheck>
+      } />
+      <Route path="/funnel-builder" element={
+        <AuthCheck>
+          <PasswordProtection password="juanbind">
+            <FunnelBuilder />
+          </PasswordProtection>
+        </AuthCheck>
+      } />
+      <Route path="/ai-tools" element={
+        <AuthCheck>
+          <AITools />
+        </AuthCheck>
+      } />
+      <Route path="/reports" element={
+        <AuthCheck>
+          <Reports />
+        </AuthCheck>
+      } />
+      <Route path="/templates" element={
+        <AuthCheck>
+          <Templates />
+        </AuthCheck>
+      } />
+      <Route path="/integrations" element={
+        <AuthCheck>
+          <Integrations />
+        </AuthCheck>
+      } />
+      <Route path="/settings" element={
+        <AuthCheck>
+          <Settings />
+        </AuthCheck>
+      } />
+    </Routes>
+  </AuthProvider>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <AuthCheck>
-                <Dashboard />
-              </AuthCheck>
-            } />
-            <Route path="/ads-library" element={
-              <AuthCheck>
-                <AdsLibrary />
-              </AuthCheck>
-            } />
-            <Route path="/creatives" element={
-              <AuthCheck>
-                <Creatives />
-              </AuthCheck>
-            } />
-            <Route path="/ai-tools/media-buyer" element={
-              <AuthCheck>
-                <AIMediaBuyerPage />
-              </AuthCheck>
-            } />
-            <Route path="/crm" element={
-              <AuthCheck>
-                <CRM />
-              </AuthCheck>
-            } />
-            <Route path="/funnel-builder" element={
-              <AuthCheck>
-                <PasswordProtection password="juanbind">
-                  <FunnelBuilder />
-                </PasswordProtection>
-              </AuthCheck>
-            } />
-            <Route path="/ai-tools" element={
-              <AuthCheck>
-                <AITools />
-              </AuthCheck>
-            } />
-            <Route path="/reports" element={
-              <AuthCheck>
-                <Reports />
-              </AuthCheck>
-            } />
-            <Route path="/templates" element={
-              <AuthCheck>
-                <Templates />
-              </AuthCheck>
-            } />
-            <Route path="/integrations" element={
-              <AuthCheck>
-                <Integrations />
-              </AuthCheck>
-            } />
-            <Route path="/settings" element={
-              <AuthCheck>
-                <Settings />
-              </AuthCheck>
-            } />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <ScrollToTop />
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/auth" element={<Auth />} />
+          
+          {/* Protected routes - wrapped in AuthProvider */}
+          <Route path="/*" element={<ProtectedRoutes />} />
+          
+          {/* Catch all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
