@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AuthCheck } from "./components/auth/AuthCheck";
+import PasswordProtection from "./components/auth/PasswordProtection";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -58,7 +60,9 @@ const App = () => (
             } />
             <Route path="/funnel-builder" element={
               <AuthCheck>
-                <FunnelBuilder />
+                <PasswordProtection password="juanbind">
+                  <FunnelBuilder />
+                </PasswordProtection>
               </AuthCheck>
             } />
             <Route path="/crm" element={

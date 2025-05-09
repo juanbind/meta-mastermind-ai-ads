@@ -25,9 +25,10 @@ interface SidebarLinkProps {
   label: string;
   isActive: boolean;
   onClick?: () => void;
+  tag?: string;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, onClick }) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, onClick, tag }) => {
   return (
     <Link
       to={to}
@@ -40,6 +41,11 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, on
     >
       <div className="flex-shrink-0">{icon}</div>
       <span className="font-medium">{label}</span>
+      {tag && (
+        <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full ml-2">
+          {tag}
+        </span>
+      )}
     </Link>
   );
 };
@@ -53,7 +59,7 @@ const Sidebar: React.FC = () => {
   const links = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Dashboard' },
     { to: '/ads-library', icon: <Search size={20} />, label: 'Ad Library' },
-    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder' },
+    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder', tag: 'Coming Soon' },
     { to: '/crm', icon: <Users size={20} />, label: 'CRM' },
     { to: '/ai-tools', icon: <Zap size={20} />, label: 'AI Tools' },
     { to: '/ai-tools/media-buyer', icon: <BarChart size={20} />, label: 'AI Media Buyer' },
@@ -97,6 +103,7 @@ const Sidebar: React.FC = () => {
               icon={link.icon}
               label={link.label}
               isActive={currentPath === link.to}
+              tag={link.tag}
             />
           ))}
         </div>
@@ -145,6 +152,7 @@ const Sidebar: React.FC = () => {
                   label={link.label}
                   isActive={currentPath === link.to}
                   onClick={closeMobileMenu}
+                  tag={link.tag}
                 />
               ))}
             </div>
