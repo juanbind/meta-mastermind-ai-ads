@@ -54,7 +54,17 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
           
         if (pagesError) throw pagesError;
         
-        setPages(pagesData || []);
+        // Convert the data to the proper FunnelPage type
+        const typedPages: FunnelPage[] = pagesData?.map(page => ({
+          id: page.id,
+          name: page.name,
+          type: page.type as 'quiz' | 'result' | 'form' | 'landing' | 'thank_you',
+          order_index: page.order_index,
+          content: page.content,
+          funnel_id: page.funnel_id
+        })) || [];
+        
+        setPages(typedPages);
         
         const { data: rulesData, error: rulesError } = await supabase
           .from('logic_rules')
@@ -63,7 +73,20 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
           
         if (rulesError) throw rulesError;
         
-        setLogicRules(rulesData || []);
+        // Convert the data to the proper LogicRule type
+        const typedRules: LogicRule[] = rulesData?.map(rule => ({
+          id: rule.id,
+          element_id: rule.element_id,
+          condition: typeof rule.condition === 'string' 
+            ? JSON.parse(rule.condition) 
+            : rule.condition as LogicRule['condition'],
+          action: typeof rule.action === 'string'
+            ? JSON.parse(rule.action)
+            : rule.action as LogicRule['action'],
+          funnel_id: rule.funnel_id
+        })) || [];
+        
+        setLogicRules(typedRules);
       } catch (error) {
         console.error('Error fetching funnel data:', error);
         toast({

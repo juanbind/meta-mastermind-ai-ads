@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 
 interface LogicRuleBuilderProps {
   funnelId: string;
-  elements: Array<{id: string, label: string, type: string}>;
+  elements: Array<{id: string, label: string, type: string, content?: any}>;
   pages?: Array<{id: string, name: string}>;
   onRulesChange?: (rules: any[]) => void;
 }
@@ -206,7 +207,7 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({
             ? JSON.parse(element.content) 
             : element.content;
             
-          if (content.fields && Array.isArray(content.fields)) {
+          if (content?.fields && Array.isArray(content.fields)) {
             content.fields.forEach((field: any) => {
               if (field.name) {
                 formFields.push({
