@@ -29,6 +29,14 @@ const Settings: React.FC = () => {
     }
   }, [location.search]);
 
+  useEffect(() => {
+    // Update state when user metadata changes
+    if (user) {
+      setFullName(user.user_metadata?.full_name || '');
+      setProfileImage(user.user_metadata?.avatar_url || null);
+    }
+  }, [user]);
+
   const handleSaveChanges = async () => {
     setIsLoading(true);
     try {

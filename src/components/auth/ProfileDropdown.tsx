@@ -29,14 +29,15 @@ const ProfileDropdown = () => {
   };
 
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
+  const avatarUrl = user?.user_metadata?.avatar_url;
   
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full flex items-center justify-center border border-white/20">
-          {user?.user_metadata?.avatar_url ? (
+          {avatarUrl ? (
             <img 
-              src={user.user_metadata.avatar_url} 
+              src={avatarUrl} 
               alt="Profile" 
               className="h-full w-full rounded-full object-cover"
             />
@@ -61,6 +62,7 @@ const ProfileDropdown = () => {
             <User className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem 
             className="cursor-pointer text-white hover:bg-white/10" 
             onClick={() => handleNavigation('team')}
@@ -68,6 +70,7 @@ const ProfileDropdown = () => {
             <Users className="mr-2 h-4 w-4" />
             <span>Team</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem 
             className="cursor-pointer text-white hover:bg-white/10" 
             onClick={() => handleNavigation('billing')}
@@ -75,6 +78,7 @@ const ProfileDropdown = () => {
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem 
             className="cursor-pointer text-white hover:bg-white/10" 
             onClick={() => handleNavigation('security')}
@@ -82,6 +86,7 @@ const ProfileDropdown = () => {
             <Lock className="mr-2 h-4 w-4" />
             <span>Security</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem 
             className="cursor-pointer text-white hover:bg-white/10" 
             onClick={() => handleNavigation('notifications')}
@@ -89,6 +94,7 @@ const ProfileDropdown = () => {
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem 
             className="cursor-pointer text-white hover:bg-white/10" 
             onClick={() => handleNavigation('profile')}
