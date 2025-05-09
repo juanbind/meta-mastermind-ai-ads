@@ -49,25 +49,25 @@ const ProfileDropdown = () => {
             <User className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('profile')}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('notifications')}>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('security')}>
-            <Lock className="mr-2 h-4 w-4" />
-            <span>Security</span>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('team')}>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('billing')}>
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('team')}>
-            <Users className="mr-2 h-4 w-4" />
-            <span>Team</span>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('security')}>
+            <Lock className="mr-2 h-4 w-4" />
+            <span>Security</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('notifications')}>
+            <Bell className="mr-2 h-4 w-4" />
+            <span>Notifications</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('profile')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="bg-white/10" />
