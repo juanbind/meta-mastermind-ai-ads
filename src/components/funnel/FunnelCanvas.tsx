@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Save, Trash } from 'lucide-react';
 import FunnelRenderedElement from './FunnelRenderedElement';
 import { useToast } from '@/hooks/use-toast';
+import { TEMPLATE_STRUCTURES } from './FunnelElement';
 
 export interface CanvasItem {
   id: string;
@@ -19,9 +20,10 @@ export interface FunnelCanvasProps {
   onSave: (items: CanvasItem[]) => Promise<void> | void;
   funnelId: string;
   initialItems?: any[];
+  onCreatePages?: (pages: any[]) => Promise<void> | void;
 }
 
-const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialItems = [] }) => {
+const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialItems = [], onCreatePages }) => {
   const { toast } = useToast();
   const [items, setItems] = useState<CanvasItem[]>(() => {
     if (!initialItems || !Array.isArray(initialItems)) {
@@ -52,6 +54,12 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       const offset = monitor.getSourceClientOffset();
       const canvasRect = canvasRef.current?.getBoundingClientRect();
       
+      // Handle template drops specially
+      if (item.isTemplate && onCreatePages) {
+        handleTemplateDropped(item.type, item.templatePages);
+        return;
+      }
+      
       if (offset && canvasRect) {
         const x = offset.x - canvasRect.left;
         const y = offset.y - canvasRect.top;
@@ -65,6 +73,29 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       isOver: monitor.isOver(),
     }),
   });
+  
+  // Function to handle template drops
+  const handleTemplateDropped = async (templateType: string, templatePages: any[]) => {
+    if (!onCreatePages) return;
+    
+    try {
+      // Create the pages based on the template structure
+      await onCreatePages(templatePages);
+      
+      toast({
+        title: 'Template created',
+        description: `Created a new ${templateType.toLowerCase().replace('_', ' ')} with ${templatePages.length} pages.`
+      });
+      
+    } catch (error) {
+      console.error('Error creating template pages:', error);
+      toast({
+        title: 'Error creating template',
+        description: 'There was a problem creating the template pages. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
   
   // Function to add a new item to the canvas
   const addItem = (type: string, position?: { x: number, y: number }) => {
@@ -271,10 +302,10 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
   const renderEmptyState = () => (
     <div className="text-center p-8">
       <p className="text-lg text-gray-500 mb-4">
-        Drag elements from the sidebar to start building your funnel.
+        Drag elements or templates from the sidebar to start building your funnel.
       </p>
       <div className="border-2 border-dashed border-gray-300 rounded-xl p-10">
-        <p className="text-gray-400">Drop elements here</p>
+        <p className="text-gray-400">Drop elements or templates here</p>
       </div>
     </div>
   );

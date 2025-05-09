@@ -70,10 +70,53 @@ export const ELEMENT_TYPES = {
   CONDITIONAL_BLOCK: 'CONDITIONAL_BLOCK'
 };
 
+// Define template types with multi-page structures
+export const TEMPLATE_TYPES = {
+  SALES_FUNNEL: 'SALES_FUNNEL',
+  LEAD_CAPTURE: 'LEAD_CAPTURE',
+  WEBINAR_REGISTRATION: 'WEBINAR_REGISTRATION',
+  PRODUCT_LAUNCH: 'PRODUCT_LAUNCH',
+  SURVEY_FUNNEL: 'SURVEY_FUNNEL'
+};
+
+// Define the pre-built page structures for each template type
+export const TEMPLATE_STRUCTURES = {
+  SALES_FUNNEL: [
+    { name: 'Landing', type: 'landing' },
+    { name: 'Offer', type: 'offer' },
+    { name: 'Checkout', type: 'checkout' },
+    { name: 'Thank You', type: 'thank-you' }
+  ],
+  LEAD_CAPTURE: [
+    { name: 'Lead Form', type: 'form' },
+    { name: 'Thank You', type: 'thank-you' }
+  ],
+  WEBINAR_REGISTRATION: [
+    { name: 'Registration', type: 'form' },
+    { name: 'Confirmation', type: 'confirmation' },
+    { name: 'Webinar Room', type: 'webinar' }
+  ],
+  PRODUCT_LAUNCH: [
+    { name: 'Teaser', type: 'landing' },
+    { name: 'Launch', type: 'launch' },
+    { name: 'Pricing', type: 'pricing' },
+    { name: 'Checkout', type: 'checkout' }
+  ],
+  SURVEY_FUNNEL: [
+    { name: 'Welcome', type: 'welcome' },
+    { name: 'Questions', type: 'survey' },
+    { name: 'Results', type: 'results' }
+  ]
+};
+
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'FUNNEL_ELEMENT',
-    item: { type },
+    item: { 
+      type,
+      isTemplate: Object.values(TEMPLATE_TYPES).includes(type as any),
+      templatePages: TEMPLATE_STRUCTURES[type as keyof typeof TEMPLATE_STRUCTURES]
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
