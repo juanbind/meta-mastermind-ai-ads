@@ -4,14 +4,16 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Target, Users, TrendingUp } from 'lucide-react';
 
+interface BudgetDistribution {
+  type: string;
+  allocation: number;
+  dailyBudget: number;
+}
+
 interface CampaignAnalysisProps {
   buyerPersona: string;
   recommendedObjective: string;
-  budgetDistribution: {
-    type: string;
-    allocation: number;
-    dailyBudget: number;
-  }[];
+  budgetDistribution: BudgetDistribution[];
   isAnalyzing?: boolean;
 }
 

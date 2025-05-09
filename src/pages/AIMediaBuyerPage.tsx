@@ -74,6 +74,7 @@ const AIMediaBuyerPage: React.FC = () => {
       startDate: new Date(),
       endDate: null,
     },
+    adSetNamingConvention: '', // Added missing property
     
     // Ad Creative Preferences
     adCreatives: [
