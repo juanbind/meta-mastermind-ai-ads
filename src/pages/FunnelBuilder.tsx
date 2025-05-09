@@ -27,14 +27,7 @@ import {
   Shield,
   Award,
   MessageSquare,
-  AlertCircle,
-  Laptop,
-  Smartphone,
-  Tablet,
-  Code,
-  PanelLeft,
-  PanelRight,
-  Layers
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar';
@@ -50,9 +43,6 @@ import FunnelCanvas, { CanvasItem } from '@/components/funnel/FunnelCanvas';
 import { ELEMENT_TYPES } from '@/components/funnel/FunnelElement';
 import { supabase, FunnelData } from '@/lib/supabase';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import FunnelPlayer from '@/components/funnel/FunnelPlayer';
-import LogicRuleBuilder from '@/components/funnel/LogicRuleBuilder';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Template {
   id: string;
@@ -100,18 +90,6 @@ const FunnelBuilder: React.FC = () => {
   const [funnels, setFunnels] = useState<Funnel[]>([]);
   const [activeTab, setActiveTab] = useState<string>('all');
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  
-  const [showNewPageDialog, setShowNewPageDialog] = useState(false);
-  const [newPageName, setNewPageName] = useState('');
-  const [newPageType, setNewPageType] = useState<string>('form');
-  const [funnelPages, setFunnelPages] = useState<any[]>([]);
-  const [activePageId, setActivePageId] = useState<string | null>(null);
-  const [showLogicBuilder, setShowLogicBuilder] = useState(false);
-  const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [isPreview, setIsPreview] = useState(false);
-  const [showLeadsDialog, setShowLeadsDialog] = useState(false);
-  const [funnelLeads, setFunnelLeads] = useState<any[]>([]);
-  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
   
   const templates: Template[] = [
     {
@@ -640,822 +618,18 @@ const FunnelBuilder: React.FC = () => {
     }
   };
 
-  // Function to load pages for the active funnel
-  const loadFunnelPages = async () => {
-    if (!activeFunnel) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('funnel_pages')
-        .select('*')
-        .eq('funnel_id', activeFunnel.id)
-        .order('order_index');
-        
-      if (error) throw error;
-      
-      setFunnelPages(data || []);
-      
-      // Set the first page as active if no active page is set
-      if (data && data.length > 0 && !activePageId) {
-        setActivePageId(data[0].id);
-      }
-    } catch (error) {
-      console.error('Error loading funnel pages:', error);
-      toast({
-        title: 'Error loading pages',
-        description: 'Could not load funnel pages. Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Load pages when active funnel changes
-  useEffect(() => {
-    if (activeFunnel) {
-      loadFunnelPages();
-    }
-  }, [activeFunnel]);
-
-  // Function to create a new page
-  const handleCreateNewPage = async () => {
-    if (!activeFunnel) return;
-    
-    if (!newPageName.trim()) {
-      toast({
-        title: 'Name required',
-        description: 'Please enter a name for your page.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      
-      // Get the highest order_index
-      let maxOrder = 0;
-      if (funnelPages && funnelPages.length > 0) {
-        maxOrder = Math.max(...funnelPages.map(page => page.order_index)) + 1;
-      }
-      
-      // Create the new page
-      const { data, error } = await supabase
-        .from('funnel_pages')
-        .insert({
-          name: newPageName,
-          type: newPageType,
-          order_index: maxOrder,
-          funnel_id: activeFunnel.id,
-          content: JSON.stringify([])
-        })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      
-      // Add the new page to state
-      setFunnelPages([...funnelPages, data]);
-      setActivePageId(data.id);
-      
-      toast({
-        title: 'Page created',
-        description: `Page "${newPageName}" has been created.`,
-      });
-      
-      setShowNewPageDialog(false);
-      setNewPageName('');
-      setNewPageType('form');
-    } catch (error) {
-      console.error('Error creating page:', error);
-      toast({
-        title: 'Error creating page',
-        description: 'Could not create page. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to delete a page
-  const handleDeletePage = async (pageId: string) => {
-    if (!activeFunnel || !pageId) return;
-    
-    if (!window.confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      
-      // Delete the page
-      const { error } = await supabase
-        .from('funnel_pages')
-        .delete()
-        .eq('id', pageId);
-        
-      if (error) throw error;
-      
-      // Update state
-      const updatedPages = funnelPages.filter(page => page.id !== pageId);
-      setFunnelPages(updatedPages);
-      
-      // If we deleted the active page, set another one as active
-      if (activePageId === pageId && updatedPages.length > 0) {
-        setActivePageId(updatedPages[0].id);
-      } else if (updatedPages.length === 0) {
-        setActivePageId(null);
-      }
-      
-      toast({
-        title: 'Page deleted',
-        description: 'The page has been successfully deleted.',
-      });
-    } catch (error) {
-      console.error('Error deleting page:', error);
-      toast({
-        title: 'Error deleting page',
-        description: 'Could not delete the page. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to save page content
-  const handleSavePage = async (items: CanvasItem[]) => {
-    if (!activeFunnel || !activePageId) return;
-    
-    setIsLoading(true);
-    try {
-      const currentDate = new Date().toISOString();
-      
-      // Update the page content
-      const { error } = await supabase
-        .from('funnel_pages')
-        .update({ 
-          content: JSON.stringify(items),
-          updated_at: currentDate
-        })
-        .eq('id', activePageId);
-        
-      if (error) throw error;
-      
-      // Update local state
-      setFunnelPages(funnelPages.map(page => 
-        page.id === activePageId 
-          ? { ...page, content: JSON.stringify(items), updated_at: currentDate }
-          : page
-      ));
-      
-      toast({
-        title: 'Page saved',
-        description: `Page has been saved successfully with ${items.length} elements.`,
-      });
-    } catch (error) {
-      console.error('Error saving page:', error);
-      toast({
-        title: 'Error saving page',
-        description: 'There was a problem saving your page.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to reorder pages
-  const handleReorderPages = async (pageId: string, direction: 'up' | 'down') => {
-    if (!activeFunnel) return;
-    
-    const pageIndex = funnelPages.findIndex(page => page.id === pageId);
-    if (pageIndex === -1) return;
-    
-    // Can't move up if already at the top
-    if (direction === 'up' && pageIndex === 0) return;
-    
-    // Can't move down if already at the bottom
-    if (direction === 'down' && pageIndex === funnelPages.length - 1) return;
-    
-    const newIndex = direction === 'up' ? pageIndex - 1 : pageIndex + 1;
-    
-    // Create a copy of the pages array
-    const updatedPages = [...funnelPages];
-    
-    // Swap the pages
-    const temp = updatedPages[pageIndex];
-    updatedPages[pageIndex] = updatedPages[newIndex];
-    updatedPages[newIndex] = temp;
-    
-    // Update the order_index values
-    updatedPages.forEach((page, index) => {
-      page.order_index = index;
-    });
-    
-    setFunnelPages(updatedPages);
-    
-    // Update the order_index values in the database
-    try {
-      setIsLoading(true);
-      
-      // Update each page with its new order_index
-      for (const page of updatedPages) {
-        await supabase
-          .from('funnel_pages')
-          .update({ order_index: page.order_index })
-          .eq('id', page.id);
-      }
-      
-      toast({
-        title: 'Pages reordered',
-        description: 'Page order has been updated successfully.',
-      });
-    } catch (error) {
-      console.error('Error reordering pages:', error);
-      toast({
-        title: 'Error reordering pages',
-        description: 'Could not update page order. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to fetch funnel leads
-  const fetchFunnelLeads = async () => {
-    if (!activeFunnel) return;
-    
-    setIsLoadingLeads(true);
-    try {
-      const { data, error } = await supabase
-        .from('leads')
-        .select(`
-          id, 
-          email, 
-          phone, 
-          score, 
-          created_at, 
-          answers,
-          contacts (first_name, last_name)
-        `)
-        .eq('funnel_id', activeFunnel.id)
-        .order('created_at', { ascending: false });
-        
-      if (error) throw error;
-      
-      setFunnelLeads(data || []);
-    } catch (error) {
-      console.error('Error fetching leads:', error);
-      toast({
-        title: 'Error loading leads',
-        description: 'Could not load funnel leads. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoadingLeads(false);
-    }
-  };
-
-  // Get the active page content
-  const getActivePageContent = () => {
-    if (!activePageId) return [];
-    
-    const activePage = funnelPages.find(page => page.id === activePageId);
-    if (!activePage) return [];
-    
-    try {
-      const content = activePage.content;
-      return typeof content === 'string' ? JSON.parse(content) : (content || []);
-    } catch (error) {
-      console.error('Error parsing page content:', error);
-      return [];
-    }
-  };
-
-  // Get all elements with IDs for logic rules
-  const getAllElementsForLogic = () => {
-    const elements: any[] = [];
-    
-    funnelPages.forEach(page => {
-      try {
-        const content = typeof page.content === 'string' 
-          ? JSON.parse(page.content) 
-          : (page.content || []);
-        
-        if (Array.isArray(content)) {
-          content.forEach((element: any) => {
-            if (element && element.id) {
-              elements.push({
-                id: element.id,
-                label: `${page.name} - ${element.type} - ${
-                  typeof element.content === 'string' 
-                    ? element.content.substring(0, 20) 
-                    : 'Element'
-                }`,
-                type: element.type
-              });
-            }
-          });
-        }
-      } catch (e) {
-        console.error('Error parsing page content for logic:', e);
-      }
-    });
-    
-    return elements;
-  };
-
-  const renderActiveFunnelContent = () => {
-    if (!activeFunnel) return null;
-    
-    if (isPreview) {
-      return (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-metamaster-gray-800">
-              Preview: {activeFunnel.name}
-            </h2>
-            
-            <div className="flex items-center space-x-4">
-              <div className="border rounded-lg flex">
-                <Button
-                  variant={previewDevice === 'mobile' ? 'default' : 'ghost'} 
-                  size="sm"
-                  className="rounded-r-none"
-                  onClick={() => setPreviewDevice('mobile')}
-                >
-                  <Smartphone size={16} />
-                </Button>
-                <Button
-                  variant={previewDevice === 'tablet' ? 'default' : 'ghost'} 
-                  size="sm"
-                  className="rounded-none border-l border-r"
-                  onClick={() => setPreviewDevice('tablet')}
-                >
-                  <Tablet size={16} />
-                </Button>
-                <Button
-                  variant={previewDevice === 'desktop' ? 'default' : 'ghost'} 
-                  size="sm"
-                  className="rounded-l-none"
-                  onClick={() => setPreviewDevice('desktop')}
-                >
-                  <Laptop size={16} />
-                </Button>
-              </div>
-              
-              <Button variant="outline" onClick={() => setIsPreview(false)}>
-                Exit Preview
-              </Button>
-            </div>
-          </div>
-          
-          <div className={`bg-white p-6 rounded-xl shadow-md border border-gray-100 ${
-            previewDevice === 'mobile' ? 'max-w-sm' : 
-            previewDevice === 'tablet' ? 'max-w-2xl' : 'w-full'
-          } mx-auto`}>
-            <FunnelPlayer 
-              funnelId={activeFunnel.id} 
-              previewMode={true}
-              device={previewDevice}
-            />
-          </div>
-        </div>
-      );
-    }
-    
-    if (showLogicBuilder) {
-      return (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-metamaster-gray-800">
-              Logic Rules: {activeFunnel.name}
-            </h2>
-            <Button variant="outline" onClick={() => setShowLogicBuilder(false)}>
-              Back to Builder
-            </Button>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-            <LogicRuleBuilder 
-              funnelId={activeFunnel?.id || ''} 
-              pages={funnelPages.map(page => ({ id: page.id, name: page.name }))} 
-              elements={getAllElementsForLogic()}
-            />
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-metamaster-gray-800">{activeFunnel.name}</h2>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline"
-              className="flex items-center"
-              onClick={() => {
-                fetchFunnelLeads();
-                setShowLeadsDialog(true);
-              }}
-            >
-              <MessageSquare size={16} className="mr-2" /> View Leads
-            </Button>
-            
-            <Button 
-              variant="outline"
-              className="flex items-center"
-              onClick={() => setShowLogicBuilder(true)}
-            >
-              <Code size={16} className="mr-2" /> Logic Rules
-            </Button>
-            
-            <Button 
-              variant="outline"
-              className="flex items-center"
-              onClick={() => setIsPreview(true)}
-            >
-              <Layers size={16} className="mr-2" /> Preview Funnel
-            </Button>
-
-            {activeFunnel.is_published ? (
-              <Button 
-                variant="outline"
-                className="flex items-center"
-                onClick={() => {
-                  if (activeFunnel.published_url) {
-                    window.open(`/f/${activeFunnel.published_url}`, '_blank');
-                  }
-                }}
-              >
-                <ArrowRight size={16} className="mr-2" /> View Published
-              </Button>
-            ) : (
-              <Button 
-                variant="secondary"
-                className="flex items-center"
-                onClick={handlePublishFunnel}
-                disabled={isLoading}
-              >
-                <ArrowRight size={16} className="mr-2" /> Publish Funnel
-              </Button>
-            )}
-            
-            <Button 
-              variant="outline"
-              onClick={() => setActiveFunnel(null)}
-            >
-              Back to All Funnels
-            </Button>
-          </div>
-        </div>
-        
-        {/* Page tabs */}
-        {funnelPages.length > 0 ? (
-          <div className="mb-6">
-            <div className="flex items-center space-x-2 mb-2">
-              <h3 className="text-lg font-medium">Pages</h3>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => setShowNewPageDialog(true)}
-                className="h-8"
-              >
-                <Plus size={16} className="mr-1" /> Add Page
-              </Button>
-            </div>
-            
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2">
-              {funnelPages.map((page) => (
-                <div
-                  key={page.id}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg cursor-pointer ${
-                    activePageId === page.id
-                      ? 'bg-metamaster-primary text-white'
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                  onClick={() => setActivePageId(page.id)}
-                >
-                  <span className="whitespace-nowrap">{page.name}</span>
-                  <div className="ml-2 flex items-center space-x-1">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReorderPages(page.id, 'up');
-                      }}
-                      className={`p-1 rounded-full ${
-                        activePageId === page.id
-                          ? 'text-white/70 hover:text-white hover:bg-white/20'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-300'
-                      }`}
-                      title="Move up"
-                    >
-                      <ArrowRight size={14} className="rotate-270" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReorderPages(page.id, 'down');
-                      }}
-                      className={`p-1 rounded-full ${
-                        activePageId === page.id
-                          ? 'text-white/70 hover:text-white hover:bg-white/20'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-300'
-                      }`}
-                      title="Move down"
-                    >
-                      <ArrowRight size={14} className="rotate-90" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePage(page.id);
-                      }}
-                      className={`p-1 rounded-full ${
-                        activePageId === page.id
-                          ? 'text-white/70 hover:text-white hover:bg-white/20'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-300'
-                      }`}
-                      title="Delete page"
-                    >
-                      <Trash size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mb-6 p-6 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-center">
-            <h3 className="font-medium mb-2">No Pages Created Yet</h3>
-            <p className="text-metamaster-gray-500 mb-4">
-              Start by creating your first funnel page.
-            </p>
-            <Button onClick={() => setShowNewPageDialog(true)}>
-              <Plus size={16} className="mr-2" /> Create First Page
-            </Button>
-          </div>
-        )}
-        
-        {/* Funnel Builder Interface */}
-        {activePageId && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Elements */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <h3 className="font-bold text-lg mb-4">Elements</h3>
-                
-                <Accordion type="single" collapsible defaultValue="content-blocks" className="w-full">
-                  <AccordionItem value="content-blocks">
-                    <AccordionTrigger>Content Blocks</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-3">
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.HERO_SECTION} 
-                          icon={<LayoutTemplate size={18} />} 
-                          label="Hero Section" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.FEATURES_BLOCK} 
-                          icon={<Grid size={18} />} 
-                          label="Features Block" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.TESTIMONIAL_BLOCK} 
-                          icon={<MessageSquare size={18} />} 
-                          label="Testimonials" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.CTA_BLOCK} 
-                          icon={<ArrowRight size={18} />} 
-                          label="Call to Action" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.FAQ_BLOCK} 
-                          icon={<MessageSquare size={18} />} 
-                          label="FAQ Accordion" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.PRICING_BLOCK} 
-                          icon={<CircleDot size={18} />} 
-                          label="Pricing Block" 
-                        />
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                
-                  <AccordionItem value="basic-elements">
-                    <AccordionTrigger>Basic Elements</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-3">
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.HEADLINE} 
-                          icon={<Type size={18} />} 
-                          label="Headline" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.PARAGRAPH} 
-                          icon={<Type size={18} />} 
-                          label="Paragraph" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.IMAGE} 
-                          icon={<Image size={18} />} 
-                          label="Image" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.VIDEO} 
-                          icon={<Video size={18} />} 
-                          label="Video" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.FORM} 
-                          icon={<FormInput size={18} />} 
-                          label="Form" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.BULLET_LIST} 
-                          icon={<ListIcon size={18} />} 
-                          label="Bullet List" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.BUTTON} 
-                          icon={<MoveHorizontal size={18} />} 
-                          label="Button" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.INPUT} 
-                          icon={<FormInput size={18} />} 
-                          label="Input Field" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.DROPDOWN} 
-                          icon={<ListIcon size={18} />} 
-                          label="Dropdown" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.CALENDAR} 
-                          icon={<Calendar size={18} />} 
-                          label="Calendar" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.DIVIDER} 
-                          icon={<SeparatorHorizontal size={18} />} 
-                          label="Divider" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.SPACING} 
-                          icon={<MoveDiagonal size={18} />} 
-                          label="Spacing" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.ICON} 
-                          icon={<CircleDot size={18} />} 
-                          label="Icon" 
-                        />
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                
-                  <AccordionItem value="conversion-elements">
-                    <AccordionTrigger>Conversion Elements</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-3">
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.SOCIAL_PROOF} 
-                          icon={<Star size={18} />} 
-                          label="Social Proof" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.COUNTDOWN} 
-                          icon={<Clock size={18} />} 
-                          label="Countdown Timer" 
-                        />
-                        <FunnelElement 
-                          type={ELEMENT_TYPES.TRUST_BADGES} 
-                          icon={<Shield size={18} />} 
-                          label="Trust Badges" 
-                        />
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-              
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <h3 className="font-bold text-lg mb-4">Funnel Settings</h3>
-                <div className="space-y-4">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start text-metamaster-gray-800"
-                    onClick={() => toast({
-                      title: "Page Settings",
-                      description: "Page settings panel opened.",
-                    })}
-                  >
-                    <Settings size={18} className="mr-2" /> Page Settings
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start text-metamaster-gray-800"
-                    onClick={() => handleDuplicateFunnel(activeFunnel)}
-                  >
-                    <Copy size={18} className="mr-2" /> Duplicate Funnel
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => handleDeleteFunnel(activeFunnel.id)}
-                  >
-                    <Trash size={18} className="mr-2" /> Delete Funnel
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Middle Column - Canvas */}
-            <FunnelCanvas 
-              onSave={handleSavePage} 
-              funnelId={activeFunnel.id}
-              initialItems={getActivePageContent()}
-              key={activePageId} // Re-mount when page changes
-            />
-            
-            {/* Right Column - Templates */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                <div className="mb-4 flex justify-between items-center">
-                  <h3 className="font-bold text-lg">Templates</h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-metamaster-primary"
-                    onClick={() => {
-                      setActiveFunnel(null);
-                      setActiveTab('templates');
-                    }}
-                  >
-                    View All
-                  </Button>
-                </div>
-                
-                <div className="space-y-3">
-                  {templates.slice(0, 3).map((template) => (
-                    <div 
-                      key={template.id} 
-                      className="flex items-center space-x-3 p-2 hover:bg-metamaster-gray-100 rounded-lg transition-colors cursor-pointer"
-                      onClick={() => handleSelectTemplate(template)}
-                    >
-                      <div className="w-16 h-16 bg-metamaster-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                        <img src={template.image} className="w-full h-full object-cover" alt={template.name} />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-sm">{template.name}</h4>
-                        <div className="flex gap-1 mt-1">
-                          {template.tags.map((tag, i) => (
-                            <span key={i} className="text-xs bg-metamaster-gray-200 px-2 py-0.5 rounded-full">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-metamaster-primary to-metamaster-secondary rounded-xl p-6 shadow-md text-white">
-                <h3 className="font-bold text-lg mb-2">AI Funnel Builder</h3>
-                <p className="opacity-80 mb-4">Let AI build your entire funnel by answering a few simple questions about your business.</p>
-                <Button 
-                  className="bg-white text-metamaster-primary hover:bg-white/90 flex items-center"
-                  onClick={() => setShowAIDialog(true)}
-                >
-                  Try AI Builder <ArrowRight size={16} className="ml-2" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-metamaster-gray-100">
         <Sidebar />
         <div className="md:ml-64 pt-8">
           <div className="container mx-auto px-4 pb-12">
-            {/* Coming Soon Alert - Remove this once fully implemented */}
+            {/* Coming Soon Alert */}
             <Alert variant="warning" className="mb-6">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Enhanced Funnel Builder</AlertTitle>
+              <AlertTitle>Coming Soon</AlertTitle>
               <AlertDescription>
-                This funnel builder now includes multi-page support, conditional logic, and lead scoring.
+                The Funnel Builder is currently in development. Some features may be limited or not fully functional yet.
               </AlertDescription>
             </Alert>
             
@@ -1481,9 +655,280 @@ const FunnelBuilder: React.FC = () => {
               </Button>
             </div>
             
-            {renderActiveFunnelContent()}
-            
-            {!activeFunnel && (
+            {activeFunnel ? (
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-metamaster-gray-800">{activeFunnel.name}</h2>
+                  <div className="flex space-x-2">
+                    {activeFunnel.is_published ? (
+                      <Button 
+                        variant="outline"
+                        className="flex items-center"
+                        onClick={() => {
+                          if (activeFunnel.published_url) {
+                            window.open(`/f/${activeFunnel.published_url}`, '_blank');
+                          }
+                        }}
+                      >
+                        <ArrowRight size={16} className="mr-2" /> View Published Funnel
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="secondary"
+                        className="flex items-center"
+                        onClick={handlePublishFunnel}
+                        disabled={isLoading}
+                      >
+                        <ArrowRight size={16} className="mr-2" /> Publish Funnel
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline"
+                      onClick={() => setActiveFunnel(null)}
+                    >
+                      Back to All Funnels
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Funnel Builder Interface */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left Column - Elements */}
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <h3 className="font-bold text-lg mb-4">Elements</h3>
+                      
+                      <Accordion type="single" collapsible defaultValue="content-blocks" className="w-full">
+                        <AccordionItem value="content-blocks">
+                          <AccordionTrigger>Content Blocks</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.HERO_SECTION} 
+                                icon={<LayoutTemplate size={18} />} 
+                                label="Hero Section" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FEATURES_BLOCK} 
+                                icon={<Grid size={18} />} 
+                                label="Features Block" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.TESTIMONIAL_BLOCK} 
+                                icon={<MessageSquare size={18} />} 
+                                label="Testimonials" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.CTA_BLOCK} 
+                                icon={<ArrowRight size={18} />} 
+                                label="Call to Action" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FAQ_BLOCK} 
+                                icon={<MessageSquare size={18} />} 
+                                label="FAQ Accordion" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.PRICING_BLOCK} 
+                                icon={<CircleDot size={18} />} 
+                                label="Pricing Block" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      
+                        <AccordionItem value="basic-elements">
+                          <AccordionTrigger>Basic Elements</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.HEADLINE} 
+                                icon={<Type size={18} />} 
+                                label="Headline" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.PARAGRAPH} 
+                                icon={<Type size={18} />} 
+                                label="Paragraph" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.IMAGE} 
+                                icon={<Image size={18} />} 
+                                label="Image" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.VIDEO} 
+                                icon={<Video size={18} />} 
+                                label="Video" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.FORM} 
+                                icon={<FormInput size={18} />} 
+                                label="Form" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.BULLET_LIST} 
+                                icon={<ListIcon size={18} />} 
+                                label="Bullet List" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.BUTTON} 
+                                icon={<MoveHorizontal size={18} />} 
+                                label="Button" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.INPUT} 
+                                icon={<FormInput size={18} />} 
+                                label="Input Field" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.DROPDOWN} 
+                                icon={<ListIcon size={18} />} 
+                                label="Dropdown" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.CALENDAR} 
+                                icon={<Calendar size={18} />} 
+                                label="Calendar" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.DIVIDER} 
+                                icon={<SeparatorHorizontal size={18} />} 
+                                label="Divider" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.SPACING} 
+                                icon={<MoveDiagonal size={18} />} 
+                                label="Spacing" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.ICON} 
+                                icon={<CircleDot size={18} />} 
+                                label="Icon" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      
+                        <AccordionItem value="conversion-elements">
+                          <AccordionTrigger>Conversion Elements</AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3">
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.SOCIAL_PROOF} 
+                                icon={<Star size={18} />} 
+                                label="Social Proof" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.COUNTDOWN} 
+                                icon={<Clock size={18} />} 
+                                label="Countdown Timer" 
+                              />
+                              <FunnelElement 
+                                type={ELEMENT_TYPES.TRUST_BADGES} 
+                                icon={<Shield size={18} />} 
+                                label="Trust Badges" 
+                              />
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </div>
+                    
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <h3 className="font-bold text-lg mb-4">Funnel Settings</h3>
+                      <div className="space-y-4">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start text-metamaster-gray-800"
+                          onClick={() => toast({
+                            title: "Page Settings",
+                            description: "Page settings panel opened.",
+                          })}
+                        >
+                          <Settings size={18} className="mr-2" /> Page Settings
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start text-metamaster-gray-800"
+                          onClick={() => handleDuplicateFunnel(activeFunnel)}
+                        >
+                          <Copy size={18} className="mr-2" /> Duplicate Funnel
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDeleteFunnel(activeFunnel.id)}
+                        >
+                          <Trash size={18} className="mr-2" /> Delete Funnel
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Middle Column - Canvas */}
+                  <FunnelCanvas 
+                    onSave={handleSaveFunnel} 
+                    funnelId={activeFunnel.id}
+                  />
+                  
+                  {/* Right Column - Templates */}
+                  <div className="space-y-6">
+                    <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+                      <div className="mb-4 flex justify-between items-center">
+                        <h3 className="font-bold text-lg">Templates</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-metamaster-primary"
+                          onClick={() => {
+                            setActiveFunnel(null);
+                            setActiveTab('templates');
+                          }}
+                        >
+                          View All
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {templates.slice(0, 3).map((template) => (
+                          <div 
+                            key={template.id} 
+                            className="flex items-center space-x-3 p-2 hover:bg-metamaster-gray-100 rounded-lg transition-colors cursor-pointer"
+                            onClick={() => handleSelectTemplate(template)}
+                          >
+                            <div className="w-16 h-16 bg-metamaster-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                              <img src={template.image} className="w-full h-full object-cover" alt={template.name} />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">{template.name}</h4>
+                              <div className="flex gap-1 mt-1">
+                                {template.tags.map((tag, i) => (
+                                  <span key={i} className="text-xs bg-metamaster-gray-200 px-2 py-0.5 rounded-full">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-metamaster-primary to-metamaster-secondary rounded-xl p-6 shadow-md text-white">
+                      <h3 className="font-bold text-lg mb-2">AI Funnel Builder</h3>
+                      <p className="opacity-80 mb-4">Let AI build your entire funnel by answering a few simple questions about your business.</p>
+                      <Button 
+                        className="bg-white text-metamaster-primary hover:bg-white/90 flex items-center"
+                        onClick={() => setShowAIDialog(true)}
+                      >
+                        Try AI Builder <ArrowRight size={16} className="ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div>
                 {/* Tabs for All/Templates */}
                 <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
@@ -1502,7 +947,7 @@ const FunnelBuilder: React.FC = () => {
                     ) : funnels.length === 0 ? (
                       <div className="text-center py-12 bg-white rounded-xl border border-gray-100 shadow-sm">
                         <div className="max-w-md mx-auto">
-                          <LayoutGrid size={64} className="mx-auto mb-2 text-metamaster-gray-400" />
+                          <LayoutGrid size={64} className="mx-auto mb-4 text-metamaster-gray-400" />
                           <h3 className="text-xl font-bold mb-2">No funnels yet</h3>
                           <p className="text-metamaster-gray-500 mb-6">
                             Create your first funnel or use one of our templates to get started quickly.
@@ -1683,140 +1128,6 @@ const FunnelBuilder: React.FC = () => {
               </Button>
               <Button onClick={handleAIGenerate} disabled={isGeneratingAI} className="bg-metamaster-primary hover:bg-metamaster-secondary">
                 {isGeneratingAI ? "Generating..." : "Generate Funnel"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        
-        {/* New Page Dialog */}
-        <Dialog open={showNewPageDialog} onOpenChange={setShowNewPageDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Page</DialogTitle>
-              <DialogDescription>
-                Enter a name and select a type for your new funnel page.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="page-name">Page Name</Label>
-                <Input 
-                  id="page-name" 
-                  placeholder="e.g., Contact Form, Quiz Question" 
-                  value={newPageName}
-                  onChange={(e) => setNewPageName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="page-type">Page Type</Label>
-                <Select value={newPageType} onValueChange={setNewPageType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select page type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="landing">Landing Page</SelectItem>
-                    <SelectItem value="form">Form Page</SelectItem>
-                    <SelectItem value="quiz">Quiz Question</SelectItem>
-                    <SelectItem value="result">Result Page</SelectItem>
-                    <SelectItem value="thank_you">Thank You Page</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowNewPageDialog(false)} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreateNewPage} disabled={isLoading}>
-                {isLoading ? "Creating..." : "Add Page"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        
-        {/* Leads Dialog */}
-        <Dialog open={showLeadsDialog} onOpenChange={setShowLeadsDialog}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Funnel Leads</DialogTitle>
-              <DialogDescription>
-                Leads captured from your funnel. Click on a lead to view details.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4 py-4">
-              {isLoadingLeads ? (
-                <div className="text-center py-8">
-                  <p>Loading leads...</p>
-                </div>
-              ) : funnelLeads.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageSquare size={48} className="mx-auto text-gray-300 mb-4" />
-                  <h4 className="text-lg font-medium mb-2">No Leads Yet</h4>
-                  <p className="text-metamaster-gray-500">
-                    Publish your funnel to start collecting leads.
-                  </p>
-                </div>
-              ) : (
-                <div className="overflow-auto max-h-96">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name/Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Score
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Answers
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {funnelLeads.map((lead) => {
-                        const firstName = lead.contacts?.first_name || lead.answers?.first_name || '';
-                        const lastName = lead.contacts?.last_name || lead.answers?.last_name || '';
-                        const name = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
-                        
-                        return (
-                          <tr key={lead.id} className="hover:bg-gray-50 cursor-pointer">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">{name}</div>
-                              <div className="text-sm text-gray-500">{lead.email}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                ${lead.score >= 50 ? 'bg-green-100 text-green-800' : 
-                                  lead.score >= 25 ? 'bg-yellow-100 text-yellow-800' : 
-                                  'bg-gray-100 text-gray-800'}`}
-                              >
-                                {lead.score}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(lead.created_at).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {Object.keys(lead.answers || {}).length} answers
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-            
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowLeadsDialog(false)}>
-                Close
               </Button>
             </DialogFooter>
           </DialogContent>

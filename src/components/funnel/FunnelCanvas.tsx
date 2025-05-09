@@ -1,430 +1,903 @@
-
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LayoutGrid, AlertCircle, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Save, Trash } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import FunnelRenderedElement from './FunnelRenderedElement';
-import { useToast } from '@/hooks/use-toast';
-import { TEMPLATE_STRUCTURES } from './FunnelElement';
-import { useNavigate } from 'react-router-dom';
+import { ELEMENT_TYPES } from './FunnelElement';
+import { supabase, FunnelData } from '@/lib/supabase';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface CanvasItem {
   id: string;
   type: string;
   content: string;
   props?: Record<string, any>;
-  position?: { x: number, y: number };
+  conditions?: ConditionRule[];
 }
 
-export interface FunnelCanvasProps {
-  onSave: (items: CanvasItem[]) => Promise<void> | void;
-  funnelId: string;
-  initialItems?: any[];
-  onCreatePages?: (pages: any[]) => Promise<void> | void;
+export interface ConditionRule {
+  id: string;
+  sourceId: string;
+  type: 'show' | 'hide' | 'goto';
+  conditions: {
+    field: string;
+    operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'empty' | 'not_empty';
+    value: string;
+  }[];
+  targetId?: string;
+  isActive: boolean;
 }
 
-const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialItems = [], onCreatePages }) => {
+interface FunnelCanvasProps {
+  onSave: (items: CanvasItem[]) => void;
+  funnelId?: string;
+}
+
+const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId }) => {
+  const [items, setItems] = useState<CanvasItem[]>([]);
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentDevice, setCurrentDevice] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
+  const [variables, setVariables] = useState<{name: string, value: string}[]>([]);
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [items, setItems] = useState<CanvasItem[]>(() => {
-    if (!initialItems || !Array.isArray(initialItems)) {
-      return [];
-    }
-    
-    try {
-      return initialItems.map(item => {
-        if (typeof item === 'string') {
-          return JSON.parse(item);
+  
+  // Load funnel data if funnelId is provided
+  useEffect(() => {
+    const loadFunnelData = async () => {
+      if (!funnelId) return;
+      
+      setIsLoading(true);
+      try {
+        // Using raw SQL query to get around TypeScript issues
+        const { data, error } = await supabase
+          .from('funnels')
+          .select('*')
+          .eq('id', funnelId)
+          .single();
+          
+        if (error) {
+          throw error;
         }
-        return item;
-      });
-    } catch (e) {
-      console.error('Error parsing initial items:', e);
-      return [];
-    }
-  });
-  
-  const [isSaving, setIsSaving] = useState(false);
-  const [activeItemId, setActiveItemId] = useState<string | null>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  
-  // Set up the drop target for draggable elements
-  const [{ isOver }, drop] = useDrop({
-    accept: 'FUNNEL_ELEMENT',
-    drop: (item: any, monitor) => {
-      const offset = monitor.getSourceClientOffset();
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
-      
-      // Handle template drops specially
-      if (item.isTemplate && onCreatePages) {
-        // Immediately create pages from template without any further user action required
-        handleTemplateDropped(item.type, item.templatePages);
-        return;
-      }
-      
-      if (offset && canvasRect) {
-        const x = offset.x - canvasRect.left;
-        const y = offset.y - canvasRect.top;
-        addItem(item.type, { x, y });
-      } else {
-        // If we can't get position, just add it to the end
-        addItem(item.type);
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  });
-  
-  // Function to handle template drops - automatically creates all pages without user intervention
-  const handleTemplateDropped = async (templateType: string, templatePages: any[]) => {
-    if (!onCreatePages) {
-      toast({
-        title: "Can't create template",
-        description: "Page creation functionality is not available",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    try {
-      toast({
-        title: "Creating template...",
-        description: "Please wait while we set up your funnel pages"
-      });
-      
-      // Get the pre-built pages with content from template structures
-      const fullTemplatePages = templatePages.map(page => {
-        // Find the matching structure in our template definitions
-        const templateData = TEMPLATE_STRUCTURES[templateType as keyof typeof TEMPLATE_STRUCTURES]
-          .find(tpl => tpl.name === page.name);
         
-        // Return the page with the pre-built content
-        return {
-          ...page,
-          content: templateData?.content || []
-        };
-      });
-      
-      // Create the pages based on the template structure with content
-      await onCreatePages(fullTemplatePages);
-      
-      toast({
-        title: 'Template created successfully',
-        description: `Created a new ${templateType.toLowerCase().replace('_', ' ')} with ${templatePages.length} pages including pre-built content.`
-      });
-      
-      // Auto-save the current canvas state if there are items
-      if (items.length > 0) {
-        await onSave(items);
+        if (data && data.content) {
+          setItems(JSON.parse(data.content));
+          toast({
+            title: "Funnel loaded",
+            description: "Your funnel has been loaded successfully.",
+          });
+        }
+      } catch (error) {
+        console.error('Error loading funnel:', error);
+        toast({
+          title: "Error loading funnel",
+          description: "There was an error loading your funnel.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
-    } catch (error) {
-      console.error('Error creating template pages:', error);
-      toast({
-        title: 'Error creating template',
-        description: 'There was a problem creating the template pages. Please try again.',
-        variant: 'destructive'
-      });
-    }
-  };
-  
-  // Function to add a new item to the canvas
-  const addItem = (type: string, position?: { x: number, y: number }) => {
-    // Create a new unique ID
-    const newId = `${type}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    
-    let content = '';
-    let props = {};
-    
-    // Set default content and props based on type
-    switch (type) {
-      case 'HEADLINE':
-        content = 'Enter your headline here';
-        props = { level: 'h2', align: 'center' };
-        break;
-      case 'PARAGRAPH':
-        content = 'Enter your paragraph text here';
-        props = { size: 'medium' };
-        break;
-      case 'BUTTON':
-        content = 'Click Me';
-        props = { variant: 'primary', size: 'medium', url: '#', action: 'submit' };
-        break;
-      case 'IMAGE':
-        content = '';
-        props = { src: 'https://via.placeholder.com/600x400', alt: 'Placeholder Image', width: 600, height: 400 };
-        break;
-      case 'FORM':
-        content = JSON.stringify({
-          fields: [
-            { name: 'name', label: 'Name', type: 'text', required: true },
-            { name: 'email', label: 'Email', type: 'email', required: true }
-          ],
-          buttonText: 'Submit'
-        });
-        props = { submitEndpoint: 'validate-contact' };
-        break;
-      case 'MULTIPLE_CHOICE':
-        content = JSON.stringify({
-          id: `question-${Date.now()}`,
-          question: 'Your question here?',
-          description: 'Optional description text',
-          required: true,
-          options: [
-            { label: 'Option 1', value: 'option1', description: '' },
-            { label: 'Option 2', value: 'option2', description: '' }
-          ]
-        });
-        props = { };
-        break;
-      case 'DROPDOWN':
-        content = JSON.stringify({
-          id: `dropdown-${Date.now()}`,
-          label: 'Select an option',
-          placeholder: 'Choose...',
-          required: true,
-          options: [
-            { label: 'Option 1', value: 'option1' },
-            { label: 'Option 2', value: 'option2' }
-          ]
-        });
-        props = { };
-        break;
-      case 'CHECKBOX':
-        content = JSON.stringify({
-          id: `checkbox-${Date.now()}`,
-          label: 'I agree to the terms',
-          required: true
-        });
-        props = { };
-        break;
-      case 'DIVIDER':
-        content = '';
-        props = { style: 'solid', thickness: 1, color: '#e5e7eb' };
-        break;
-      case 'HERO_SECTION':
-        content = JSON.stringify({
-          headline: 'Your Bold Headline Here',
-          subheadline: 'Supporting subheadline that adds more context',
-          backgroundType: 'color',
-          backgroundColor: '#f8f9fa',
-          backgroundImage: '',
-          alignment: 'center',
-          cta: {
-            text: 'Get Started',
-            url: '#'
-          }
-        });
-        props = { padding: 'large' };
-        break;
-      case 'IMAGE_TEXT_SECTION':
-        content = JSON.stringify({
-          heading: 'Image + Text Section',
-          text: 'This is a combined image and text section that looks great on all devices.',
-          imageUrl: 'https://via.placeholder.com/600x400',
-          imageAlt: 'Placeholder image',
-          layout: 'image-left', // or image-right
-          mobileStack: 'image-top' // or image-bottom
-        });
-        props = { };
-        break;
-      case 'LIST_WITH_ICONS':
-        content = JSON.stringify({
-          title: 'Benefits',
-          items: [
-            { icon: 'check-circle', text: 'First benefit item' },
-            { icon: 'check-circle', text: 'Second benefit item' },
-            { icon: 'check-circle', text: 'Third benefit item' }
-          ],
-          iconColor: '#22c55e'
-        });
-        props = { alignment: 'left' };
-        break;
-      default:
-        content = 'New Element';
-    }
-    
-    const newItem: CanvasItem = {
-      id: newId,
-      type,
-      content,
-      props,
-      position
     };
     
-    setItems(prevItems => [...prevItems, newItem]);
-    setActiveItemId(newId); // Set as active for immediate editing
-    
-    toast({
-      title: 'Element added',
-      description: `Added new ${type.toLowerCase()} element to your funnel.`
-    });
-  };
-  
-  // Function to update an item
-  const updateItem = useCallback((id: string, updates: Partial<CanvasItem>) => {
-    setItems(currentItems => 
-      currentItems.map(item => 
-        item.id === id ? { ...item, ...updates } : item
-      )
-    );
-    
-    toast({
-      title: 'Element updated',
-      description: 'The changes were applied successfully.'
-    });
-  }, [toast]);
-  
-  // Function to delete an item
-  const deleteItem = useCallback((id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
-    if (activeItemId === id) {
-      setActiveItemId(null);
-    }
-    
-    toast({
-      title: 'Element removed',
-      description: 'The element was deleted from your funnel.'
-    });
-  }, [activeItemId, toast]);
-  
-  // Function to move items up and down in the order
-  const moveItem = useCallback((id: string, direction: 'up' | 'down') => {
-    const itemIndex = items.findIndex(item => item.id === id);
-    if (itemIndex === -1) return;
-    
-    const newItems = [...items];
-    
-    if (direction === 'up' && itemIndex > 0) {
-      // Swap with the item above
-      [newItems[itemIndex], newItems[itemIndex - 1]] = [newItems[itemIndex - 1], newItems[itemIndex]];
-    } else if (direction === 'down' && itemIndex < newItems.length - 1) {
-      // Swap with the item below
-      [newItems[itemIndex], newItems[itemIndex + 1]] = [newItems[itemIndex + 1], newItems[itemIndex]];
-    }
-    
-    setItems(newItems);
-  }, [items]);
-  
-  // Save the current canvas state
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      await onSave(items);
-      setIsSaving(false);
+    loadFunnelData();
+  }, [funnelId, toast]);
+
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: 'funnel-element',
+    drop: (item: { type: string; label: string }, monitor) => {
+      const id = `${item.type}-${Date.now()}`;
+      const defaultContent = getDefaultContent(item.type);
+      
+      addItem({
+        id,
+        type: item.type,
+        content: defaultContent,
+        props: getDefaultProps(item.type),
+      });
       
       toast({
-        title: 'Funnel saved',
-        description: 'Your funnel has been saved successfully!'
+        title: "Element added",
+        description: `Added a new ${item.label} element to your funnel.`,
       });
-    } catch (error) {
-      console.error('Error saving funnel:', error);
-      setIsSaving(false);
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  }));
+
+  const getDefaultContent = (type: string): string => {
+    switch (type) {
+      case ELEMENT_TYPES.HEADLINE:
+        return 'Your Headline Here';
+      case ELEMENT_TYPES.PARAGRAPH:
+        return 'This is a paragraph. Click to edit this text.';
+      case ELEMENT_TYPES.BULLET_LIST:
+        return 'Item 1\nItem 2\nItem 3';
+      case ELEMENT_TYPES.BUTTON:
+        return 'Click Here';
+      case ELEMENT_TYPES.INPUT:
+        return 'Name';
+      case ELEMENT_TYPES.DROPDOWN:
+        return 'Option 1\nOption 2\nOption 3';
+      case ELEMENT_TYPES.CALENDAR:
+        return 'Select a date';
+      case ELEMENT_TYPES.DIVIDER:
+        return '';
+      case ELEMENT_TYPES.SPACING:
+        return '';
+      case ELEMENT_TYPES.ICON:
+        return 'star';
       
-      toast({
-        title: 'Error saving funnel',
-        description: 'There was a problem saving your funnel. Please try again.',
-        variant: 'destructive'
-      });
+      // New content block defaults
+      case ELEMENT_TYPES.HERO_SECTION:
+        return JSON.stringify({
+          headline: 'Powerful Headline That Converts',
+          subheadline: 'Supporting text that explains your offer and removes objections',
+          buttonText: 'Get Started Now',
+          trustBadges: ['Trusted by 10,000+ customers', 'Satisfaction Guaranteed', 'Award-winning Support']
+        });
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+        return JSON.stringify({
+          headline: 'Why Choose Our Solution',
+          features: [
+            {
+              icon: 'check',
+              title: 'Feature One',
+              description: 'Description of how this feature benefits the customer.'
+            },
+            {
+              icon: 'star',
+              title: 'Feature Two',
+              description: 'Description of how this feature benefits the customer.'
+            },
+            {
+              icon: 'heart',
+              title: 'Feature Three',
+              description: 'Description of how this feature benefits the customer.'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+        return JSON.stringify({
+          testimonials: [
+            {
+              quote: 'This product completely transformed how we operate. The results were immediate and impressive.',
+              name: 'Jane Smith',
+              role: 'CEO, Company Name',
+              rating: 5
+            },
+            {
+              quote: "I was skeptical at first, but after using it for a month, I can't imagine going back.",
+              name: 'John Doe',
+              role: 'Marketing Director',
+              rating: 5
+            }
+          ]
+        });
+      // Text & Typography elements
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        return 'Hello {{name}}, welcome to our {{product}}!';
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
+        return JSON.stringify({
+          text: 'Styled with custom fonts',
+          fontFamily: 'Arial',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#333333'
+        });
+        
+      // Media & Visuals elements
+      case ELEMENT_TYPES.IMAGE_BLOCK:
+        return JSON.stringify({
+          src: 'https://placehold.co/600x400?text=Your+Image+Here',
+          alt: 'Image description',
+          caption: 'Image caption'
+        });
+      case ELEMENT_TYPES.VIDEO_EMBED:
+        return JSON.stringify({
+          type: 'youtube', // youtube, vimeo, wistia
+          videoId: 'dQw4w9WgXcQ',
+          title: 'Video title'
+        });
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+        return JSON.stringify({
+          images: [
+            {
+              src: 'https://placehold.co/600x400?text=Slide+1',
+              alt: 'Slide 1'
+            },
+            {
+              src: 'https://placehold.co/600x400?text=Slide+2',
+              alt: 'Slide 2'
+            },
+            {
+              src: 'https://placehold.co/600x400?text=Slide+3',
+              alt: 'Slide 3'
+            }
+          ]
+        });
+        
+      // Interactive Components
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        return JSON.stringify({
+          question: 'Choose your preferred option:',
+          options: ['Option A', 'Option B', 'Option C'],
+          allowMultiple: false
+        });
+      case ELEMENT_TYPES.DATE_PICKER:
+        return JSON.stringify({
+          label: 'Select a date:',
+          placeholder: 'MM/DD/YYYY',
+          required: false
+        });
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return JSON.stringify({
+          label: 'Upload your file:',
+          acceptedFileTypes: '.pdf,.doc,.docx,.jpg,.png',
+          maxFileSize: 5, // MB
+          instructions: 'Max file size: 5MB'
+        });
+        
+      // Forms & Data Collection
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return JSON.stringify({
+          title: 'Contact Information',
+          fields: [
+            {
+              type: 'text',
+              name: 'name',
+              label: 'Full Name',
+              placeholder: 'John Doe',
+              required: true
+            },
+            {
+              type: 'email',
+              name: 'email',
+              label: 'Email Address',
+              placeholder: 'john@example.com',
+              required: true
+            },
+            {
+              type: 'phone',
+              name: 'phone',
+              label: 'Phone Number',
+              placeholder: '(123) 456-7890',
+              required: false
+            }
+          ],
+          submitButtonText: 'Submit'
+        });
+      case ELEMENT_TYPES.PHONE_INPUT:
+        return JSON.stringify({
+          label: 'Phone Number',
+          placeholder: 'Enter your phone number',
+          required: true,
+          includeCountryCode: true
+        });
+        
+      // Layout & Design elements
+      case ELEMENT_TYPES.SECTION_TEMPLATE:
+        return JSON.stringify({
+          type: 'two-column',
+          title: 'Section Title',
+          leftContent: 'Content for left column goes here.',
+          rightContent: 'Content for right column goes here.'
+        });
+      case ELEMENT_TYPES.CARD:
+        return JSON.stringify({
+          title: 'Card Title',
+          content: 'Card content goes here.',
+          image: 'https://placehold.co/600x400?text=Card+Image',
+          buttonText: 'Learn More'
+        });
+      case ELEMENT_TYPES.BACKGROUND:
+        return JSON.stringify({
+          type: 'color', // color, image, gradient
+          value: '#f5f5f5', // color hex or image URL
+          gradientDirection: 'to bottom', // for gradients
+          gradientColors: ['#ffffff', '#f0f0f0'] // for gradients
+        });
+        
+      // Navigation & Progress
+      case ELEMENT_TYPES.PROGRESS_BAR:
+        return JSON.stringify({
+          currentStep: 1,
+          totalSteps: 5,
+          labels: ['Start', 'Personal Info', 'Preferences', 'Review', 'Submit'],
+          showLabels: true
+        });
+        
+      // Advanced Features
+      case ELEMENT_TYPES.HTML_BLOCK:
+        return '<div class="custom-html">This is custom HTML content</div>';
+      case ELEMENT_TYPES.CONDITIONAL_BLOCK:
+        return JSON.stringify({
+          condition: {
+            variable: 'subscription_type',
+            operator: 'equals',
+            value: 'premium'
+          },
+          content: 'This content only shows for premium subscribers.',
+          elseContent: 'This content shows for non-premium subscribers.'
+        });
+      case ELEMENT_TYPES.CTA_BLOCK:
+        return JSON.stringify({
+          headline: 'Ready to Get Started?',
+          subheadline: 'Join thousands of satisfied customers today.',
+          buttonText: 'Sign Up Now',
+          hasCountdown: false,
+          countdownDate: ''
+        });
+      case ELEMENT_TYPES.FAQ_BLOCK:
+        return JSON.stringify({
+          headline: 'Frequently Asked Questions',
+          faqs: [
+            {
+              question: 'How does your product work?',
+              answer: 'Our product works by implementing cutting-edge technology to solve your specific problems efficiently.'
+            },
+            {
+              question: 'What kind of support do you offer?',
+              answer: 'We offer 24/7 customer support via email, live chat, and phone.'
+            },
+            {
+              question: 'How long does implementation take?',
+              answer: 'Most customers are up and running within 24 hours of signing up.'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.PRICING_BLOCK:
+        return JSON.stringify({
+          headline: 'Simple, Transparent Pricing',
+          subheadline: 'No hidden fees or long-term contracts.',
+          isYearly: false,
+          plans: [
+            {
+              name: 'Basic',
+              monthlyPrice: 9.99,
+              yearlyPrice: 99,
+              description: 'Perfect for individuals',
+              features: ['Feature 1', 'Feature 2', 'Feature 3'],
+              isPopular: false,
+              buttonText: 'Choose Basic'
+            },
+            {
+              name: 'Pro',
+              monthlyPrice: 29.99,
+              yearlyPrice: 299,
+              description: 'Ideal for small teams',
+              features: ['All Basic Features', 'Feature 4', 'Feature 5', 'Feature 6'],
+              isPopular: true,
+              buttonText: 'Choose Pro'
+            },
+            {
+              name: 'Enterprise',
+              monthlyPrice: 99.99,
+              yearlyPrice: 999,
+              description: 'For growing organizations',
+              features: ['All Pro Features', 'Feature 7', 'Feature 8', 'Feature 9', 'Feature 10'],
+              isPopular: false,
+              buttonText: 'Choose Enterprise'
+            }
+          ]
+        });
+      case ELEMENT_TYPES.SOCIAL_PROOF:
+        return JSON.stringify({
+          type: 'counter', // 'counter', 'logos', 'reviews', 'activity'
+          headline: 'Trusted by Thousands',
+          stats: [
+            { label: 'Customers', value: '10,000+' },
+            { label: 'Countries', value: '50+' },
+            { label: 'Satisfaction', value: '99%' }
+          ],
+          logos: []
+        });
+      case ELEMENT_TYPES.COUNTDOWN:
+        return JSON.stringify({
+          type: 'fixed', // 'fixed' or 'evergreen'
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          evergreeDuration: 3600, // 1 hour in seconds
+          message: 'Special Offer Ends In:',
+          expiredMessage: 'Offer Expired'
+        });
+      case ELEMENT_TYPES.TRUST_BADGES:
+        return JSON.stringify({
+          badges: [
+            { type: 'guarantee', text: '30-Day Money Back Guarantee' },
+            { type: 'security', text: 'Secure Payment' },
+            { type: 'certification', text: 'GDPR Compliant' },
+          ]
+        });
+      default:
+        return '';
     }
   };
-  
-  // Placeholder content for empty canvas
-  const renderEmptyState = () => (
-    <div className="text-center p-8">
-      <p className="text-lg text-gray-500 mb-4">
-        Drag elements or templates from the sidebar to start building your funnel.
-      </p>
-      <div className="border-2 border-dashed border-gray-300 rounded-xl p-10 flex flex-col items-center gap-4">
-        <p className="text-gray-400">Drop elements or templates here</p>
-        <p className="text-sm text-gray-400">
-          Templates automatically create all pages with pre-built content
-        </p>
+
+  const getDefaultProps = (type: string): Record<string, any> => {
+    switch (type) {
+      case ELEMENT_TYPES.IMAGE:
+        return { src: 'https://placehold.co/600x400?text=Drop+image+here', alt: 'Placeholder image' };
+      case ELEMENT_TYPES.VIDEO:
+        return { src: '', placeholder: 'https://placehold.co/600x400/2A2A2A/FFFFFF?text=Video+Placeholder' };
+      case ELEMENT_TYPES.FORM:
+        return { fields: ['name', 'email'], buttonText: 'Submit' };
+      case ELEMENT_TYPES.BUTTON:
+        return { variant: 'primary', url: '#', action: 'link' };
+      case ELEMENT_TYPES.INPUT:
+        return { placeholder: 'Enter your name', required: false, type: 'text' };
+      case ELEMENT_TYPES.DROPDOWN:
+        return { placeholder: 'Select an option', required: false };
+      case ELEMENT_TYPES.CALENDAR:
+        return { minDate: '', maxDate: '', timeSlots: [] };
+      case ELEMENT_TYPES.DIVIDER:
+        return { style: 'solid', color: '#e2e8f0', height: 1 };
+      case ELEMENT_TYPES.SPACING:
+        return { height: 20 };
+      case ELEMENT_TYPES.ICON:
+        return { name: 'star', color: '#3B82F6', size: 24 };
+      
+      // Text & Typography
+      case ELEMENT_TYPES.DYNAMIC_TEXT:
+        return {
+          style: { 
+            fontSize: '16px',
+            color: '#333333',
+            fontWeight: 'normal'
+          },
+          variables: [] // List of available variables
+        };
+      case ELEMENT_TYPES.CUSTOM_FONT_TEXT:
+        return {
+          fontFamily: 'Arial, sans-serif',
+          fontSize: '16px',
+          fontWeight: 'normal',
+          color: '#333333',
+          alignment: 'left',
+          lineHeight: 1.5
+        };
+      
+      // Media & Visuals
+      case ELEMENT_TYPES.IMAGE_BLOCK:
+        return {
+          maxWidth: '100%',
+          alignment: 'center',
+          borderRadius: '0px',
+          shadow: false,
+          responsive: true,
+          aspectRatio: '16:9'
+        };
+      case ELEMENT_TYPES.VIDEO_EMBED:
+        return {
+          autoplay: false,
+          controls: true,
+          muted: false,
+          loop: false,
+          thumbnail: '',
+          responsive: true,
+          aspectRatio: '16:9',
+          lazyLoad: true
+        };
+      case ELEMENT_TYPES.IMAGE_SLIDER:
+        return {
+          autoplay: true,
+          showNavigation: true,
+          showDots: true,
+          infinite: true,
+          speed: 500,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          adaptiveHeight: true
+        };
+      
+      // Interactive Components
+      case ELEMENT_TYPES.MULTIPLE_CHOICE:
+        return {
+          style: 'radio', // 'radio', 'checkbox', 'button'
+          required: false,
+          storeAs: '',
+          inline: false
+        };
+      case ELEMENT_TYPES.DATE_PICKER:
+        return {
+          minDate: '',
+          maxDate: '',
+          format: 'MM/DD/YYYY',
+          storeAs: '',
+          required: false,
+          showClearButton: true
+        };
+      case ELEMENT_TYPES.FILE_UPLOAD:
+        return {
+          multiple: false,
+          maxFiles: 1,
+          maxSizeMB: 5,
+          storeAs: '',
+          acceptedFileTypes: ['.pdf', '.doc', '.docx', '.jpg', '.png'],
+          showFilePreview: true
+        };
+      
+      // Forms & Data Collection
+      case ELEMENT_TYPES.FORM_BLOCK:
+        return {
+          layout: 'vertical', // 'vertical', 'horizontal', 'inline'
+          spacing: 'md',
+          submitButtonAlignment: 'left',
+          submitButtonColor: 'primary',
+          successMessage: 'Form submitted successfully!',
+          redirectOnSubmit: false,
+          redirectUrl: '',
+          storeSubmissions: true,
+          integrations: [] // CRM, email marketing, etc.
+        };
+      case ELEMENT_TYPES.PHONE_INPUT:
+        return {
+          defaultCountry: 'US',
+          showFlags: true,
+          onlyCountries: [],
+          preferredCountries: ['US', 'CA', 'GB'],
+          required: false,
+          validationPattern: '',
+          storeAs: ''
+        };
+      
+      // Layout & Design
+      case ELEMENT_TYPES.SECTION_TEMPLATE:
+        return {
+          padding: '40px',
+          margin: '0px',
+          borderRadius: '0px',
+          backgroundColor: '#ffffff',
+          backgroundImage: '',
+          minHeight: '300px',
+          contentWidth: 'container',
+          verticalAlignment: 'center',
+          responsiveReorder: true
+        };
+      case ELEMENT_TYPES.CARD:
+        return {
+          padding: '20px',
+          borderRadius: '8px',
+          backgroundColor: '#ffffff',
+          shadow: true,
+          hoverEffect: true,
+          aspectRatio: '',
+          maxWidth: '100%'
+        };
+      case ELEMENT_TYPES.BACKGROUND:
+        return {
+          blur: 0,
+          overlay: false,
+          overlayColor: 'rgba(0,0,0,0.5)',
+          parallax: false,
+          fixed: false
+        };
+      
+      // Navigation & Progress
+      case ELEMENT_TYPES.PROGRESS_BAR:
+        return {
+          type: 'steps', // 'steps', 'bar', 'percentage'
+          activeColor: '#3B82F6',
+          inactiveColor: '#e5e7eb',
+          showPercentage: true,
+          animation: true,
+          animationDuration: 0.5,
+          responsive: true
+        };
+      
+      // Advanced Features
+      case ELEMENT_TYPES.HTML_BLOCK:
+        return {
+          containerClasses: '',
+          containerStyle: {},
+          sanitize: true
+        };
+      case ELEMENT_TYPES.CONDITIONAL_BLOCK:
+        return {
+          logicType: 'show', // 'show', 'hide'
+          conditions: []
+        };
+      
+      // Content Blocks (default props)
+      case ELEMENT_TYPES.HERO_SECTION:
+        return { 
+          bgType: 'color', // 'color', 'image', 'video'
+          bgColor: '#f9fafb',
+          bgImage: '',
+          bgVideo: '',
+          layout: 'center', // 'left', 'center', 'right'
+          style: {
+            fontFamily: 'Arial, Helvetica, sans-serif',
+            headingSize: '48px',
+            subheadingSize: '20px',
+            color: '#111827',
+            buttonColor: '#3B82F6',
+            buttonTextColor: '#ffffff'
+          }
+        };
+      case ELEMENT_TYPES.FEATURES_BLOCK:
+        return { 
+          layout: 'grid', // 'grid', 'alternating'
+          columns: 3, // 2, 3, 4
+          style: {
+            bgColor: '#ffffff',
+            iconColor: '#3B82F6',
+            headingColor: '#111827',
+            textColor: '#4b5563'
+          }
+        };
+      case ELEMENT_TYPES.TESTIMONIAL_BLOCK:
+        return { 
+          layout: 'grid', // 'grid', 'slider'
+          showPhotos: true,
+          showRatings: true,
+          style: {
+            bgColor: '#f9fafb',
+            textColor: '#111827',
+            quoteColor: '#6b7280',
+            accentColor: '#3B82F6'
+          }
+        };
+      case ELEMENT_TYPES.CTA_BLOCK:
+        return { 
+          bgType: 'color', // 'color', 'image', 'gradient'
+          bgColor: '#3B82F6',
+          bgImage: '',
+          gradient: 'linear-gradient(90deg, #3B82F6, #6366F1)',
+          style: {
+            textColor: '#ffffff',
+            buttonColor: '#ffffff',
+            buttonTextColor: '#3B82F6',
+            padding: '60px'
+          }
+        };
+      case ELEMENT_TYPES.FAQ_BLOCK:
+        return { 
+          layout: 'accordion', // 'accordion', 'grid'
+          enableSearch: false,
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            borderColor: '#e5e7eb'
+          }
+        };
+      case ELEMENT_TYPES.PRICING_BLOCK:
+        return { 
+          layout: 'horizontal', // 'horizontal', 'vertical'
+          showToggle: true,
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            popularHighlightColor: '#eef2ff',
+            borderColor: '#e5e7eb'
+          }
+        };
+      case ELEMENT_TYPES.SOCIAL_PROOF:
+        return { 
+          style: {
+            bgColor: '#ffffff',
+            textColor: '#111827',
+            accentColor: '#3B82F6',
+            logoOpacity: 0.8
+          }
+        };
+      case ELEMENT_TYPES.COUNTDOWN:
+        return { 
+          style: {
+            bgColor: '#f9fafb',
+            textColor: '#111827',
+            accentColor: '#ef4444',
+            timerColor: '#ffffff',
+            timerBgColor: '#ef4444'
+          }
+        };
+      case ELEMENT_TYPES.TRUST_BADGES:
+        return { 
+          layout: 'horizontal', // 'horizontal', 'grid'
+          style: {
+            bgColor: '#ffffff',
+            iconColor: '#3B82F6',
+            textColor: '#6b7280'
+          }
+        };
+      default:
+        return {};
+    }
+  };
+
+  const addItem = (item: CanvasItem) => {
+    setItems((prev) => [...prev, item]);
+    // Auto-save whenever an item is added
+    autoSave([...items, item]);
+  };
+
+  const updateItem = (id: string, updates: Partial<CanvasItem>) => {
+    const updatedItems = items.map((item) => (item.id === id ? { ...item, ...updates } : item));
+    setItems(updatedItems);
+    // Auto-save whenever an item is updated
+    autoSave(updatedItems);
+  };
+
+  const removeItem = (id: string) => {
+    const updatedItems = items.filter((item) => item.id !== id);
+    setItems(updatedItems);
+    // Auto-save whenever an item is removed
+    autoSave(updatedItems);
+    toast({
+      title: "Element removed",
+      description: "Element has been removed from your funnel.",
+    });
+  };
+
+  const moveItem = (id: string, direction: 'up' | 'down') => {
+    setItems((prev) => {
+      const currentIndex = prev.findIndex((item) => item.id === id);
+      if (
+        (direction === 'up' && currentIndex === 0) ||
+        (direction === 'down' && currentIndex === prev.length - 1)
+      ) {
+        return prev;
+      }
+
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      const newItems = [...prev];
+      const [removed] = newItems.splice(currentIndex, 1);
+      newItems.splice(newIndex, 0, removed);
+      
+      // Auto-save whenever items are reordered
+      autoSave(newItems);
+      return newItems;
+    });
+  };
+
+  // Add a variable to the funnel
+  const addVariable = (name: string, value: string) => {
+    setVariables(prev => [...prev, { name, value }]);
+  };
+
+  // Update a variable in the funnel
+  const updateVariable = (index: number, name: string, value: string) => {
+    setVariables(prev => {
+      const updated = [...prev];
+      updated[index] = { name, value };
+      return updated;
+    });
+  };
+
+  // Process dynamic text by replacing variables
+  const processDynamicText = (text: string) => {
+    let processedText = text;
+    variables.forEach(variable => {
+      const regex = new RegExp(`{{${variable.name}}}`, 'g');
+      processedText = processedText.replace(regex, variable.value);
+    });
+    return processedText;
+  };
+
+  // Add auto-save functionality with debounce
+  const autoSave = (itemsToSave: CanvasItem[]) => {
+    if (!funnelId) return;
+    
+    // We'd normally implement a proper debounce here, but for simplicity:
+    const saveChanges = async () => {
+      try {
+        // Using raw SQL query to get around TypeScript issues
+        const { error } = await supabase
+          .from('funnels')
+          .update({ 
+            content: JSON.stringify(itemsToSave), 
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', funnelId);
+          
+        if (error) throw error;
+        
+        console.log('Auto-saved funnel changes');
+      } catch (err) {
+        console.error('Error auto-saving:', err);
+      }
+    };
+    
+    saveChanges();
+  };
+
+  const handleSave = () => {
+    onSave(items);
+    toast({
+      title: "Funnel saved",
+      description: "Your funnel changes have been saved.",
+    });
+  };
+
+  const renderDevicePreview = () => {
+    let containerClass = "w-full min-h-[500px]";
+    
+    if (currentDevice === 'mobile') {
+      containerClass += " max-w-[375px] mx-auto";
+    } else if (currentDevice === 'tablet') {
+      containerClass += " max-w-[768px] mx-auto";
+    }
+    
+    return (
+      <div className={containerClass}>
+        {items.length === 0 ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+              <LayoutGrid size={48} className="mx-auto mb-4 text-metamaster-gray-400" />
+              <p className="text-metamaster-gray-500 mb-4">Drag and drop elements here<br/>to start building your funnel</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {items.map((item) => (
+              <FunnelRenderedElement
+                key={item.id}
+                item={item}
+                isEditing={editingItem === item.id}
+                onEdit={() => setEditingItem(item.id)}
+                onSave={(content, props) => {
+                  const updates: Partial<CanvasItem> = { content };
+                  if (props) {
+                    updates.props = { ...item.props, ...props };
+                  }
+                  updateItem(item.id, updates);
+                  setEditingItem(null);
+                }}
+                onCancel={() => setEditingItem(null)}
+                onRemove={() => removeItem(item.id)}
+                onMoveUp={() => moveItem(item.id, 'up')}
+                onMoveDown={() => moveItem(item.id, 'down')}
+                device={currentDevice}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
-  );
-  
-  // Render a toolbar at the bottom with save button
-  const renderToolbar = () => (
-    <div className="fixed bottom-4 right-4 z-10 flex space-x-2">
-      <Button 
-        onClick={() => setItems([])} 
-        variant="outline"
-        className="rounded-full h-12 w-12 bg-white"
-      >
-        <Trash size={20} />
-      </Button>
-      <Button 
-        onClick={handleSave} 
-        disabled={isSaving}
-        className="rounded-full h-12 w-12 bg-metamaster-primary hover:bg-metamaster-secondary text-white"
-      >
-        <Save size={20} />
-      </Button>
-    </div>
-  );
-  
+    );
+  };
+
   return (
-    <div className="border border-gray-200 rounded-xl bg-white overflow-hidden min-h-[600px] flex flex-col">
-      {/* Canvas header */}
-      <div className="border-b border-gray-200 bg-gray-50 p-3 flex justify-between items-center">
-        <h3 className="font-medium">Editor Canvas</h3>
-        <div className="flex items-center space-x-2">
+    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+      <div className="mb-4 flex justify-between items-center">
+        <h3 className="font-bold">Canvas</h3>
+        <div className="flex space-x-2">
+          <Tabs value={currentDevice} onValueChange={(value) => setCurrentDevice(value as any)}>
+            <TabsList className="bg-metamaster-gray-100">
+              <TabsTrigger value="mobile" className="flex items-center gap-1">
+                <Smartphone size={14} />
+                <span className="hidden sm:inline">Mobile</span>
+              </TabsTrigger>
+              <TabsTrigger value="tablet" className="flex items-center gap-1">
+                <Tablet size={14} />
+                <span className="hidden sm:inline">Tablet</span>
+              </TabsTrigger>
+              <TabsTrigger value="desktop" className="flex items-center gap-1">
+                <Monitor size={14} />
+                <span className="hidden sm:inline">Desktop</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Button 
-            variant="outline" 
-            size="sm"
+            size="sm" 
+            className="bg-metamaster-primary hover:bg-metamaster-secondary"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isLoading}
           >
-            {isSaving ? 'Saving...' : 'Save Page'}
+            {isLoading ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>
       
-      {/* Canvas area */}
-      <div 
-        ref={(node) => {
-          canvasRef.current = node;
-          drop(node);
-        }}
-        className={`flex-1 p-4 overflow-y-auto ${isOver ? 'bg-gray-50' : 'bg-white'} relative`}
-        style={{ minHeight: '400px' }}
+      <div
+        ref={drop}
+        className={`border-2 ${
+          isOver ? 'border-metamaster-primary border-solid' : 'border-dashed'
+        } border-metamaster-gray-200 rounded-lg p-4 transition-colors overflow-auto`}
+        style={{ minHeight: "500px" }}
       >
-        {items.length === 0 ? renderEmptyState() : (
-          <>
-            <Alert variant="warning" className="mb-4">
-              <AlertDescription>
-                The visual builder is currently showing placeholders. 
-                Elements will be fully rendered in the preview.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="space-y-4">
-              {items.map((item) => (
-                <FunnelRenderedElement
-                  key={item.id}
-                  item={item}
-                  isEditing={activeItemId === item.id}
-                  onEdit={() => setActiveItemId(item.id)}
-                  onSave={(content, props) => {
-                    updateItem(item.id, { content, props });
-                    setActiveItemId(null);
-                  }}
-                  onCancel={() => setActiveItemId(null)}
-                  onRemove={() => deleteItem(item.id)}
-                  onMoveUp={() => moveItem(item.id, 'up')}
-                  onMoveDown={() => moveItem(item.id, 'down')}
-                  device="desktop"
-                />
-              ))}
-            </div>
-          </>
-        )}
+        {renderDevicePreview()}
       </div>
-      
-      {renderToolbar()}
     </div>
   );
 };
