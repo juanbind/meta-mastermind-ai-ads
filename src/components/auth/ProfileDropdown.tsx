@@ -24,6 +24,7 @@ const ProfileDropdown = () => {
   };
 
   const handleNavigation = (path: string) => {
+    console.log(`Navigating to: /settings?tab=${path}`);
     navigate(`/settings?tab=${path}`);
   };
 
