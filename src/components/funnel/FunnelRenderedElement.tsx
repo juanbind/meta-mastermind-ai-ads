@@ -34,6 +34,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   device
 }) => {
   const [editableContent, setEditableContent] = useState(item.content);
+  const [editableProps, setEditableProps] = useState(item.props || {});
   const { toast } = useToast();
   
   const handleSave = () => {
@@ -53,12 +54,15 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
             ELEMENT_TYPES.PRICING_BLOCK,
             ELEMENT_TYPES.SOCIAL_PROOF,
             ELEMENT_TYPES.COUNTDOWN,
-            ELEMENT_TYPES.TRUST_BADGES
+            ELEMENT_TYPES.TRUST_BADGES,
+            ELEMENT_TYPES.IMAGE_TEXT_SECTION,
+            ELEMENT_TYPES.LIST_WITH_ICONS,
+            ELEMENT_TYPES.LEAD_CAPTURE_FORM
           ].includes(item.type)) {
         JSON.parse(editableContent);
       }
       
-      onSave(editableContent, item.props);
+      onSave(editableContent, editableProps);
       toast({
         title: "Changes saved",
         description: "Your element has been updated."
@@ -82,7 +86,9 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     ELEMENT_TYPES.PRICING_BLOCK,
     ELEMENT_TYPES.SOCIAL_PROOF,
     ELEMENT_TYPES.COUNTDOWN,
-    ELEMENT_TYPES.TRUST_BADGES
+    ELEMENT_TYPES.TRUST_BADGES,
+    ELEMENT_TYPES.IMAGE_TEXT_SECTION,
+    ELEMENT_TYPES.LIST_WITH_ICONS
   ];
   
   // Form elements
@@ -93,7 +99,9 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     ELEMENT_TYPES.DROPDOWN,
     ELEMENT_TYPES.FILE_UPLOAD,
     ELEMENT_TYPES.CALENDAR,
-    ELEMENT_TYPES.DATE_PICKER
+    ELEMENT_TYPES.DATE_PICKER,
+    ELEMENT_TYPES.CHECKBOX,
+    ELEMENT_TYPES.LEAD_CAPTURE_FORM
   ];
 
   const renderDisplayContent = () => {
@@ -130,8 +138,10 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
           <div className="pt-8 pb-2 px-2">
             <ElementEditor 
               type={item.type} 
-              content={editableContent} 
-              onChange={setEditableContent} 
+              content={editableContent}
+              props={editableProps}
+              onChange={setEditableContent}
+              onPropsChange={setEditableProps}
             />
           </div>
         ) : (

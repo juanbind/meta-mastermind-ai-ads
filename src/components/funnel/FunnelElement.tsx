@@ -26,12 +26,14 @@ export const ELEMENT_TYPES = {
   
   // Content block types
   HERO_SECTION: 'hero-section',
+  IMAGE_TEXT_SECTION: 'image-text-section',
   FEATURES_BLOCK: 'features-block',
   TESTIMONIAL_BLOCK: 'testimonial-block',
   CTA_BLOCK: 'cta-block',
   FAQ_BLOCK: 'faq-block',
   PRICING_BLOCK: 'pricing-block',
   CONTACT_BLOCK: 'contact-block',
+  LIST_WITH_ICONS: 'list-with-icons',
   
   // Conversion elements
   SOCIAL_PROOF: 'social-proof',
@@ -55,6 +57,7 @@ export const ELEMENT_TYPES = {
   // Forms & Data Collection
   FORM_BLOCK: 'form-block',
   PHONE_INPUT: 'phone-input',
+  CHECKBOX: 'checkbox',
   
   // Layout & Design
   SECTION_TEMPLATE: 'section-template',
@@ -66,7 +69,8 @@ export const ELEMENT_TYPES = {
   
   // Advanced Features
   HTML_BLOCK: 'html-block',
-  CONDITIONAL_BLOCK: 'conditional-block'
+  CONDITIONAL_BLOCK: 'conditional-block',
+  LEAD_CAPTURE_FORM: 'lead-capture-form'
 };
 
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
