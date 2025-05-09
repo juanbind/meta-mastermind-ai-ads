@@ -10,69 +10,68 @@ export interface FunnelElementProps {
 }
 
 export const ELEMENT_TYPES = {
-  HEADLINE: 'headline',
-  PARAGRAPH: 'paragraph',
-  IMAGE: 'image',
-  VIDEO: 'video',
-  FORM: 'form',
-  BULLET_LIST: 'bullet-list',
-  BUTTON: 'button',
-  INPUT: 'input',
-  DROPDOWN: 'dropdown',
-  CALENDAR: 'calendar',
-  DIVIDER: 'divider',
-  ICON: 'icon',
-  SPACING: 'spacing',
+  // Basic elements
+  HEADLINE: 'HEADLINE',
+  PARAGRAPH: 'PARAGRAPH',
+  IMAGE: 'IMAGE',
+  VIDEO: 'VIDEO',
+  FORM: 'FORM',
+  BULLET_LIST: 'BULLET_LIST',
+  BUTTON: 'BUTTON',
+  INPUT: 'INPUT',
+  DROPDOWN: 'DROPDOWN',
+  CALENDAR: 'CALENDAR',
+  DIVIDER: 'DIVIDER',
+  ICON: 'ICON',
+  SPACING: 'SPACING',
   
   // Content block types
-  HERO_SECTION: 'hero-section',
-  FEATURES_BLOCK: 'features-block',
-  TESTIMONIAL_BLOCK: 'testimonial-block',
-  CTA_BLOCK: 'cta-block',
-  FAQ_BLOCK: 'faq-block',
-  PRICING_BLOCK: 'pricing-block',
-  CONTACT_BLOCK: 'contact-block',
+  HERO_SECTION: 'HERO_SECTION',
+  IMAGE_TEXT_SECTION: 'IMAGE_TEXT_SECTION',
+  FEATURES_BLOCK: 'FEATURES_BLOCK',
+  TESTIMONIAL_BLOCK: 'TESTIMONIAL_BLOCK',
+  CTA_BLOCK: 'CTA_BLOCK',
+  FAQ_BLOCK: 'FAQ_BLOCK',
+  PRICING_BLOCK: 'PRICING_BLOCK',
+  LIST_WITH_ICONS: 'LIST_WITH_ICONS',
   
   // Conversion elements
-  SOCIAL_PROOF: 'social-proof',
-  COUNTDOWN: 'countdown',
-  TRUST_BADGES: 'trust-badges',
+  SOCIAL_PROOF: 'SOCIAL_PROOF',
+  COUNTDOWN: 'COUNTDOWN',
+  TRUST_BADGES: 'TRUST_BADGES',
+  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
+  CHECKBOX: 'CHECKBOX',
   
   // Text & Typography elements
-  DYNAMIC_TEXT: 'dynamic-text',
-  CUSTOM_FONT_TEXT: 'custom-font-text',
+  DYNAMIC_TEXT: 'DYNAMIC_TEXT',
+  CUSTOM_FONT_TEXT: 'CUSTOM_FONT_TEXT',
   
   // Media & Visuals elements
-  IMAGE_BLOCK: 'image-block',
-  VIDEO_EMBED: 'video-embed',
-  IMAGE_SLIDER: 'image-slider',
-  
-  // Interactive Components
-  MULTIPLE_CHOICE: 'multiple-choice',
-  DATE_PICKER: 'date-picker',
-  FILE_UPLOAD: 'file-upload',
+  IMAGE_BLOCK: 'IMAGE_BLOCK',
+  VIDEO_EMBED: 'VIDEO_EMBED',
+  IMAGE_SLIDER: 'IMAGE_SLIDER',
   
   // Forms & Data Collection
-  FORM_BLOCK: 'form-block',
-  PHONE_INPUT: 'phone-input',
+  FORM_BLOCK: 'FORM_BLOCK',
+  PHONE_INPUT: 'PHONE_INPUT',
   
   // Layout & Design
-  SECTION_TEMPLATE: 'section-template',
-  CARD: 'card',
-  BACKGROUND: 'background',
+  SECTION_TEMPLATE: 'SECTION_TEMPLATE',
+  CARD: 'CARD',
+  BACKGROUND: 'BACKGROUND',
   
   // Navigation & Progress
-  PROGRESS_BAR: 'progress-bar',
+  PROGRESS_BAR: 'PROGRESS_BAR',
   
   // Advanced Features
-  HTML_BLOCK: 'html-block',
-  CONDITIONAL_BLOCK: 'conditional-block'
+  HTML_BLOCK: 'HTML_BLOCK',
+  CONDITIONAL_BLOCK: 'CONDITIONAL_BLOCK'
 };
 
 const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'funnel-element',
-    item: { type, label },
+    type: 'FUNNEL_ELEMENT',
+    item: { type },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -84,7 +83,6 @@ const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
       className={`flex items-center justify-start h-auto py-3 px-4 border-dashed border-2 w-full rounded cursor-grab ${
         isDragging ? 'opacity-50 border-metamaster-primary bg-metamaster-primary/5' : 'border-gray-200'
       }`}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       <div className="mr-3 text-metamaster-primary">{icon}</div>
       <span>{label}</span>

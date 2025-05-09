@@ -1,9 +1,11 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Save } from 'lucide-react';
+import { Save, Trash } from 'lucide-react';
+import FunnelRenderedElement from './FunnelRenderedElement';
+import { useToast } from '@/hooks/use-toast';
 
 export interface CanvasItem {
   id: string;
@@ -20,6 +22,7 @@ export interface FunnelCanvasProps {
 }
 
 const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialItems = [] }) => {
+  const { toast } = useToast();
   const [items, setItems] = useState<CanvasItem[]>(() => {
     if (!initialItems || !Array.isArray(initialItems)) {
       return [];
@@ -90,14 +93,90 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
         props = { src: 'https://via.placeholder.com/600x400', alt: 'Placeholder Image', width: 600, height: 400 };
         break;
       case 'FORM':
-        content = 'Contact Form';
-        props = { 
+        content = JSON.stringify({
           fields: [
             { name: 'name', label: 'Name', type: 'text', required: true },
             { name: 'email', label: 'Email', type: 'email', required: true }
           ],
           buttonText: 'Submit'
-        };
+        });
+        props = { submitEndpoint: 'validate-contact' };
+        break;
+      case 'MULTIPLE_CHOICE':
+        content = JSON.stringify({
+          id: `question-${Date.now()}`,
+          question: 'Your question here?',
+          description: 'Optional description text',
+          required: true,
+          options: [
+            { label: 'Option 1', value: 'option1', description: '' },
+            { label: 'Option 2', value: 'option2', description: '' }
+          ]
+        });
+        props = { };
+        break;
+      case 'DROPDOWN':
+        content = JSON.stringify({
+          id: `dropdown-${Date.now()}`,
+          label: 'Select an option',
+          placeholder: 'Choose...',
+          required: true,
+          options: [
+            { label: 'Option 1', value: 'option1' },
+            { label: 'Option 2', value: 'option2' }
+          ]
+        });
+        props = { };
+        break;
+      case 'CHECKBOX':
+        content = JSON.stringify({
+          id: `checkbox-${Date.now()}`,
+          label: 'I agree to the terms',
+          required: true
+        });
+        props = { };
+        break;
+      case 'DIVIDER':
+        content = '';
+        props = { style: 'solid', thickness: 1, color: '#e5e7eb' };
+        break;
+      case 'HERO_SECTION':
+        content = JSON.stringify({
+          headline: 'Your Bold Headline Here',
+          subheadline: 'Supporting subheadline that adds more context',
+          backgroundType: 'color',
+          backgroundColor: '#f8f9fa',
+          backgroundImage: '',
+          alignment: 'center',
+          cta: {
+            text: 'Get Started',
+            url: '#'
+          }
+        });
+        props = { padding: 'large' };
+        break;
+      case 'IMAGE_TEXT_SECTION':
+        content = JSON.stringify({
+          heading: 'Image + Text Section',
+          text: 'This is a combined image and text section that looks great on all devices.',
+          imageUrl: 'https://via.placeholder.com/600x400',
+          imageAlt: 'Placeholder image',
+          layout: 'image-left', // or image-right
+          mobileStack: 'image-top' // or image-bottom
+        });
+        props = { };
+        break;
+      case 'LIST_WITH_ICONS':
+        content = JSON.stringify({
+          title: 'Benefits',
+          items: [
+            { icon: 'check-circle', text: 'First benefit item' },
+            { icon: 'check-circle', text: 'Second benefit item' },
+            { icon: 'check-circle', text: 'Third benefit item' }
+          ],
+          iconColor: '#22c55e'
+        });
+        props = { alignment: 'left' };
         break;
       default:
         content = 'New Element';
@@ -111,8 +190,13 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       position
     };
     
-    setItems([...items, newItem]);
+    setItems(prevItems => [...prevItems, newItem]);
     setActiveItemId(newId); // Set as active for immediate editing
+    
+    toast({
+      title: 'Element added',
+      description: `Added new ${type.toLowerCase()} element to your funnel.`
+    });
   };
   
   // Function to update an item
@@ -122,18 +206,28 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
         item.id === id ? { ...item, ...updates } : item
       )
     );
-  }, []);
+    
+    toast({
+      title: 'Element updated',
+      description: 'The changes were applied successfully.'
+    });
+  }, [toast]);
   
   // Function to delete an item
-  const deleteItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
+  const deleteItem = useCallback((id: string) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== id));
     if (activeItemId === id) {
       setActiveItemId(null);
     }
-  };
+    
+    toast({
+      title: 'Element removed',
+      description: 'The element was deleted from your funnel.'
+    });
+  }, [activeItemId, toast]);
   
   // Function to move items up and down in the order
-  const moveItem = (id: string, direction: 'up' | 'down') => {
+  const moveItem = useCallback((id: string, direction: 'up' | 'down') => {
     const itemIndex = items.findIndex(item => item.id === id);
     if (itemIndex === -1) return;
     
@@ -148,7 +242,7 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
     }
     
     setItems(newItems);
-  };
+  }, [items]);
   
   // Save the current canvas state
   const handleSave = async () => {
@@ -156,9 +250,20 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       setIsSaving(true);
       await onSave(items);
       setIsSaving(false);
+      
+      toast({
+        title: 'Funnel saved',
+        description: 'Your funnel has been saved successfully!'
+      });
     } catch (error) {
       console.error('Error saving funnel:', error);
       setIsSaving(false);
+      
+      toast({
+        title: 'Error saving funnel',
+        description: 'There was a problem saving your funnel. Please try again.',
+        variant: 'destructive'
+      });
     }
   };
   
@@ -176,7 +281,14 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
   
   // Render a toolbar at the bottom with save button
   const renderToolbar = () => (
-    <div className="fixed bottom-4 right-4 z-10">
+    <div className="fixed bottom-4 right-4 z-10 flex space-x-2">
+      <Button 
+        onClick={() => setItems([])} 
+        variant="outline"
+        className="rounded-full h-12 w-12 bg-white"
+      >
+        <Trash size={20} />
+      </Button>
       <Button 
         onClick={handleSave} 
         disabled={isSaving}
@@ -214,12 +326,34 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
         style={{ minHeight: '400px' }}
       >
         {items.length === 0 ? renderEmptyState() : (
-          <Alert variant="warning" className="mb-4">
-            <AlertDescription>
-              The visual builder is currently showing placeholders. 
-              Elements will be fully rendered in the preview.
-            </AlertDescription>
-          </Alert>
+          <>
+            <Alert variant="warning" className="mb-4">
+              <AlertDescription>
+                The visual builder is currently showing placeholders. 
+                Elements will be fully rendered in the preview.
+              </AlertDescription>
+            </Alert>
+            
+            <div className="space-y-4">
+              {items.map((item) => (
+                <FunnelRenderedElement
+                  key={item.id}
+                  item={item}
+                  isEditing={activeItemId === item.id}
+                  onEdit={() => setActiveItemId(item.id)}
+                  onSave={(content, props) => {
+                    updateItem(item.id, { content, props });
+                    setActiveItemId(null);
+                  }}
+                  onCancel={() => setActiveItemId(null)}
+                  onRemove={() => deleteItem(item.id)}
+                  onMoveUp={() => moveItem(item.id, 'up')}
+                  onMoveDown={() => moveItem(item.id, 'down')}
+                  device="desktop"
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
       

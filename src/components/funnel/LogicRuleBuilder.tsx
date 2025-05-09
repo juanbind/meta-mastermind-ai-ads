@@ -1,65 +1,125 @@
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, Plus, ArrowRightLeft, Code } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { LogicRule } from '@/hooks/useFunnelLogic';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-interface LogicRuleBuilderProps {
-  funnelId: string;
-  elements: Array<{id: string, label: string, type: string, content?: any}>;
-  pages?: Array<{id: string, name: string}>;
-  onRulesChange?: (rules: any[]) => void;
+// Interface for field sources (questions or form fields)
+interface FieldSource {
+  id: string;
+  label: string;
+  type: string;
+  content?: any; // Content property (optional)
 }
 
-const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ 
-  funnelId, 
-  elements, 
-  pages = [],
-  onRulesChange 
-}) => {
-  const [rules, setRules] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+// Interface for fields that can be used in logic rules
+interface LogicField {
+  id: string;
+  name: string;
+  label: string;
+  type: string;
+  options?: Array<{ value: string, label: string }>;
+}
 
-  // Fetch existing rules on component mount
+// Interface for the component props
+interface LogicRuleBuilderProps {
+  initialRules: LogicRule[];
+  fieldSources: FieldSource[];
+  targetElements: { id: string, label: string, type: string }[];
+  onSave: (rules: LogicRule[]) => void;
+  onCancel: () => void;
+  funnelId: string;
+}
+
+const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({
+  initialRules,
+  fieldSources,
+  targetElements,
+  onSave,
+  onCancel,
+  funnelId
+}) => {
+  const [rules, setRules] = useState<LogicRule[]>(initialRules || []);
+  const [logicFields, setLogicFields] = useState<LogicField[]>([]);
+
+  // Set up available logic fields from the field sources
   useEffect(() => {
-    const fetchRules = async () => {
+    const fields: LogicField[] = [];
+    
+    fieldSources.forEach(source => {
       try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('logic_rules')
-          .select('*')
-          .eq('funnel_id', funnelId);
-          
-        if (error) throw error;
-        setRules(data || []);
+        // Try to parse content if it's a string
+        let parsedContent = source.content;
+        if (typeof source.content === 'string') {
+          try {
+            parsedContent = JSON.parse(source.content);
+          } catch (e) {
+            console.error('Failed to parse content:', e);
+            // Continue with unparsed content
+          }
+        }
         
-        if (onRulesChange) {
-          onRulesChange(data || []);
+        if (source.type === 'MULTIPLE_CHOICE' && parsedContent) {
+          // Handle quiz questions
+          fields.push({
+            id: parsedContent.id || source.id,
+            name: parsedContent.id || source.id,
+            label: parsedContent.question || source.label,
+            type: 'select',
+            options: parsedContent.options?.map((opt: any) => ({
+              value: opt.value,
+              label: opt.label
+            }))
+          });
+        } else if ((source.type === 'FORM' || source.type === 'FORM_BLOCK') && parsedContent) {
+          // Handle form fields
+          if (parsedContent.fields && Array.isArray(parsedContent.fields)) {
+            parsedContent.fields.forEach((field: any) => {
+              fields.push({
+                id: field.name,
+                name: field.name,
+                label: field.label,
+                type: field.type,
+                // Add options if it's a select field
+                ...(field.options && {
+                  options: field.options.map((opt: any) => ({
+                    value: typeof opt === 'string' ? opt : opt.value,
+                    label: typeof opt === 'string' ? opt : opt.label
+                  }))
+                })
+              });
+            });
+          }
         }
       } catch (error) {
-        console.error('Error fetching logic rules:', error);
-        toast({
-          title: 'Error loading rules',
-          description: 'Could not load logic rules. Please try again.',
-          variant: 'destructive'
-        });
-      } finally {
-        setIsLoading(false);
+        console.error('Error processing field source:', error, source);
       }
-    };
+    });
     
-    if (funnelId) {
-      fetchRules();
-    }
-  }, [funnelId, toast, onRulesChange]);
+    setLogicFields(fields);
+  }, [fieldSources]);
 
-  const addNewRule = () => {
-    const newRule = {
+  // Add a new rule
+  const addRule = () => {
+    const newRule: LogicRule = {
       id: `temp-${Date.now()}`,
       element_id: '',
       condition: {
@@ -69,398 +129,273 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({
       },
       action: {
         type: 'show',
-        target: '',
-        value: ''
+        target: ''
       },
-      funnel_id: funnelId,
-      isNew: true
+      funnel_id: funnelId
     };
     
     setRules([...rules, newRule]);
   };
 
-  const updateRule = (index: number, field: string, value: any) => {
-    const updatedRules = [...rules];
-    
-    // Handle nested fields
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      updatedRules[index][parent][child] = value;
-    } else {
-      updatedRules[index][field] = value;
-    }
-    
-    updatedRules[index].hasChanges = true;
-    setRules(updatedRules);
+  // Update a rule
+  const updateRule = (index: number, updates: Partial<LogicRule>) => {
+    setRules(currentRules => 
+      currentRules.map((rule, i) => 
+        i === index ? { ...rule, ...updates } : rule
+      )
+    );
   };
 
-  const deleteRule = async (index: number) => {
-    const ruleToDelete = rules[index];
-    
-    if (ruleToDelete.isNew) {
-      // Just remove from local state if it's a new unsaved rule
-      const updatedRules = rules.filter((_, i) => i !== index);
-      setRules(updatedRules);
-      return;
-    }
-    
-    // Otherwise delete from database
-    try {
-      setIsLoading(true);
-      const { error } = await supabase
-        .from('logic_rules')
-        .delete()
-        .eq('id', ruleToDelete.id);
-        
-      if (error) throw error;
-      
-      const updatedRules = rules.filter((_, i) => i !== index);
-      setRules(updatedRules);
-      
-      if (onRulesChange) {
-        onRulesChange(updatedRules);
-      }
-      
-      toast({
-        title: 'Rule deleted',
-        description: 'Logic rule has been removed.'
-      });
-    } catch (error) {
-      console.error('Error deleting rule:', error);
-      toast({
-        title: 'Error deleting rule',
-        description: 'Could not delete rule. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Delete a rule
+  const deleteRule = (index: number) => {
+    setRules(currentRules => currentRules.filter((_, i) => i !== index));
   };
 
-  const saveAllRules = async () => {
-    try {
-      setIsLoading(true);
-      
-      // Process each rule
-      for (const rule of rules) {
-        if (rule.isNew || rule.hasChanges) {
-          const { id, isNew, hasChanges, ...ruleData } = rule;
-          
-          if (isNew) {
-            // Insert new rule
-            const { error } = await supabase
-              .from('logic_rules')
-              .insert(ruleData);
-              
-            if (error) throw error;
-          } else {
-            // Update existing rule
-            const { error } = await supabase
-              .from('logic_rules')
-              .update(ruleData)
-              .eq('id', id);
-              
-            if (error) throw error;
-          }
-        }
-      }
-      
-      // Refetch rules to get the server-generated IDs for new rules
-      const { data, error } = await supabase
-        .from('logic_rules')
-        .select('*')
-        .eq('funnel_id', funnelId);
-        
-      if (error) throw error;
-      
-      setRules(data || []);
-      
-      if (onRulesChange) {
-        onRulesChange(data || []);
-      }
-      
-      toast({
-        title: 'Rules saved',
-        description: 'Logic rules have been saved successfully.'
-      });
-    } catch (error) {
-      console.error('Error saving rules:', error);
-      toast({
-        title: 'Error saving rules',
-        description: 'Could not save rules. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Get field options based on selected field
+  const getFieldOptions = (fieldName: string) => {
+    const field = logicFields.find(f => f.name === fieldName);
+    return field?.options || [];
   };
 
-  // Get all available form fields from elements
-  const getAvailableFields = () => {
-    const formFields: {id: string, label: string}[] = [];
-    
-    elements.forEach(element => {
-      // For form elements, add each field
-      if (element.type === 'form' && element.content) {
-        try {
-          const content = typeof element.content === 'string' 
-            ? JSON.parse(element.content) 
-            : element.content;
-            
-          if (content?.fields && Array.isArray(content.fields)) {
-            content.fields.forEach((field: any) => {
-              if (field.name) {
-                formFields.push({
-                  id: field.name,
-                  label: `${element.label} - ${field.label || field.name}`
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.error('Error parsing form fields:', e);
-        }
-      }
-      
-      // For quiz elements, add the question as a field
-      if (element.type === 'quiz' && element.id) {
-        formFields.push({
-          id: element.id,
-          label: element.label
-        });
-      }
-    });
-    
-    return formFields;
+  // Handle save
+  const handleSave = () => {
+    onSave(rules);
   };
-
-  const formFields = getAvailableFields();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Logic Rules</h3>
-        <Button 
-          onClick={addNewRule} 
-          variant="outline" 
-          size="sm"
-          className="flex items-center"
-        >
-          <Plus size={16} className="mr-2" /> Add Rule
-        </Button>
-      </div>
-      
-      {rules.length === 0 ? (
-        <div className="text-center p-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
-          <Code size={36} className="mx-auto text-gray-400 mb-2" />
-          <h4 className="font-medium mb-1">No Logic Rules</h4>
-          <p className="text-sm text-gray-500 mb-4">
-            Logic rules help create interactive funnels with conditions.
-          </p>
-          <Button onClick={addNewRule} size="sm">
-            <Plus size={16} className="mr-2" /> Create First Rule
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {rules.map((rule, index) => (
-            <Card key={rule.id} className="relative">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>Rule {index + 1}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => deleteRule(index)}
-                    className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pb-2">
-                {/* Element selector */}
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700">Element</label>
-                  <Select
-                    value={rule.element_id || ''}
-                    onValueChange={(value) => updateRule(index, 'element_id', value)}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select element" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {elements.map(element => (
-                        <SelectItem key={element.id} value={element.id}>
-                          {element.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Condition builder */}
-                <div className="p-3 bg-gray-50 rounded-md">
-                  <div className="text-sm font-medium text-gray-700 mb-2">When:</div>
-                  <div className="grid grid-cols-5 gap-2">
-                    <div className="col-span-2">
-                      <Select
-                        value={rule.condition.field || ''}
-                        onValueChange={(value) => updateRule(index, 'condition.field', value)}
-                        disabled={isLoading}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select field" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {formFields.map(field => (
-                            <SelectItem key={field.id} value={field.id}>
-                              {field.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Select
-                        value={rule.condition.operator || 'equals'}
-                        onValueChange={(value) => updateRule(index, 'condition.operator', value)}
-                        disabled={isLoading}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="equals">equals</SelectItem>
-                          <SelectItem value="notEquals">not equals</SelectItem>
-                          <SelectItem value="contains">contains</SelectItem>
-                          <SelectItem value="greaterThan">greater than</SelectItem>
-                          <SelectItem value="lessThan">less than</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="col-span-2">
-                      <Input
-                        value={rule.condition.value || ''}
-                        onChange={(e) => updateRule(index, 'condition.value', e.target.value)}
-                        placeholder="Value"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Action builder */}
-                <div className="p-3 bg-gray-50 rounded-md">
-                  <div className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <ArrowRightLeft size={16} className="mr-2" /> Then:
-                  </div>
-                  <div className="grid grid-cols-5 gap-2">
-                    <div>
-                      <Select
-                        value={rule.action.type || 'show'}
-                        onValueChange={(value) => updateRule(index, 'action.type', value)}
-                        disabled={isLoading}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="show">Show</SelectItem>
-                          <SelectItem value="hide">Hide</SelectItem>
-                          <SelectItem value="navigate">Navigate to</SelectItem>
-                          <SelectItem value="setValue">Set value</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="col-span-4">
-                      {rule.action.type === 'navigate' ? (
-                        <Select
-                          value={rule.action.target || ''}
-                          onValueChange={(value) => updateRule(index, 'action.target', value)}
-                          disabled={isLoading}
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>Logic Rules Builder</CardTitle>
+        <CardDescription>Create rules to show or hide elements based on form responses</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="rules">
+          <TabsList className="mb-4">
+            <TabsTrigger value="rules">Rules</TabsTrigger>
+            <TabsTrigger value="fields">Available Fields</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="rules">
+            {rules.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No logic rules defined yet. Click "Add Rule" to create one.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {rules.map((rule, index) => (
+                  <Card key={index}>
+                    <CardHeader className="py-2 px-4">
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-base">Rule {index + 1}</CardTitle>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => deleteRule(index)}
+                          className="text-destructive hover:text-destructive"
                         >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select page" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {pages.map(page => (
-                              <SelectItem key={page.id} value={page.id}>
-                                {page.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : rule.action.type === 'setValue' ? (
-                        <div className="grid grid-cols-2 gap-2">
+                          Remove
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="py-2">
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div className="md:col-span-2 font-medium">If</div>
+                        <div className="md:col-span-3">
                           <Select
-                            value={rule.action.target || ''}
-                            onValueChange={(value) => updateRule(index, 'action.target', value)}
-                            disabled={isLoading}
+                            value={rule.condition.field}
+                            onValueChange={(value) => 
+                              updateRule(index, {
+                                condition: {
+                                  ...rule.condition,
+                                  field: value
+                                }
+                              })
+                            }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select field" />
                             </SelectTrigger>
                             <SelectContent>
-                              {formFields.map(field => (
-                                <SelectItem key={field.id} value={field.id}>
+                              {logicFields.map((field) => (
+                                <SelectItem key={field.name} value={field.name}>
                                   {field.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <Input
-                            value={rule.action.value || ''}
-                            onChange={(e) => updateRule(index, 'action.value', e.target.value)}
-                            placeholder="Value"
-                            disabled={isLoading}
-                          />
                         </div>
-                      ) : (
-                        <Select
-                          value={rule.action.target || ''}
-                          onValueChange={(value) => updateRule(index, 'action.target', value)}
-                          disabled={isLoading}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select element" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {elements.map(element => (
-                              <SelectItem key={element.id} value={element.id}>
-                                {element.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              
-              {(rule.isNew || rule.hasChanges) && (
-                <CardFooter className="pt-1 pb-3 justify-end">
-                  <div className="text-xs text-amber-500 font-medium">
-                    * Unsaved changes
-                  </div>
-                </CardFooter>
-              )}
-            </Card>
-          ))}
-          
-          <div className="flex justify-end">
-            <Button 
-              onClick={saveAllRules} 
-              disabled={isLoading || !rules.some(rule => rule.isNew || rule.hasChanges)}
-            >
-              {isLoading ? 'Saving...' : 'Save All Rules'}
+                        
+                        <div className="md:col-span-2">
+                          <Select
+                            value={rule.condition.operator}
+                            onValueChange={(value) => 
+                              updateRule(index, {
+                                condition: {
+                                  ...rule.condition,
+                                  operator: value as LogicRule['condition']['operator']
+                                }
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Operator" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="equals">Equals</SelectItem>
+                              <SelectItem value="notEquals">Does not equal</SelectItem>
+                              <SelectItem value="contains">Contains</SelectItem>
+                              <SelectItem value="greaterThan">Greater than</SelectItem>
+                              <SelectItem value="lessThan">Less than</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="md:col-span-3">
+                          {getFieldOptions(rule.condition.field).length > 0 ? (
+                            <Select
+                              value={String(rule.condition.value)}
+                              onValueChange={(value) => 
+                                updateRule(index, {
+                                  condition: {
+                                    ...rule.condition,
+                                    value
+                                  }
+                                })
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select value" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getFieldOptions(rule.condition.field).map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              value={String(rule.condition.value || '')}
+                              onChange={(e) => 
+                                updateRule(index, {
+                                  condition: {
+                                    ...rule.condition,
+                                    value: e.target.value
+                                  }
+                                })
+                              }
+                              placeholder="Value"
+                            />
+                          )}
+                        </div>
+                        
+                        <div className="md:col-span-2">
+                          <Select
+                            value={rule.action.type}
+                            onValueChange={(value) => 
+                              updateRule(index, {
+                                action: {
+                                  ...rule.action,
+                                  type: value as LogicRule['action']['type']
+                                }
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Action" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="show">Show</SelectItem>
+                              <SelectItem value="hide">Hide</SelectItem>
+                              <SelectItem value="navigate">Navigate to</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center mt-2">
+                        <div className="md:col-span-2 md:text-right font-medium">Then</div>
+                        <div className="md:col-span-10">
+                          <Select
+                            value={rule.action.target}
+                            onValueChange={(value) => 
+                              updateRule(index, {
+                                action: {
+                                  ...rule.action,
+                                  target: value
+                                }
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select target" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Elements</SelectLabel>
+                                {targetElements.map((element) => (
+                                  <SelectItem key={element.id} value={element.id}>
+                                    {element.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            
+            <Button onClick={addRule} className="mt-4">
+              Add Rule
             </Button>
-          </div>
-        </div>
-      )}
-    </div>
+          </TabsContent>
+          
+          <TabsContent value="fields">
+            <div className="border rounded-md">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">Field Name</th>
+                    <th className="text-left p-2">Type</th>
+                    <th className="text-left p-2">Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logicFields.map((field) => (
+                    <tr key={field.name} className="border-b">
+                      <td className="p-2">{field.label}</td>
+                      <td className="p-2">{field.type}</td>
+                      <td className="p-2">
+                        {field.options && field.options.length > 0 ? (
+                          <div className="text-xs text-gray-500">
+                            {field.options.map(opt => opt.label).join(', ')}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">No options</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      <CardFooter className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>
+          Save Rules
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

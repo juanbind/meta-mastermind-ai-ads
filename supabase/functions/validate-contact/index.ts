@@ -1,61 +1,94 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
+// CORS headers for browser requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+}
 
-console.log("Contact validation function started");
+// Email validation regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+// Phone validation regex (basic international format)
+const PHONE_REGEX = /^\+?[0-9]{7,15}$/
+
+interface ContactValidationRequest {
+  email: string
+  phone?: string
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { email, phone } = await req.json();
-    const errors = {};
-    
-    // Email validation using regex
-    if (email) {
-      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      if (!emailRegex.test(email)) {
-        errors['email'] = "Invalid email format";
-      }
+    const { email, phone } = await req.json() as ContactValidationRequest
+
+    // Validate email (required)
+    if (!email) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Email is required',
+          isValid: false 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
     }
-    
-    // Basic phone validation
+
+    // Check email format
+    const isEmailValid = EMAIL_REGEX.test(email)
+    if (!isEmailValid) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid email format',
+          isValid: false 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
+    }
+
+    // Validate phone if provided
+    let isPhoneValid = true
     if (phone) {
-      // Strip all non-numeric characters
-      const cleanPhone = phone.replace(/\D/g, '');
-      
-      // Check if it's a reasonable length (most country codes are 1-3 digits, most local numbers 7-10 digits)
-      if (cleanPhone.length < 7 || cleanPhone.length > 15) {
-        errors['phone'] = "Phone number length appears invalid";
-      }
+      isPhoneValid = PHONE_REGEX.test(phone)
     }
-    
-    // Check if we have any validation errors
-    const isValid = Object.keys(errors).length === 0;
-    
+
+    // Sanitize inputs
+    const sanitizedEmail = email.trim().toLowerCase()
+    const sanitizedPhone = phone ? phone.replace(/[^\d+]/g, '') : null
+
     return new Response(
-      JSON.stringify({ 
-        isValid,
-        errors: isValid ? null : errors,
+      JSON.stringify({
+        isValid: isEmailValid && isPhoneValid,
         sanitized: {
-          email: email ? email.toLowerCase().trim() : null,
-          phone: phone ? phone.replace(/\D/g, '') : null
+          email: sanitizedEmail,
+          phone: sanitizedPhone
         }
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      }
+    )
   } catch (error) {
-    console.error("Error in validate-contact function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    );
+      JSON.stringify({ 
+        error: error.message,
+        isValid: false 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
+    )
   }
-});
+})

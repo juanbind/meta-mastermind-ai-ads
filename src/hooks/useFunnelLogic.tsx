@@ -10,6 +10,8 @@ export interface FunnelPage {
   order_index: number;
   content: any;
   funnel_id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface LogicRule {
@@ -26,6 +28,8 @@ export interface LogicRule {
     value?: any;
   };
   funnel_id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface UseFunnelLogicProps {
@@ -61,7 +65,9 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
           type: page.type as 'quiz' | 'result' | 'form' | 'landing' | 'thank_you',
           order_index: page.order_index,
           content: page.content,
-          funnel_id: page.funnel_id
+          funnel_id: page.funnel_id,
+          created_at: page.created_at,
+          updated_at: page.updated_at
         })) || [];
         
         setPages(typedPages);
@@ -83,7 +89,9 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
           action: typeof rule.action === 'string'
             ? JSON.parse(rule.action)
             : rule.action as LogicRule['action'],
-          funnel_id: rule.funnel_id
+          funnel_id: rule.funnel_id,
+          created_at: rule.created_at,
+          updated_at: rule.updated_at
         })) || [];
         
         setLogicRules(typedRules);
@@ -145,14 +153,16 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
       }
       
       // Validate contact info
-      const { data: validationData } = await supabase.functions.invoke('validate-contact', {
+      const { data: validationData, error: validationError } = await supabase.functions.invoke('validate-contact', {
         body: { 
           email, 
           phone: dataToSubmit.phone || null
         }
       });
       
-      if (!validationData.isValid) {
+      if (validationError) throw validationError;
+      
+      if (!validationData?.isValid) {
         toast({
           title: 'Invalid contact information',
           description: 'Please provide a valid email and phone number.',
@@ -176,9 +186,13 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
       if (leadError) throw leadError;
       
       // Trigger lead scoring
-      await supabase.functions.invoke('score-lead', {
+      const { data: scoreData, error: scoreError } = await supabase.functions.invoke('score-lead', {
         body: { leadId: lead.id }
       });
+      
+      if (scoreError) {
+        console.error('Error scoring lead:', scoreError);
+      }
       
       setLeadId(lead.id);
       
@@ -188,9 +202,9 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
       });
       
       // Navigate to thank you page if it exists
-      const thankYouPage = pages.findIndex(page => page.type === 'thank_you');
-      if (thankYouPage !== -1) {
-        setCurrentPageIndex(thankYouPage);
+      const thankYouPageIndex = pages.findIndex(page => page.type === 'thank_you');
+      if (thankYouPageIndex !== -1) {
+        setCurrentPageIndex(thankYouPageIndex);
       }
       
       return lead;
