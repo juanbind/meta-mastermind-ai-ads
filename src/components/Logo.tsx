@@ -4,10 +4,9 @@ import React from 'react';
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'full' | 'icon';
-  className?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full', className = '' }) => {
+const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full' }) => {
   const sizeClasses = {
     sm: 'h-6',
     md: 'h-8',
@@ -15,7 +14,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full', className = 
   };
 
   return (
-    <div className={`flex items-center ${variant === 'icon' ? '' : 'space-x-2'} ${className}`}>
+    <div className={`flex items-center ${variant === 'icon' ? '' : 'space-x-2'}`}>
       <div className={`${sizeClasses[size]} aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 hover:scale-105`}>
         <img 
           src="/lovable-uploads/b98c86bf-eb30-48c8-b5cd-db790735e047.png" 
