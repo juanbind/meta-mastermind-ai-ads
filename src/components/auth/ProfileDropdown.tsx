@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, Bell, Lock, CreditCard, Users } from 'lucide-react';
@@ -22,7 +21,12 @@ const ProfileDropdown = () => {
   // Use effect to update the avatar URL when user data changes
   useEffect(() => {
     if (user?.user_metadata?.avatar_url) {
-      setAvatarUrl(user.user_metadata.avatar_url);
+      const url = user.user_metadata.avatar_url;
+      // Add a cache-busting parameter to the URL to prevent browser caching
+      const cacheBuster = `?t=${new Date().getTime()}`;
+      setAvatarUrl(`${url}${cacheBuster}`);
+    } else {
+      setAvatarUrl(null);
     }
   }, [user]);
   
@@ -36,6 +40,11 @@ const ProfileDropdown = () => {
     navigate(`/settings?tab=${path}`);
   };
 
+  const handleImageError = () => {
+    console.log('Image failed to load, using fallback');
+    setAvatarUrl(null);
+  };
+
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
   
   return (
@@ -47,7 +56,7 @@ const ProfileDropdown = () => {
               src={avatarUrl} 
               alt="Profile" 
               className="h-full w-full rounded-full object-cover"
-              onError={() => setAvatarUrl(null)} // Fallback if image fails to load
+              onError={handleImageError}
             />
           ) : (
             <User className="h-5 w-5 text-white" />

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
@@ -35,6 +36,7 @@ const Settings: React.FC = () => {
     if (user) {
       setFullName(user.user_metadata?.full_name || '');
       setProfileImage(user.user_metadata?.avatar_url || null);
+      setEmail(user?.email || '');
     }
   }, [user]);
 
@@ -50,34 +52,63 @@ const Settings: React.FC = () => {
       
       // Handle profile image upload first if there's a new file
       if (imageFile) {
-        const timestamp = Date.now();
-        const fileExt = imageFile.name.split('.').pop();
-        const filePath = `${user?.id}/${timestamp}.${fileExt}`;
-        
-        // Upload the file to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, imageFile);
+        try {
+          const timestamp = Date.now();
+          const fileExt = imageFile.name.split('.').pop();
+          const filePath = `${user?.id}/${timestamp}.${fileExt}`;
           
-        if (uploadError) {
-          throw uploadError;
-        }
-        
-        // Get the public URL
-        const { data: publicUrlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(filePath);
+          console.log('Uploading file to:', `avatars/${filePath}`);
+          // Upload the file to Supabase Storage
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, imageFile, {
+              cacheControl: '3600',
+              upsert: true
+            });
+            
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw uploadError;
+          }
           
-        if (publicUrlData) {
-          const avatarUrl = publicUrlData.publicUrl;
-          updates.avatar_url = avatarUrl;
-          setProfileImage(avatarUrl);
+          console.log('Upload successful:', uploadData);
+          
+          // Get the public URL
+          const { data: publicUrlData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+            
+          if (publicUrlData) {
+            console.log('Public URL:', publicUrlData);
+            const avatarUrl = publicUrlData.publicUrl;
+            updates.avatar_url = avatarUrl;
+            console.log('Setting avatar URL to:', avatarUrl);
+          }
+        } catch (uploadError: any) {
+          console.error('Error uploading image:', uploadError);
+          toast({
+            title: "Image upload failed",
+            description: uploadError.message || "There was an error uploading your profile image. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
       }
       
       // Only make the update call if we have changes to make
       if (Object.keys(updates).length > 0) {
-        await updateUserMetadata(updates);
+        console.log('Updating user metadata with:', updates);
+        const { error } = await updateUserMetadata(updates);
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Set the profile image state to the new URL if it was updated
+        if (updates.avatar_url) {
+          setProfileImage(updates.avatar_url);
+        }
         
         toast({
           title: "Settings updated",
@@ -92,11 +123,11 @@ const Settings: React.FC = () => {
           description: "No changes were made to your profile.",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
         title: "Update failed",
-        description: "There was an error updating your profile. Please try again.",
+        description: error.message || "There was an error updating your profile. Please try again.",
         variant: "destructive",
       });
     } finally {
