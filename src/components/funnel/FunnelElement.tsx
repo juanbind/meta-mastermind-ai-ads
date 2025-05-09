@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useDrag } from 'react-dnd';
 
@@ -263,7 +262,7 @@ export const TEMPLATE_STRUCTURES = {
             heading: 'Join thousands of happy subscribers',
             testimonials: [
               { text: 'This guide changed how I approach my business', author: 'Jane D.' },
-              { text: 'Best resource I've found online in years', author: 'Mark S.' }
+              { text: "Best resource I've found online in years", author: 'Mark S.' }
             ]
           }),
           props: {}
