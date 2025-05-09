@@ -21,7 +21,7 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-slate-50 lg:text-6xl">Launch Meta Ad Campaigns in Seconds</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-slate-50 lg:text-6xl">Launch Ad Campaigns in Seconds</h1>
           <p className="text-lg text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!</p>
           
           <Button className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-6 py-4 md:px-8 md:py-6 rounded-xl h-auto w-full sm:w-auto" size="lg" onClick={handleGetStarted}>
