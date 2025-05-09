@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
@@ -11,6 +10,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<{ success: boolean, message?: string }>;
   signOut: () => Promise<void>;
+  updateUserMetadata: (metadata: Record<string, any>) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,6 +136,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Add updateUserMetadata function
+  const updateUserMetadata = async (metadata: Record<string, any>) => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.updateUser({
+        data: metadata
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update the local user state
+      setUser(data.user);
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully",
+      });
+      
+    } catch (error: any) {
+      console.error("Error updating user metadata:", error);
+      toast({
+        title: "Error updating profile",
+        description: error.message || "An error occurred during profile update",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     session,
     user,
@@ -143,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
+    updateUserMetadata,
   };
 
   return (
