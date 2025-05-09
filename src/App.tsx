@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
@@ -57,20 +58,68 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route element={<AuthCheck />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/ai-tools" element={<AITools />} />
-            <Route path="/ai-media-buyer" element={<AIMediaBuyerPage />} />
-            <Route path="/campaign-builder" element={<CampaignBuilder />} />
-            <Route path="/ads-library" element={<AdsLibrary />} />
-            <Route path="/creatives" element={<Creatives />} />
-            <Route path="/funnel-builder" element={<FunnelBuilder />} />
-            <Route path="/crm" element={<CRM />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/integrations" element={<Integrations />} />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
+          
+          <Route path="/dashboard" element={
+            <AuthCheck>
+              <Dashboard />
+            </AuthCheck>
+          } />
+          <Route path="/ai-tools" element={
+            <AuthCheck>
+              <AITools />
+            </AuthCheck>
+          } />
+          <Route path="/ai-media-buyer" element={
+            <AuthCheck>
+              <AIMediaBuyerPage />
+            </AuthCheck>
+          } />
+          <Route path="/campaign-builder" element={
+            <AuthCheck>
+              <CampaignBuilder />
+            </AuthCheck>
+          } />
+          <Route path="/ads-library" element={
+            <AuthCheck>
+              <AdsLibrary />
+            </AuthCheck>
+          } />
+          <Route path="/creatives" element={
+            <AuthCheck>
+              <Creatives />
+            </AuthCheck>
+          } />
+          <Route path="/funnel-builder" element={
+            <AuthCheck>
+              <FunnelBuilder />
+            </AuthCheck>
+          } />
+          <Route path="/crm" element={
+            <AuthCheck>
+              <CRM />
+            </AuthCheck>
+          } />
+          <Route path="/reports" element={
+            <AuthCheck>
+              <Reports />
+            </AuthCheck>
+          } />
+          <Route path="/integrations" element={
+            <AuthCheck>
+              <Integrations />
+            </AuthCheck>
+          } />
+          <Route path="/templates" element={
+            <AuthCheck>
+              <Templates />
+            </AuthCheck>
+          } />
+          <Route path="/settings" element={
+            <AuthCheck>
+              <Settings />
+            </AuthCheck>
+          } />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       )}

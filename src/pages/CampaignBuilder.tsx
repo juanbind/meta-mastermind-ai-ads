@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -256,79 +255,103 @@ const CampaignBuilder: React.FC = () => {
     });
   };
   
+  // Progress Steps calculation
+  const isStepCompleted = (step: number): boolean => {
+    if (step === 0 && currentStep !== 'intelligence') return true;
+    if (step === 1 && !['intelligence', 'structure'].includes(currentStep)) return true;
+    if (step === 2 && !['intelligence', 'structure', 'creatives'].includes(currentStep)) return true;
+    if (step === 3 && (currentStep === 'confirmation' || currentStep === 'tracker')) return true;
+    return false;
+  };
+  
+  const isCurrentStep = (stepName: CampaignStep | string): boolean => {
+    if (stepName === 'intelligence' && currentStep === 'intelligence') return true;
+    if (stepName === 'structure' && currentStep === 'structure') return true;
+    if (stepName === 'creatives' && currentStep === 'creatives') return true;
+    if (stepName === 'launch' && currentStep === 'launch') return true;
+    if (stepName === 'live' && (currentStep === 'confirmation' || currentStep === 'tracker')) return true;
+    return false;
+  };
+  
   // Render the appropriate step component
   const renderStep = () => {
-    switch (currentStep) {
-      case 'intelligence':
-        return (
-          <CampaignIntelligence 
-            campaignData={campaignData}
-            updateCampaignData={updateCampaignData}
-            onNext={generateAIRecommendations}
-            isProcessing={isProcessing}
-          />
-        );
-      case 'structure':
-        return (
-          <CampaignStructure 
-            campaignData={campaignData}
-            updateCampaignData={updateCampaignData}
-            onBack={() => setCurrentStep('intelligence')}
-            onNext={() => setCurrentStep('creatives')}
-          />
-        );
-      case 'creatives':
-        return (
-          <CreativeInjection 
-            campaignData={campaignData}
-            updateCampaignData={updateCampaignData}
-            onBack={() => setCurrentStep('structure')}
-            onNext={() => setCurrentStep('launch')}
-          />
-        );
-      case 'launch':
-        return (
-          <LaunchSection 
-            campaignData={campaignData}
-            isConnectedToFacebook={isConnectedToFacebook}
-            connectToFacebook={connectToFacebook}
-            onLaunch={launchCampaign}
-            isProcessing={isProcessing}
-            onBack={() => setCurrentStep('creatives')}
-          />
-        );
-      case 'confirmation':
-        return (
-          <PostLaunchConfirmation 
-            campaignData={campaignData}
-            onTrackCampaign={() => setCurrentStep('tracker')}
-          />
-        );
-      case 'tracker':
-        return (
-          <CampaignSummary 
-            campaignData={campaignData}
-            onCreateNew={() => {
-              setCampaignData({
-                offerType: '',
-                offerDescription: '',
-                funnelUrl: '',
-                budgetRange: '500-1000',
-                timeframe: '7',
-                budgetType: 'CBO',
-                optimizationEvent: 'LEAD',
-                attribution: '7d_click',
-                campaignName: 'AI Generated Campaign',
-                adSets: [],
-                scheduleType: 'now'
-              });
-              setCurrentStep('intelligence');
-            }}
-          />
-        );
-      default:
-        return <div>Unknown step</div>;
-    }
+    return (
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        {(() => {
+          switch (currentStep) {
+            case 'intelligence':
+              return (
+                <CampaignIntelligence 
+                  campaignData={campaignData}
+                  updateCampaignData={updateCampaignData}
+                  onNext={generateAIRecommendations}
+                  isProcessing={isProcessing}
+                />
+              );
+            case 'structure':
+              return (
+                <CampaignStructure 
+                  campaignData={campaignData}
+                  updateCampaignData={updateCampaignData}
+                  onBack={() => setCurrentStep('intelligence')}
+                  onNext={() => setCurrentStep('creatives')}
+                />
+              );
+            case 'creatives':
+              return (
+                <CreativeInjection 
+                  campaignData={campaignData}
+                  updateCampaignData={updateCampaignData}
+                  onBack={() => setCurrentStep('structure')}
+                  onNext={() => setCurrentStep('launch')}
+                />
+              );
+            case 'launch':
+              return (
+                <LaunchSection 
+                  campaignData={campaignData}
+                  isConnectedToFacebook={isConnectedToFacebook}
+                  connectToFacebook={connectToFacebook}
+                  onLaunch={launchCampaign}
+                  isProcessing={isProcessing}
+                  onBack={() => setCurrentStep('creatives')}
+                />
+              );
+            case 'confirmation':
+              return (
+                <PostLaunchConfirmation 
+                  campaignData={campaignData}
+                  onTrackCampaign={() => setCurrentStep('tracker')}
+                />
+              );
+            case 'tracker':
+              return (
+                <CampaignSummary 
+                  campaignData={campaignData}
+                  onCreateNew={() => {
+                    setCampaignData({
+                      offerType: '',
+                      offerDescription: '',
+                      funnelUrl: '',
+                      budgetRange: '500-1000',
+                      timeframe: '7',
+                      budgetType: 'CBO',
+                      optimizationEvent: 'LEAD',
+                      attribution: '7d_click',
+                      campaignName: 'AI Generated Campaign',
+                      adSets: [],
+                      scheduleType: 'now'
+                    });
+                    setCurrentStep('intelligence');
+                  }}
+                />
+              );
+            default:
+              return <div>Unknown step</div>;
+          }
+        })()}
+      </div>
+    );
   };
   
   return (
@@ -347,19 +370,9 @@ const CampaignBuilder: React.FC = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between w-full max-w-4xl mx-auto">
               {['Intelligence', 'Structure', 'Creatives', 'Launch', 'Live'].map((step, index) => {
-                const stepKey = step.toLowerCase() as CampaignStep;
-                const isCurrent = 
-                  (stepKey === 'intelligence' && currentStep === 'intelligence') ||
-                  (stepKey === 'structure' && currentStep === 'structure') ||
-                  (stepKey === 'creatives' && currentStep === 'creatives') ||
-                  (stepKey === 'launch' && currentStep === 'launch') ||
-                  (stepKey === 'live' && (currentStep === 'confirmation' || currentStep === 'tracker'));
-                
-                const isCompleted = 
-                  (index === 0 && currentStep !== 'intelligence') ||
-                  (index === 1 && currentStep !== 'structure' && currentStep !== 'intelligence') ||
-                  (index === 2 && currentStep !== 'creatives' && currentStep !== 'structure' && currentStep !== 'intelligence') ||
-                  (index === 3 && (currentStep === 'confirmation' || currentStep === 'tracker'));
+                const stepKey = step.toLowerCase();
+                const isCurrent = isCurrentStep(stepKey);
+                const isCompleted = isStepCompleted(index);
                 
                 return (
                   <React.Fragment key={step}>

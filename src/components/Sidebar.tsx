@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Logo } from '@/components/Logo';
-import { ProfileDropdown } from '@/components/ProfileDropdown';
+import Logo from '@/components/Logo';
+import ProfileDropdown from '@/components/auth/ProfileDropdown';
 import { 
   LayoutDashboard, 
   Zap, 
