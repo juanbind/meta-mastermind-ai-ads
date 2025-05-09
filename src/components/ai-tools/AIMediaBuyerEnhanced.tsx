@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,6 +26,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface AIMediaBuyerProps {
   onClose?: () => void;
@@ -45,6 +50,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     businessType: '',
     businessDescription: '',
     businessWebsite: '',
+    industryVertical: '',
     
     // Target audience
     targetAudience: '',
@@ -52,14 +58,28 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     ageRangeMin: '18',
     ageRangeMax: '65',
     gender: 'all',
+    languages: [],
+    education: [],
+    income: [],
     
     // Ideal customer profile
     customerInterests: '',
     customerBehaviors: '',
     customerPainPoints: '',
+    customAudiences: [],
+    lookalikes: false,
+    
+    // Ad creative preferences
+    primaryColor: '#000000',
+    secondaryColor: '#ffffff',
+    tone: 'professional',
+    adFormat: 'image',
+    callToAction: 'Learn More',
     
     // Budget & settings
     budget: '',
+    duration: '30',
+    bidStrategy: 'lowest_cost',
     stopLossThreshold: '200',
     enableStopLoss: true,
     autoOptimize: true,
@@ -78,16 +98,93 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     { value: 'engagement', label: 'Engagement' },
     { value: 'conversions', label: 'Conversions' },
     { value: 'leads', label: 'Lead Generation' },
-    { value: 'sales', label: 'Sales' }
+    { value: 'sales', label: 'Sales' },
+    { value: 'app_installs', label: 'App Installs' },
+    { value: 'reach', label: 'Reach' },
+    { value: 'video_views', label: 'Video Views' }
   ];
 
   const businessTypes = [
-    { value: 'ecommerce', label: 'E-commerce' },
-    { value: 'service', label: 'Service-based' },
-    { value: 'saas', label: 'SaaS' },
-    { value: 'local', label: 'Local Business' },
-    { value: 'education', label: 'Education' },
-    { value: 'health', label: 'Healthcare' },
+    // Retail & E-commerce
+    { value: 'apparel', label: 'Apparel & Fashion' },
+    { value: 'beauty', label: 'Beauty & Cosmetics' },
+    { value: 'electronics', label: 'Electronics & Technology' },
+    { value: 'home_decor', label: 'Home Decor & Furniture' },
+    { value: 'jewelry', label: 'Jewelry & Accessories' },
+    { value: 'toys_hobbies', label: 'Toys & Hobbies' },
+    { value: 'specialty_retail', label: 'Specialty Retail' },
+    { value: 'general_ecommerce', label: 'General E-commerce' },
+    
+    // Health & Wellness
+    { value: 'fitness', label: 'Fitness & Gyms' },
+    { value: 'healthcare', label: 'Healthcare & Medical' },
+    { value: 'mental_health', label: 'Mental Health Services' },
+    { value: 'nutrition', label: 'Nutrition & Supplements' },
+    { value: 'spa_wellness', label: 'Spa & Wellness Centers' },
+    { value: 'pharmacy', label: 'Pharmacy' },
+    
+    // Services
+    { value: 'accounting', label: 'Accounting & Financial Services' },
+    { value: 'consulting', label: 'Consulting Services' },
+    { value: 'cleaning', label: 'Cleaning Services' },
+    { value: 'legal', label: 'Legal Services' },
+    { value: 'marketing', label: 'Marketing & PR' },
+    { value: 'photography', label: 'Photography & Videography' },
+    { value: 'repair', label: 'Repair Services' },
+    { value: 'security', label: 'Security Services' },
+    { value: 'coaching', label: 'Coaching & Training' },
+    
+    // Technology
+    { value: 'saas', label: 'SaaS & Software' },
+    { value: 'app_development', label: 'App Development' },
+    { value: 'it_services', label: 'IT Services & Support' },
+    { value: 'web_design', label: 'Web Design & Development' },
+    { value: 'data_analytics', label: 'Data & Analytics' },
+    { value: 'cybersecurity', label: 'Cybersecurity' },
+    { value: 'ai_ml', label: 'AI & Machine Learning' },
+    
+    // Food & Beverage
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'cafe', label: 'Cafe & Coffee Shop' },
+    { value: 'bakery', label: 'Bakery' },
+    { value: 'food_truck', label: 'Food Truck' },
+    { value: 'catering', label: 'Catering' },
+    { value: 'bar_nightclub', label: 'Bar & Nightclub' },
+    { value: 'food_delivery', label: 'Food Delivery Service' },
+    
+    // Education
+    { value: 'higher_education', label: 'Higher Education' },
+    { value: 'online_course', label: 'Online Courses & E-Learning' },
+    { value: 'tutoring', label: 'Tutoring & Test Prep' },
+    { value: 'vocational', label: 'Vocational Training' },
+    { value: 'language', label: 'Language Schools' },
+    { value: 'childhood_education', label: 'Early Childhood Education' },
+    
+    // Real Estate & Housing
+    { value: 'real_estate', label: 'Real Estate' },
+    { value: 'property_management', label: 'Property Management' },
+    { value: 'home_services', label: 'Home Services' },
+    { value: 'interior_design', label: 'Interior Design' },
+    { value: 'construction', label: 'Construction' },
+    { value: 'architecture', label: 'Architecture' },
+    
+    // Entertainment & Events
+    { value: 'event_planning', label: 'Event Planning & Services' },
+    { value: 'entertainment', label: 'Entertainment Venue' },
+    { value: 'film_production', label: 'Film & Production' },
+    { value: 'music', label: 'Music & Recording' },
+    { value: 'gaming', label: 'Gaming & eSports' },
+    
+    // Other Industries  
+    { value: 'agriculture', label: 'Agriculture & Farming' },
+    { value: 'automotive', label: 'Automotive' },
+    { value: 'charity', label: 'Charity & Non-profit' },
+    { value: 'manufacturing', label: 'Manufacturing' },
+    { value: 'media_news', label: 'Media & News' },
+    { value: 'pets', label: 'Pet Services & Supplies' },
+    { value: 'sports', label: 'Sports & Recreation' },
+    { value: 'transportation', label: 'Transportation & Logistics' },
+    { value: 'travel', label: 'Travel & Tourism' },
     { value: 'other', label: 'Other' }
   ];
 
@@ -95,6 +192,75 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     { value: 'all', label: 'All' },
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' }
+  ];
+  
+  const educationOptions = [
+    { value: 'high_school', label: 'High School' },
+    { value: 'college', label: 'College' },
+    { value: 'graduate', label: 'Graduate School' },
+    { value: 'doctorate', label: 'Doctorate' }
+  ];
+  
+  const incomeOptions = [
+    { value: 'low', label: '$0 - $50,000' },
+    { value: 'medium', label: '$50,000 - $100,000' },
+    { value: 'high', label: '$100,000 - $150,000' },
+    { value: 'very_high', label: '$150,000+' }
+  ];
+  
+  const languageOptions = [
+    { value: 'english', label: 'English' },
+    { value: 'spanish', label: 'Spanish' },
+    { value: 'french', label: 'French' },
+    { value: 'german', label: 'German' },
+    { value: 'italian', label: 'Italian' },
+    { value: 'portuguese', label: 'Portuguese' },
+    { value: 'russian', label: 'Russian' },
+    { value: 'chinese', label: 'Chinese' },
+    { value: 'japanese', label: 'Japanese' },
+    { value: 'korean', label: 'Korean' },
+    { value: 'arabic', label: 'Arabic' },
+    { value: 'hindi', label: 'Hindi' }
+  ];
+  
+  const adFormatOptions = [
+    { value: 'image', label: 'Single Image' },
+    { value: 'carousel', label: 'Carousel' },
+    { value: 'video', label: 'Video' },
+    { value: 'collection', label: 'Collection' },
+    { value: 'slideshow', label: 'Slideshow' },
+    { value: 'stories', label: 'Stories' }
+  ];
+  
+  const toneOptions = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'casual', label: 'Casual' },
+    { value: 'humorous', label: 'Humorous' },
+    { value: 'serious', label: 'Serious' },
+    { value: 'inspirational', label: 'Inspirational' },
+    { value: 'educational', label: 'Educational' },
+    { value: 'dramatic', label: 'Dramatic' },
+    { value: 'urgent', label: 'Urgent' }
+  ];
+  
+  const callToActionOptions = [
+    { value: 'learn_more', label: 'Learn More' },
+    { value: 'shop_now', label: 'Shop Now' },
+    { value: 'sign_up', label: 'Sign Up' },
+    { value: 'subscribe', label: 'Subscribe' },
+    { value: 'download', label: 'Download' },
+    { value: 'get_quote', label: 'Get Quote' },
+    { value: 'contact_us', label: 'Contact Us' },
+    { value: 'book_now', label: 'Book Now' },
+    { value: 'apply_now', label: 'Apply Now' },
+    { value: 'get_offer', label: 'Get Offer' }
+  ];
+  
+  const bidStrategyOptions = [
+    { value: 'lowest_cost', label: 'Lowest Cost' },
+    { value: 'cost_cap', label: 'Cost Cap' },
+    { value: 'bid_cap', label: 'Bid Cap' },
+    { value: 'target_cost', label: 'Target Cost' }
   ];
 
   const handleStepChange = (newStep: number) => {
@@ -141,7 +307,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       }
     }
     
-    if (step === 4) {
+    if (step === 5) {
       if (!formData.budget) {
         toast({
           title: "Budget required",
@@ -174,6 +340,20 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     setFormData({
       ...formData,
       [name]: checked
+    });
+  };
+  
+  const handleMultiSelectChange = (name: string, value: string, isChecked: boolean) => {
+    setFormData(prev => {
+      const currentValues = prev[name] as string[] || [];
+      const updatedValues = isChecked 
+        ? [...currentValues, value]
+        : currentValues.filter(item => item !== value);
+      
+      return {
+        ...prev,
+        [name]: updatedValues
+      };
     });
   };
   
@@ -294,14 +474,84 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 <SelectTrigger>
                   <SelectValue placeholder="Select business type" />
                 </SelectTrigger>
-                <SelectContent>
-                  {businessTypes.map((type) => (
+                <SelectContent className="max-h-[300px] overflow-y-auto">
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b font-semibold">Retail & E-commerce</div>
+                  {businessTypes.slice(0, 8).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Health & Wellness</div>
+                  {businessTypes.slice(8, 14).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Services</div>
+                  {businessTypes.slice(14, 23).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Technology</div>
+                  {businessTypes.slice(23, 30).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Food & Beverage</div>
+                  {businessTypes.slice(30, 37).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Education</div>
+                  {businessTypes.slice(37, 43).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Real Estate & Housing</div>
+                  {businessTypes.slice(43, 49).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Entertainment & Events</div>
+                  {businessTypes.slice(49, 54).map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                  
+                  <div className="sticky top-0 bg-white px-2 py-1 border-b border-t font-semibold">Other Industries</div>
+                  {businessTypes.slice(54).map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            
+            <div>
+              <label htmlFor="industryVertical" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Industry Vertical
+              </label>
+              <Input
+                id="industryVertical"
+                name="industryVertical"
+                value={formData.industryVertical}
+                onChange={handleInputChange}
+                placeholder="E.g., Luxury Retail, B2B SaaS, Healthcare"
+              />
             </div>
             
             <div>
@@ -427,6 +677,88 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               </Select>
             </div>
             
+            <div>
+              <label className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Languages
+              </label>
+              <div className="grid grid-cols-3 gap-2 p-3 border rounded-md">
+                {languageOptions.map((language) => (
+                  <div key={language.value} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`language-${language.value}`} 
+                      checked={formData.languages.includes(language.value)}
+                      onCheckedChange={(checked) => 
+                        handleMultiSelectChange('languages', language.value, checked === true)
+                      }
+                    />
+                    <label 
+                      htmlFor={`language-${language.value}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {language.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="advanced">
+                <AccordionTrigger>Advanced Audience Options</AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                      Education Level
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 p-3 border rounded-md">
+                      {educationOptions.map((option) => (
+                        <div key={option.value} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`education-${option.value}`} 
+                            checked={formData.education.includes(option.value)}
+                            onCheckedChange={(checked) => 
+                              handleMultiSelectChange('education', option.value, checked === true)
+                            }
+                          />
+                          <label 
+                            htmlFor={`education-${option.value}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {option.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                      Income Level
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 p-3 border rounded-md">
+                      {incomeOptions.map((option) => (
+                        <div key={option.value} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`income-${option.value}`} 
+                            checked={formData.income.includes(option.value)}
+                            onCheckedChange={(checked) => 
+                              handleMultiSelectChange('income', option.value, checked === true)
+                            }
+                          />
+                          <label 
+                            htmlFor={`income-${option.value}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {option.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            
             <div className="flex justify-between">
               <Button
                 variant="outline"
@@ -491,6 +823,19 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               />
             </div>
             
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="lookalikes" 
+                  checked={formData.lookalikes} 
+                  onCheckedChange={(checked) => handleCheckboxChange('lookalikes', checked as boolean)}
+                />
+                <label htmlFor="lookalikes" className="text-sm font-medium text-metamaster-gray-700 cursor-pointer">
+                  Create lookalike audiences based on your existing customers
+                </label>
+              </div>
+            </div>
+            
             <div className="flex justify-between">
               <Button
                 variant="outline"
@@ -511,6 +856,133 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       case 4:
         return (
           <div className="space-y-4">
+            <h3 className="font-medium text-lg">Ad Creative Preferences</h3>
+            
+            <div>
+              <label htmlFor="adFormat" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Ad Format
+              </label>
+              <Select
+                value={formData.adFormat}
+                onValueChange={(value) => handleSelectChange('adFormat', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select ad format" />
+                </SelectTrigger>
+                <SelectContent>
+                  {adFormatOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label htmlFor="tone" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Content Tone
+              </label>
+              <Select
+                value={formData.tone}
+                onValueChange={(value) => handleSelectChange('tone', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {toneOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label htmlFor="callToAction" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Call to Action
+              </label>
+              <Select
+                value={formData.callToAction}
+                onValueChange={(value) => handleSelectChange('callToAction', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select call to action" />
+                </SelectTrigger>
+                <SelectContent>
+                  {callToActionOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="primaryColor" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                  Primary Brand Color
+                </label>
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="w-10 h-10 rounded-md border" 
+                    style={{ backgroundColor: formData.primaryColor }}
+                  ></div>
+                  <Input
+                    id="primaryColor"
+                    name="primaryColor"
+                    type="color"
+                    value={formData.primaryColor}
+                    onChange={handleInputChange}
+                    className="w-full h-10"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label htmlFor="secondaryColor" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                  Secondary Brand Color
+                </label>
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="w-10 h-10 rounded-md border" 
+                    style={{ backgroundColor: formData.secondaryColor }}
+                  ></div>
+                  <Input
+                    id="secondaryColor"
+                    name="secondaryColor"
+                    type="color"
+                    value={formData.secondaryColor}
+                    onChange={handleInputChange}
+                    className="w-full h-10"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => handleStepChange(3)}
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={() => handleStepChange(5)}
+                className="bg-metamaster-primary hover:bg-metamaster-secondary"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        );
+        
+      case 5:
+        return (
+          <div className="space-y-4">
             <h3 className="font-medium text-lg">Budget & Configuration</h3>
             
             <div>
@@ -526,6 +998,42 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 type="number"
                 min="1"
               />
+            </div>
+            
+            <div>
+              <label htmlFor="duration" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Campaign Duration (days)
+              </label>
+              <Input
+                id="duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleInputChange}
+                placeholder="Number of days to run the campaign"
+                type="number"
+                min="1"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="bidStrategy" className="block text-sm font-medium text-metamaster-gray-700 mb-1">
+                Bid Strategy
+              </label>
+              <Select
+                value={formData.bidStrategy}
+                onValueChange={(value) => handleSelectChange('bidStrategy', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select bid strategy" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bidStrategyOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">
@@ -622,7 +1130,7 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               <div className="flex justify-between">
                 <Button
                   variant="outline"
-                  onClick={() => handleStepChange(3)}
+                  onClick={() => handleStepChange(4)}
                 >
                   Previous
                 </Button>
@@ -692,6 +1200,10 @@ const AIMediaBuyerEnhanced: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 <div className={`flex-1 h-0.5 mx-2 ${step > 3 ? 'bg-metamaster-primary' : 'bg-metamaster-gray-200'}`}></div>
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${step >= 4 ? 'bg-metamaster-primary text-white' : 'bg-white text-metamaster-gray-400'}`}>
                   4
+                </div>
+                <div className={`flex-1 h-0.5 mx-2 ${step > 4 ? 'bg-metamaster-primary' : 'bg-metamaster-gray-200'}`}></div>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${step >= 5 ? 'bg-metamaster-primary text-white' : 'bg-white text-metamaster-gray-400'}`}>
+                  5
                 </div>
               </div>
             </div>
