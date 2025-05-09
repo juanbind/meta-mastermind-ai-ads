@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
@@ -8,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from '@/lib/supabase';
 
 const Settings: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUserMetadata } = useAuth();
   const { toast } = useToast();
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -18,6 +18,7 @@ const Settings: React.FC = () => {
   const [email, setEmail] = useState(user?.email || '');
   const [profileImage, setProfileImage] = useState<string | null>(user?.user_metadata?.avatar_url || null);
   const [activeTab, setActiveTab] = useState('profile');
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
     // Get tab from URL query parameter
@@ -28,11 +29,44 @@ const Settings: React.FC = () => {
     }
   }, [location.search]);
 
-  const handleSaveChanges = () => {
-    toast({
-      title: "Settings updated",
-      description: "Your profile information has been updated successfully.",
-    });
+  const handleSaveChanges = async () => {
+    setIsLoading(true);
+    try {
+      // Only update the metadata that has changed
+      const updates: Record<string, any> = {};
+      
+      if (fullName !== user?.user_metadata?.full_name) {
+        updates.full_name = fullName;
+      }
+      
+      if (profileImage !== user?.user_metadata?.avatar_url) {
+        updates.avatar_url = profileImage;
+      }
+      
+      // Only make the update call if we have changes to make
+      if (Object.keys(updates).length > 0) {
+        await updateUserMetadata(updates);
+        
+        toast({
+          title: "Settings updated",
+          description: "Your profile information has been updated successfully.",
+        });
+      } else {
+        toast({
+          title: "No changes detected",
+          description: "No changes were made to your profile.",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Update failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleProfileImageClick = () => {
@@ -41,20 +75,30 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setProfileImage(e.target.result as string);
-          toast({
-            title: "Profile image updated",
-            description: "Your profile image has been updated successfully.",
-          });
-        }
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    
+    setIsLoading(true);
+    try {
+      // Create a preview immediately for better UX
+      const objectUrl = URL.createObjectURL(file);
+      setProfileImage(objectUrl);
+
+      // Toast for user feedback
+      toast({
+        title: "Image selected",
+        description: "Click 'Save Changes' to update your profile image.",
+      });
+    } catch (error) {
+      console.error("Error handling profile image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process the selected image.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -69,7 +113,7 @@ const Settings: React.FC = () => {
           </div>
           
           <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab}>
+            <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
               <div className="border-b border-gray-100">
                 <TabsList className="flex bg-transparent h-auto p-0">
                   <TabsTrigger 
@@ -141,6 +185,7 @@ const Settings: React.FC = () => {
                           size="sm" 
                           className="mt-2 text-sm" 
                           onClick={handleProfileImageClick}
+                          disabled={isLoading}
                         >
                           Change Photo
                         </Button>
@@ -168,6 +213,7 @@ const Settings: React.FC = () => {
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               className="w-full border border-gray-200 rounded-lg p-2.5"
+                              disabled
                             />
                           </div>
                           <div>
@@ -196,8 +242,9 @@ const Settings: React.FC = () => {
                       <Button 
                         className="bg-metamaster-primary hover:bg-metamaster-secondary"
                         onClick={handleSaveChanges}
+                        disabled={isLoading}
                       >
-                        Save Changes
+                        {isLoading ? "Saving..." : "Save Changes"}
                       </Button>
                     </div>
                   </div>

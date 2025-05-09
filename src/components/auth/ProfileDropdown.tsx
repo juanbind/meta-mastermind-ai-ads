@@ -34,10 +34,18 @@ const ProfileDropdown = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full flex items-center justify-center border border-white/20">
-          <User className="h-5 w-5 text-white" />
+          {user?.user_metadata?.avatar_url ? (
+            <img 
+              src={user.user_metadata.avatar_url} 
+              alt="Profile" 
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            <User className="h-5 w-5 text-white" />
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-metamaster-dark text-white border border-white/10" align="end" forceMount>
+      <DropdownMenuContent className="w-56 bg-metamaster-dark text-white border border-white/10" align="end">
         <DropdownMenuLabel>
           <div className="font-normal">
             <div className="font-medium text-sm">{userDisplayName}</div>
@@ -46,33 +54,54 @@ const ProfileDropdown = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-white/10" />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => navigate('/dashboard')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => navigate('/dashboard')}
+          >
             <User className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('team')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => handleNavigation('team')}
+          >
             <Users className="mr-2 h-4 w-4" />
             <span>Team</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('billing')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => handleNavigation('billing')}
+          >
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Billing</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('security')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => handleNavigation('security')}
+          >
             <Lock className="mr-2 h-4 w-4" />
             <span>Security</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('notifications')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => handleNavigation('notifications')}
+          >
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('profile')}>
+          <DropdownMenuItem 
+            className="cursor-pointer text-white hover:bg-white/10" 
+            onClick={() => handleNavigation('profile')}
+          >
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="bg-white/10" />
-        <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={handleLogout}>
+        <DropdownMenuItem 
+          className="cursor-pointer text-white hover:bg-white/10" 
+          onClick={handleLogout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
