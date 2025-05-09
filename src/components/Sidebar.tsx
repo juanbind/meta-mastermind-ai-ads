@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -14,7 +13,10 @@ import {
   Menu,
   X,
   Image,
-  AlertCircle
+  AlertCircle,
+  Bell,
+  CreditCard,
+  Lock
 } from 'lucide-react';
 import Logo from './Logo';
 import { Button } from '@/components/ui/button';
@@ -30,6 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface SidebarLinkProps {
   to: string;
@@ -102,12 +105,16 @@ const Sidebar: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleSettingsClick = () => {
-    navigate('/settings');
+  const handleNavigation = (path: string) => {
+    navigate(`/settings?tab=${path}`);
     if (mobileMenuOpen) {
       closeMobileMenu();
     }
   };
+
+  const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
+  const userInitials = userDisplayName.charAt(0).toUpperCase();
+  const avatarUrl = user?.user_metadata?.avatar_url;
 
   return (
     <>
@@ -143,12 +150,15 @@ const Sidebar: React.FC = () => {
           <Popover>
             <PopoverTrigger asChild>
               <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
-                <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
-                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                </div>
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={avatarUrl} />
+                  <AvatarFallback className="bg-metamaster-gray-800 text-white">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate text-metamaster-gray-800">
-                    {user?.user_metadata?.full_name || 'User'}
+                    {userDisplayName}
                   </p>
                   <p className="text-xs text-metamaster-gray-500 truncate">
                     {user?.email || 'user@example.com'}
@@ -160,7 +170,35 @@ const Sidebar: React.FC = () => {
               <div className="py-2">
                 <button 
                   className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                  onClick={handleSettingsClick}
+                  onClick={() => handleNavigation('notifications')}
+                >
+                  <Bell size={16} className="mr-2" />
+                  Notifications
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('team')}
+                >
+                  <Users size={16} className="mr-2" />
+                  Team
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('security')}
+                >
+                  <Lock size={16} className="mr-2" />
+                  Security
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('billing')}
+                >
+                  <CreditCard size={16} className="mr-2" />
+                  Billing
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('profile')}
                 >
                   <Settings size={16} className="mr-2" />
                   Settings
@@ -207,12 +245,15 @@ const Sidebar: React.FC = () => {
               <Popover>
                 <PopoverTrigger asChild>
                   <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
-                    <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
-                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={avatarUrl} />
+                      <AvatarFallback className="bg-metamaster-gray-800 text-white">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate text-metamaster-gray-800">
-                        {user?.user_metadata?.full_name || 'User'}
+                        {userDisplayName}
                       </p>
                       <p className="text-xs text-metamaster-gray-500 truncate">
                         {user?.email || 'user@example.com'}
@@ -224,7 +265,35 @@ const Sidebar: React.FC = () => {
                   <div className="py-2">
                     <button 
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                      onClick={handleSettingsClick}
+                      onClick={() => handleNavigation('notifications')}
+                    >
+                      <Bell size={16} className="mr-2" />
+                      Notifications
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('team')}
+                    >
+                      <Users size={16} className="mr-2" />
+                      Team
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('security')}
+                    >
+                      <Lock size={16} className="mr-2" />
+                      Security
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('billing')}
+                    >
+                      <CreditCard size={16} className="mr-2" />
+                      Billing
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('profile')}
                     >
                       <Settings size={16} className="mr-2" />
                       Settings
