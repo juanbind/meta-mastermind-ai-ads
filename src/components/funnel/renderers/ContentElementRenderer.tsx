@@ -60,6 +60,11 @@ const ContentElementRenderer: React.FC<ContentElementRendererProps> = ({
             device={device} 
           />
         </div>
+
+        {/* No-code editing indicator */}
+        <div className="absolute bottom-2 right-2 z-20 text-xs bg-white bg-opacity-75 px-2 py-0.5 rounded text-purple-600 font-medium">
+          {getElementTypeLabel(type)}
+        </div>
       </div>
     );
   } catch (error) {
@@ -110,6 +115,16 @@ const getElevationShadow = (elevation: number): string => {
     default:
       return '0 3px 8px rgba(0,0,0,0.12)';
   }
+};
+
+// Helper function to get a user-friendly label for element types
+const getElementTypeLabel = (type: string): string => {
+  // Convert camelCase or snake_case to Title Case with spaces
+  return type
+    .replace(/([A-Z])/g, ' $1') // Insert a space before all capital letters
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .replace(/^./, (str) => str.toUpperCase()) // Capitalize the first letter
+    .trim(); // Remove leading/trailing spaces
 };
 
 export default ContentElementRenderer;
