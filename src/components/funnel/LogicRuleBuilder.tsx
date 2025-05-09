@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 export interface LogicRuleBuilderProps {
   funnelId: string;
   pages: { id: any; name: any; }[];
-  elements?: any[]; // Make elements optional since it's missing in some places
+  elements: any[]; // Add the elements prop to the interface
 }
 
 const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, elements = [] }) => {

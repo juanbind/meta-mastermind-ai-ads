@@ -54,8 +54,8 @@ export const ELEMENT_TYPES = {
   // Forms & Data Collection
   FORM_BLOCK: 'FORM_BLOCK',
   PHONE_INPUT: 'PHONE_INPUT',
-  FILE_UPLOAD: 'FILE_UPLOAD',
-  DATE_PICKER: 'DATE_PICKER',
+  FILE_UPLOAD: 'FILE_UPLOAD',  // Adding this missing element type
+  DATE_PICKER: 'DATE_PICKER',  // Adding this missing element type
   
   // Layout & Design
   SECTION_TEMPLATE: 'SECTION_TEMPLATE',
