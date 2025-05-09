@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 export interface FunnelPage {
   id: string;
   name: string;
-  type: 'quiz' | 'result' | 'form' | 'landing' | 'thank_you';
+  type: 'quiz' | 'result' | 'form' | 'landing' | 'thank_you' | string;
   order_index: number;
   content: any;
   funnel_id: string;
@@ -46,73 +46,109 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
   const { toast } = useToast();
 
   // Fetch funnel pages
+  const fetchPages = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const { data: pagesData, error: pagesError } = await supabase
+        .from('funnel_pages')
+        .select('*')
+        .eq('funnel_id', funnelId)
+        .order('order_index');
+        
+      if (pagesError) throw pagesError;
+      
+      // Convert the data to the proper FunnelPage type
+      const typedPages: FunnelPage[] = pagesData?.map(page => ({
+        id: page.id,
+        name: page.name,
+        type: page.type,
+        order_index: page.order_index,
+        content: page.content,
+        funnel_id: page.funnel_id,
+        created_at: page.created_at,
+        updated_at: page.updated_at
+      })) || [];
+      
+      setPages(typedPages);
+      
+      const { data: rulesData, error: rulesError } = await supabase
+        .from('logic_rules')
+        .select('*')
+        .eq('funnel_id', funnelId);
+        
+      if (rulesError) throw rulesError;
+      
+      // Convert the data to the proper LogicRule type
+      const typedRules: LogicRule[] = rulesData?.map(rule => ({
+        id: rule.id,
+        element_id: rule.element_id,
+        condition: typeof rule.condition === 'string' 
+          ? JSON.parse(rule.condition) 
+          : rule.condition as LogicRule['condition'],
+        action: typeof rule.action === 'string'
+          ? JSON.parse(rule.action)
+          : rule.action as LogicRule['action'],
+        funnel_id: rule.funnel_id,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at
+      })) || [];
+      
+      setLogicRules(typedRules);
+    } catch (error) {
+      console.error('Error fetching funnel data:', error);
+      toast({
+        title: 'Error loading funnel',
+        description: 'Could not load funnel data. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [funnelId, toast]);
+  
+  // Call fetchPages whenever funnelId changes
   useEffect(() => {
-    const fetchPages = async () => {
-      try {
-        setIsLoading(true);
-        const { data: pagesData, error: pagesError } = await supabase
-          .from('funnel_pages')
-          .select('*')
-          .eq('funnel_id', funnelId)
-          .order('order_index');
-          
-        if (pagesError) throw pagesError;
-        
-        // Convert the data to the proper FunnelPage type
-        const typedPages: FunnelPage[] = pagesData?.map(page => ({
-          id: page.id,
-          name: page.name,
-          type: page.type as 'quiz' | 'result' | 'form' | 'landing' | 'thank_you',
-          order_index: page.order_index,
-          content: page.content,
-          funnel_id: page.funnel_id,
-          created_at: page.created_at,
-          updated_at: page.updated_at
-        })) || [];
-        
-        setPages(typedPages);
-        
-        const { data: rulesData, error: rulesError } = await supabase
-          .from('logic_rules')
-          .select('*')
-          .eq('funnel_id', funnelId);
-          
-        if (rulesError) throw rulesError;
-        
-        // Convert the data to the proper LogicRule type
-        const typedRules: LogicRule[] = rulesData?.map(rule => ({
-          id: rule.id,
-          element_id: rule.element_id,
-          condition: typeof rule.condition === 'string' 
-            ? JSON.parse(rule.condition) 
-            : rule.condition as LogicRule['condition'],
-          action: typeof rule.action === 'string'
-            ? JSON.parse(rule.action)
-            : rule.action as LogicRule['action'],
-          funnel_id: rule.funnel_id,
-          created_at: rule.created_at,
-          updated_at: rule.updated_at
-        })) || [];
-        
-        setLogicRules(typedRules);
-      } catch (error) {
-        console.error('Error fetching funnel data:', error);
-        toast({
-          title: 'Error loading funnel',
-          description: 'Could not load funnel data. Please try again.',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     if (funnelId) {
       fetchPages();
     }
-  }, [funnelId, toast]);
+  }, [funnelId, fetchPages]);
 
   const currentPage = pages[currentPageIndex];
+  
+  // Function to create multiple pages at once from a template
+  const createPagesFromTemplate = useCallback(async (templatePages: any[]) => {
+    try {
+      // Format pages for insertion
+      const pagesToInsert = templatePages.map((page, index) => ({
+        name: page.name,
+        type: page.type,
+        order_index: index,
+        funnel_id: funnelId,
+        content: page.content
+      }));
+      
+      // Insert all pages at once
+      const { data, error } = await supabase
+        .from('funnel_pages')
+        .insert(pagesToInsert)
+        .select();
+        
+      if (error) throw error;
+      
+      // Refresh pages to include the new ones
+      await fetchPages();
+      
+      return data;
+    } catch (error) {
+      console.error('Error creating pages from template:', error);
+      toast({
+        title: 'Error creating funnel pages',
+        description: 'Could not create the funnel pages. Please try again.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  }, [funnelId, fetchPages, toast]);
   
   const navigateToNextPage = useCallback(() => {
     if (currentPageIndex < pages.length - 1) {
@@ -262,5 +298,7 @@ export const useFunnelLogic = ({ funnelId }: UseFunnelLogicProps) => {
     updateFormValue,
     submitForm,
     getRulesForElement,
+    createPagesFromTemplate, // Expose the new function for creating pages from templates
+    refreshPages: fetchPages, // Allow manual refresh of pages
   };
 };

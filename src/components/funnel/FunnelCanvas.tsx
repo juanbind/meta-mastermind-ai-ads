@@ -7,6 +7,7 @@ import { Save, Trash } from 'lucide-react';
 import FunnelRenderedElement from './FunnelRenderedElement';
 import { useToast } from '@/hooks/use-toast';
 import { TEMPLATE_STRUCTURES } from './FunnelElement';
+import { useNavigate } from 'react-router-dom';
 
 export interface CanvasItem {
   id: string;
@@ -25,6 +26,7 @@ export interface FunnelCanvasProps {
 
 const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialItems = [], onCreatePages }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [items, setItems] = useState<CanvasItem[]>(() => {
     if (!initialItems || !Array.isArray(initialItems)) {
       return [];
@@ -56,6 +58,7 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       
       // Handle template drops specially
       if (item.isTemplate && onCreatePages) {
+        // Immediately create pages from template without any further user action required
         handleTemplateDropped(item.type, item.templatePages);
         return;
       }
@@ -74,11 +77,23 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
     }),
   });
   
-  // Function to handle template drops
+  // Function to handle template drops - automatically creates all pages without user intervention
   const handleTemplateDropped = async (templateType: string, templatePages: any[]) => {
-    if (!onCreatePages) return;
+    if (!onCreatePages) {
+      toast({
+        title: "Can't create template",
+        description: "Page creation functionality is not available",
+        variant: "destructive"
+      });
+      return;
+    }
     
     try {
+      toast({
+        title: "Creating template...",
+        description: "Please wait while we set up your funnel pages"
+      });
+      
       // Get the pre-built pages with content from template structures
       const fullTemplatePages = templatePages.map(page => {
         // Find the matching structure in our template definitions
@@ -96,9 +111,14 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       await onCreatePages(fullTemplatePages);
       
       toast({
-        title: 'Template created',
+        title: 'Template created successfully',
         description: `Created a new ${templateType.toLowerCase().replace('_', ' ')} with ${templatePages.length} pages including pre-built content.`
       });
+      
+      // Auto-save the current canvas state if there are items
+      if (items.length > 0) {
+        await onSave(items);
+      }
       
     } catch (error) {
       console.error('Error creating template pages:', error);
@@ -317,8 +337,11 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
       <p className="text-lg text-gray-500 mb-4">
         Drag elements or templates from the sidebar to start building your funnel.
       </p>
-      <div className="border-2 border-dashed border-gray-300 rounded-xl p-10">
+      <div className="border-2 border-dashed border-gray-300 rounded-xl p-10 flex flex-col items-center gap-4">
         <p className="text-gray-400">Drop elements or templates here</p>
+        <p className="text-sm text-gray-400">
+          Templates automatically create all pages with pre-built content
+        </p>
       </div>
     </div>
   );
