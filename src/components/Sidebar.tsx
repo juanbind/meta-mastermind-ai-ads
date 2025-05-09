@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   Search, 
@@ -24,6 +25,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface SidebarLinkProps {
   to: string;
@@ -70,6 +76,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, on
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -77,15 +84,14 @@ const Sidebar: React.FC = () => {
   const links = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Dashboard' },
     { to: '/ads-library', icon: <Search size={20} />, label: 'Ad Library' },
-    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder', isComingSoon: true },
-    { to: '/crm', icon: <Users size={20} />, label: 'CRM' },
-    { to: '/ai-tools', icon: <Zap size={20} />, label: 'AI Tools' },
-    { to: '/ai-tools/media-buyer', icon: <BarChart size={20} />, label: 'AI Media Buyer' },
     { to: '/creatives', icon: <Image size={20} />, label: 'Creatives' },
+    { to: '/ai-tools/media-buyer', icon: <BarChart size={20} />, label: 'AI Media Buyer' },
+    { to: '/crm', icon: <Users size={20} />, label: 'CRM' },
+    { to: '/funnel-builder', icon: <LayoutGrid size={20} />, label: 'Funnel Builder', isComingSoon: true },
+    { to: '/ai-tools', icon: <Zap size={20} />, label: 'AI Tools' },
     { to: '/reports', icon: <BarChart size={20} />, label: 'Reports' },
     { to: '/templates', icon: <FileText size={20} />, label: 'Templates' },
     { to: '/integrations', icon: <Database size={20} />, label: 'Integrations' },
-    { to: '/settings', icon: <Settings size={20} />, label: 'Settings' },
   ];
 
   const toggleMobileMenu = () => {
@@ -94,6 +100,13 @@ const Sidebar: React.FC = () => {
   
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/settings');
+    if (mobileMenuOpen) {
+      closeMobileMenu();
+    }
   };
 
   return (
@@ -127,19 +140,34 @@ const Sidebar: React.FC = () => {
         </div>
         
         <div className="absolute bottom-0 left-0 w-full px-3 py-4 border-t border-gray-200">
-          <div className="flex items-center space-x-3 px-4 py-2">
-            <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
-              {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-metamaster-gray-800">
-                {user?.user_metadata?.full_name || 'User'}
-              </p>
-              <p className="text-xs text-metamaster-gray-500 truncate">
-                {user?.email || 'user@example.com'}
-              </p>
-            </div>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
+                <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
+                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate text-metamaster-gray-800">
+                    {user?.user_metadata?.full_name || 'User'}
+                  </p>
+                  <p className="text-xs text-metamaster-gray-500 truncate">
+                    {user?.email || 'user@example.com'}
+                  </p>
+                </div>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-0" align="start">
+              <div className="py-2">
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={handleSettingsClick}
+                >
+                  <Settings size={16} className="mr-2" />
+                  Settings
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -176,19 +204,34 @@ const Sidebar: React.FC = () => {
             </div>
             
             <div className="absolute bottom-0 left-0 w-full px-3 py-4 border-t border-gray-200">
-              <div className="flex items-center space-x-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
-                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate text-metamaster-gray-800">
-                    {user?.user_metadata?.full_name || 'User'}
-                  </p>
-                  <p className="text-xs text-metamaster-gray-500 truncate">
-                    {user?.email || 'user@example.com'}
-                  </p>
-                </div>
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
+                    <div className="w-8 h-8 rounded-full bg-metamaster-gray-800 flex items-center justify-center text-white">
+                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate text-metamaster-gray-800">
+                        {user?.user_metadata?.full_name || 'User'}
+                      </p>
+                      <p className="text-xs text-metamaster-gray-500 truncate">
+                        {user?.email || 'user@example.com'}
+                      </p>
+                    </div>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="start">
+                  <div className="py-2">
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={handleSettingsClick}
+                    >
+                      <Settings size={16} className="mr-2" />
+                      Settings
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>

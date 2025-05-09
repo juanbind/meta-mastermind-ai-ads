@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -58,23 +57,9 @@ const App = () => (
                 <AdsLibrary />
               </AuthCheck>
             } />
-            <Route path="/funnel-builder" element={
+            <Route path="/creatives" element={
               <AuthCheck>
-                <PasswordProtection password="juanbind">
-                  <FunnelBuilder />
-                </PasswordProtection>
-              </AuthCheck>
-            } />
-            <Route path="/crm" element={
-              <AuthCheck>
-                <CRM />
-              </AuthCheck>
-            } />
-            
-            {/* AI Tools Routes */}
-            <Route path="/ai-tools" element={
-              <AuthCheck>
-                <AITools />
+                <Creatives />
               </AuthCheck>
             } />
             <Route path="/ai-tools/media-buyer" element={
@@ -82,15 +67,23 @@ const App = () => (
                 <AIMediaBuyerPage />
               </AuthCheck>
             } />
-            
-            {/* New Creatives Route */}
-            <Route path="/creatives" element={
+            <Route path="/crm" element={
               <AuthCheck>
-                <Creatives />
+                <CRM />
               </AuthCheck>
             } />
-            
-            {/* Other Routes */}
+            <Route path="/funnel-builder" element={
+              <AuthCheck>
+                <PasswordProtection password="juanbind">
+                  <FunnelBuilder />
+                </PasswordProtection>
+              </AuthCheck>
+            } />
+            <Route path="/ai-tools" element={
+              <AuthCheck>
+                <AITools />
+              </AuthCheck>
+            } />
             <Route path="/reports" element={
               <AuthCheck>
                 <Reports />

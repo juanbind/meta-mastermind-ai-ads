@@ -1,23 +1,48 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { User, Bell, Lock, CreditCard, Users, Mail } from 'lucide-react';
+import { User, Bell, Lock, CreditCard, Users, Mail, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [profileImage, setProfileImage] = useState<string | null>(user?.user_metadata?.avatar_url || null);
   
   const handleSaveChanges = () => {
     toast({
       title: "Settings updated",
       description: "Your profile information has been updated successfully.",
     });
+  };
+
+  const handleProfileImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setProfileImage(e.target.result as string);
+          toast({
+            title: "Profile image updated",
+            description: "Your profile image has been updated successfully.",
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
   return (
@@ -75,48 +100,81 @@ const Settings: React.FC = () => {
               <div className="p-6">
                 <TabsContent value="profile">
                   <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-medium mb-4">Personal Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
-                            Full Name
-                          </label>
-                          <input
-                            type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg p-2.5"
-                          />
+                    <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 mb-6">
+                      <div className="flex flex-col items-center">
+                        <div className="relative">
+                          <Avatar className="w-24 h-24 cursor-pointer" onClick={handleProfileImageClick}>
+                            {profileImage ? (
+                              <AvatarImage src={profileImage} alt="Profile" />
+                            ) : (
+                              <AvatarFallback className="bg-metamaster-primary text-white text-xl">
+                                {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="absolute bottom-0 right-0 bg-metamaster-primary rounded-full p-1.5 border-2 border-white cursor-pointer" onClick={handleProfileImageClick}>
+                            <Upload size={14} className="text-white" />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
-                            Email Address
-                          </label>
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg p-2.5"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
-                            Company
-                          </label>
-                          <input
-                            type="text"
-                            className="w-full border border-gray-200 rounded-lg p-2.5"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
-                            Job Title
-                          </label>
-                          <input
-                            type="text"
-                            className="w-full border border-gray-200 rounded-lg p-2.5"
-                          />
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={handleFileChange}
+                        />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="mt-2 text-sm" 
+                          onClick={handleProfileImageClick}
+                        >
+                          Change Photo
+                        </Button>
+                      </div>
+                      <div className="flex-1 w-full">
+                        <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
+                              Full Name
+                            </label>
+                            <input
+                              type="text"
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
+                              className="w-full border border-gray-200 rounded-lg p-2.5"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="w-full border border-gray-200 rounded-lg p-2.5"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
+                              Company
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full border border-gray-200 rounded-lg p-2.5"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-metamaster-gray-600 mb-1">
+                              Job Title
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full border border-gray-200 rounded-lg p-2.5"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
