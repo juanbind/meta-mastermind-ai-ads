@@ -1,14 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Image } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Creatives: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     businessName: '',
     businessServices: '',
@@ -16,6 +19,34 @@ const Creatives: React.FC = () => {
     additionalInfo: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previousRequests, setPreviousRequests] = useState<any[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchPreviousRequests();
+    }
+  }, [user]);
+
+  const fetchPreviousRequests = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('creative_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching previous requests:', error);
+        return;
+      }
+      
+      setPreviousRequests(data || []);
+    } catch (err) {
+      console.error('Error fetching requests:', err);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -37,10 +68,31 @@ const Creatives: React.FC = () => {
       return;
     }
     
-    // Simulate request submission
+    // Submit to Supabase
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to submit a request.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
-      // In a real implementation, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const { error } = await supabase
+        .from('creative_requests')
+        .insert({
+          user_id: user.id,
+          business_name: formData.businessName,
+          business_services: formData.businessServices,
+          location: formData.location,
+          additional_info: formData.additionalInfo
+        });
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Creative request submitted!",
@@ -55,7 +107,12 @@ const Creatives: React.FC = () => {
         location: '',
         additionalInfo: ''
       });
+      
+      // Refresh the requests list
+      fetchPreviousRequests();
+      
     } catch (error) {
+      console.error('Error submitting request:', error);
       toast({
         title: "Error submitting request",
         description: "Please try again later.",
@@ -64,6 +121,15 @@ const Creatives: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -76,7 +142,7 @@ const Creatives: React.FC = () => {
             <p className="text-metamaster-gray-600">Request new creatives for your marketing campaigns</p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-8">
+          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
             <div className="flex items-center mb-6">
               <div className="bg-metamaster-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-metamaster-primary mr-4">
                 <Image size={24} />
@@ -154,6 +220,53 @@ const Creatives: React.FC = () => {
                 {isSubmitting ? "Submitting..." : "Submit Creative Request"}
               </Button>
             </form>
+          </div>
+
+          {/* Previous Requests Section */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-8">
+            <h2 className="text-xl font-bold text-metamaster-gray-800 mb-6">Your Previous Requests</h2>
+            
+            {loadingRequests ? (
+              <div className="text-center py-8">
+                <p className="text-metamaster-gray-600">Loading your previous requests...</p>
+              </div>
+            ) : previousRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-metamaster-gray-600">You haven't submitted any creative requests yet.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="py-3 px-4 text-left font-medium text-metamaster-gray-700">Business Name</th>
+                      <th className="py-3 px-4 text-left font-medium text-metamaster-gray-700">Services</th>
+                      <th className="py-3 px-4 text-left font-medium text-metamaster-gray-700">Date</th>
+                      <th className="py-3 px-4 text-left font-medium text-metamaster-gray-700">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previousRequests.map((request) => (
+                      <tr key={request.id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-3 px-4">{request.business_name}</td>
+                        <td className="py-3 px-4">{request.business_services}</td>
+                        <td className="py-3 px-4">{formatDate(request.created_at)}</td>
+                        <td className="py-3 px-4">
+                          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                            request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                            request.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            'bg-blue-100 text-blue-800'
+                          }`}>
+                            {request.status === 'pending' ? 'Pending' : 
+                             request.status === 'completed' ? 'Completed' : 'In Progress'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>

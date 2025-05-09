@@ -465,6 +465,42 @@ export type Database = {
         }
         Relationships: []
       }
+      creative_requests: {
+        Row: {
+          additional_info: string | null
+          business_name: string
+          business_services: string
+          created_at: string
+          id: string
+          location: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_info?: string | null
+          business_name: string
+          business_services: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_info?: string | null
+          business_name?: string
+          business_services?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deals: {
         Row: {
           company_id: string | null
