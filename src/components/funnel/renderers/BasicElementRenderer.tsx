@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,9 +14,9 @@ const BasicElementRenderer: React.FC<BasicElementRendererProps> = ({ type, conte
   // Handle styling for headlines
   const getHeadlineElement = () => {
     const style = {
-      color: props?.color,
-      fontFamily: props?.fontFamily,
-      lineHeight: props?.lineHeight,
+      color: props?.color || '#1A1F2C',
+      fontFamily: props?.fontFamily || 'inherit',
+      lineHeight: props?.lineHeight || '1.2',
     };
     
     const className = `
@@ -42,13 +41,13 @@ const BasicElementRenderer: React.FC<BasicElementRendererProps> = ({ type, conte
   // Handle styling for paragraphs
   const getParagraphElement = () => {
     const style = {
-      color: props?.color,
-      fontFamily: props?.fontFamily,
+      color: props?.color || '#403E43',
+      fontFamily: props?.fontFamily || 'inherit',
     };
     
     const className = `
       ${props?.fontSize || 'text-base'}
-      ${props?.lineHeight || 'leading-normal'}
+      ${props?.lineHeight || 'leading-relaxed'}
       ${props?.textAlign || 'text-left'}
       ${props?.className || ''}
     `;
@@ -68,21 +67,24 @@ const BasicElementRenderer: React.FC<BasicElementRendererProps> = ({ type, conte
     
     const buttonSizes = {
       sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2',
-      lg: 'px-6 py-3 text-lg'
+      md: 'px-4 py-2.5',
+      lg: 'px-6 py-3 text-base'
     };
     
     const size = props?.size || 'md';
     
     const style = {
-      backgroundColor: props?.bgColor,
+      backgroundColor: props?.bgColor || '#9b87f5',
+      color: props?.textColor || 'white',
+      borderRadius: props?.borderRadius || '0.375rem',
     };
     
     const className = `
-      ${props?.variant === 'outline' ? 'border border-current bg-transparent' : ''}
-      ${props?.variant === 'ghost' ? 'bg-transparent hover:bg-gray-100' : ''}
+      ${props?.variant === 'outline' ? 'border border-current bg-transparent hover:bg-gray-50' : 'hover:opacity-90'}
+      ${props?.variant === 'ghost' ? 'bg-transparent hover:bg-gray-100 text-gray-700' : ''}
       ${buttonSizes[size as keyof typeof buttonSizes]}
       ${props?.fullWidth ? 'w-full' : ''}
+      font-medium transition-all shadow-sm
       ${props?.className || ''}
     `;
     

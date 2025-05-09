@@ -85,13 +85,20 @@ const FunnelElement: React.FC<FunnelElementProps> = ({ type, icon, label }) => {
   return (
     <div
       ref={drag}
-      className={`flex items-center justify-start h-auto py-3 px-4 border-dashed border-2 w-full rounded cursor-grab ${
-        isDragging ? 'opacity-50 border-metamaster-primary bg-metamaster-primary/5' : 'border-gray-200'
+      className={`relative flex items-center justify-start h-auto py-3 px-4 border border-gray-200 w-full rounded-lg cursor-grab transition-all ${
+        isDragging ? 'opacity-50 border-purple-400 bg-purple-50' : 'bg-white hover:border-purple-300 hover:shadow-sm'
       }`}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
     >
-      <div className="mr-3 text-metamaster-primary">{icon}</div>
-      <span>{label}</span>
+      <div className="mr-3 text-purple-600 flex-shrink-0">{icon}</div>
+      <span className="font-medium text-gray-700 text-sm">{label}</span>
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-60">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1H4V4H1V1Z" fill="#9b87f5" />
+          <path d="M6 1H9V4H6V1Z" fill="#9b87f5" />
+          <path d="M1 6H4V9H1V6Z" fill="#9b87f5" />
+          <path d="M6 6H9V9H6V6Z" fill="#9b87f5" />
+        </svg>
+      </div>
     </div>
   );
 };
