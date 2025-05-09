@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, Bell, Lock, CreditCard, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,14 @@ import {
 const ProfileDropdown = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  
+  // Use effect to update the avatar URL when user data changes
+  useEffect(() => {
+    if (user?.user_metadata?.avatar_url) {
+      setAvatarUrl(user.user_metadata.avatar_url);
+    }
+  }, [user]);
   
   const handleLogout = async () => {
     await signOut();
@@ -29,7 +37,6 @@ const ProfileDropdown = () => {
   };
 
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
-  const avatarUrl = user?.user_metadata?.avatar_url;
   
   return (
     <DropdownMenu>
@@ -40,6 +47,7 @@ const ProfileDropdown = () => {
               src={avatarUrl} 
               alt="Profile" 
               className="h-full w-full rounded-full object-cover"
+              onError={() => setAvatarUrl(null)} // Fallback if image fails to load
             />
           ) : (
             <User className="h-5 w-5 text-white" />

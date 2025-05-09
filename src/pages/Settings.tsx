@@ -19,6 +19,7 @@ const Settings: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(user?.user_metadata?.avatar_url || null);
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   
   useEffect(() => {
     // Get tab from URL query parameter
@@ -47,8 +48,31 @@ const Settings: React.FC = () => {
         updates.full_name = fullName;
       }
       
-      if (profileImage !== user?.user_metadata?.avatar_url) {
-        updates.avatar_url = profileImage;
+      // Handle profile image upload first if there's a new file
+      if (imageFile) {
+        const timestamp = Date.now();
+        const fileExt = imageFile.name.split('.').pop();
+        const filePath = `${user?.id}/${timestamp}.${fileExt}`;
+        
+        // Upload the file to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, imageFile);
+          
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Get the public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+          
+        if (publicUrlData) {
+          const avatarUrl = publicUrlData.publicUrl;
+          updates.avatar_url = avatarUrl;
+          setProfileImage(avatarUrl);
+        }
       }
       
       // Only make the update call if we have changes to make
@@ -59,6 +83,9 @@ const Settings: React.FC = () => {
           title: "Settings updated",
           description: "Your profile information has been updated successfully.",
         });
+        
+        // Clear the image file after successful upload
+        setImageFile(null);
       } else {
         toast({
           title: "No changes detected",
@@ -87,11 +114,21 @@ const Settings: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
     
-    setIsLoading(true);
     try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Create a preview immediately for better UX
       const objectUrl = URL.createObjectURL(file);
       setProfileImage(objectUrl);
+      setImageFile(file);
 
       // Toast for user feedback
       toast({
@@ -105,8 +142,6 @@ const Settings: React.FC = () => {
         description: "Failed to process the selected image.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
   
