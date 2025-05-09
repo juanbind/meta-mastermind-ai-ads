@@ -579,6 +579,47 @@ export type Database = {
         }
         Relationships: []
       }
+      funnel_pages: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          funnel_id: string | null
+          id: string
+          name: string
+          order_index: number
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          funnel_id?: string | null
+          id?: string
+          name: string
+          order_index: number
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          funnel_id?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funnel_pages_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "funnels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funnels: {
         Row: {
           content: string
@@ -650,6 +691,92 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      leads: {
+        Row: {
+          answers: Json | null
+          contact_id: string | null
+          created_at: string | null
+          email: string
+          funnel_id: string | null
+          id: string
+          phone: string | null
+          score: number | null
+        }
+        Insert: {
+          answers?: Json | null
+          contact_id?: string | null
+          created_at?: string | null
+          email: string
+          funnel_id?: string | null
+          id?: string
+          phone?: string | null
+          score?: number | null
+        }
+        Update: {
+          answers?: Json | null
+          contact_id?: string | null
+          created_at?: string | null
+          email?: string
+          funnel_id?: string | null
+          id?: string
+          phone?: string | null
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "funnels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logic_rules: {
+        Row: {
+          action: Json
+          condition: Json
+          created_at: string | null
+          element_id: string
+          funnel_id: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          action: Json
+          condition: Json
+          created_at?: string | null
+          element_id: string
+          funnel_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: Json
+          condition?: Json
+          created_at?: string | null
+          element_id?: string
+          funnel_id?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logic_rules_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "funnels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {
@@ -767,7 +894,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      score_lead: {
+        Args: { lead_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

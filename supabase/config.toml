@@ -7,3 +7,9 @@ verify_jwt = false # Allow public access for Facebook webhook
 [functions.fb-ad-sync]
 verify_jwt = false # Allow public access for ad library population
 timeout_seconds = 540 # Increase timeout to 9 minutes for comprehensive ad fetching
+
+[functions.score-lead]
+verify_jwt = true # Require authentication for scoring leads
+
+[functions.validate-contact]
+verify_jwt = false # Allow public access for contact validation
