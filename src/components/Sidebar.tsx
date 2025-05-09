@@ -170,24 +170,10 @@ const Sidebar: React.FC = () => {
               <div className="py-2">
                 <button 
                   className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                  onClick={() => handleNavigation('notifications')}
+                  onClick={() => handleNavigation('profile')}
                 >
-                  <Bell size={16} className="mr-2" />
-                  Notifications
-                </button>
-                <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                  onClick={() => handleNavigation('team')}
-                >
-                  <Users size={16} className="mr-2" />
-                  Team
-                </button>
-                <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                  onClick={() => handleNavigation('security')}
-                >
-                  <Lock size={16} className="mr-2" />
-                  Security
+                  <Settings size={16} className="mr-2" />
+                  Settings
                 </button>
                 <button 
                   className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
@@ -198,10 +184,24 @@ const Sidebar: React.FC = () => {
                 </button>
                 <button 
                   className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                  onClick={() => handleNavigation('profile')}
+                  onClick={() => handleNavigation('security')}
                 >
-                  <Settings size={16} className="mr-2" />
-                  Settings
+                  <Lock size={16} className="mr-2" />
+                  Security
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('team')}
+                >
+                  <Users size={16} className="mr-2" />
+                  Team
+                </button>
+                <button 
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  onClick={() => handleNavigation('notifications')}
+                >
+                  <Bell size={16} className="mr-2" />
+                  Notifications
                 </button>
               </div>
             </PopoverContent>
@@ -265,24 +265,10 @@ const Sidebar: React.FC = () => {
                   <div className="py-2">
                     <button 
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                      onClick={() => handleNavigation('notifications')}
+                      onClick={() => handleNavigation('profile')}
                     >
-                      <Bell size={16} className="mr-2" />
-                      Notifications
-                    </button>
-                    <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                      onClick={() => handleNavigation('team')}
-                    >
-                      <Users size={16} className="mr-2" />
-                      Team
-                    </button>
-                    <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                      onClick={() => handleNavigation('security')}
-                    >
-                      <Lock size={16} className="mr-2" />
-                      Security
+                      <Settings size={16} className="mr-2" />
+                      Settings
                     </button>
                     <button 
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
@@ -293,10 +279,24 @@ const Sidebar: React.FC = () => {
                     </button>
                     <button 
                       className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
-                      onClick={() => handleNavigation('profile')}
+                      onClick={() => handleNavigation('security')}
                     >
-                      <Settings size={16} className="mr-2" />
-                      Settings
+                      <Lock size={16} className="mr-2" />
+                      Security
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('team')}
+                    >
+                      <Users size={16} className="mr-2" />
+                      Team
+                    </button>
+                    <button 
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      onClick={() => handleNavigation('notifications')}
+                    >
+                      <Bell size={16} className="mr-2" />
+                      Notifications
                     </button>
                   </div>
                 </PopoverContent>
