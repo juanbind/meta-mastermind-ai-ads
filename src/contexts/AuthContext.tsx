@@ -10,7 +10,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<{ success: boolean, message?: string }>;
   signOut: () => Promise<void>;
-  updateUserMetadata: (metadata: Record<string, any>) => Promise<void>;
+  updateUserMetadata: (metadata: Record<string, any>) => Promise<{ error?: any }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Add updateUserMetadata function
+  // Update the updateUserMetadata function to return an error object
   const updateUserMetadata = async (metadata: Record<string, any>) => {
     try {
       setLoading(true);
@@ -157,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Your profile has been updated successfully",
       });
       
+      return { error: null };
     } catch (error: any) {
       console.error("Error updating user metadata:", error);
       toast({
@@ -164,7 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message || "An error occurred during profile update",
         variant: "destructive",
       });
-      throw error;
+      return { error };
     } finally {
       setLoading(false);
     }
