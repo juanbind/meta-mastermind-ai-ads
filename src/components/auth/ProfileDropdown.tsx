@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, Bell } from 'lucide-react';
+import { User, LogOut, Settings, Bell, Lock, CreditCard, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -21,6 +21,10 @@ const ProfileDropdown = () => {
   const handleLogout = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(`/settings?tab=${path}`);
   };
 
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
@@ -45,13 +49,25 @@ const ProfileDropdown = () => {
             <User className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10">
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('profile')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('notifications')}>
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('security')}>
+            <Lock className="mr-2 h-4 w-4" />
+            <span>Security</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('billing')}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span>Billing</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-white hover:bg-white/10" onClick={() => handleNavigation('team')}>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="bg-white/10" />

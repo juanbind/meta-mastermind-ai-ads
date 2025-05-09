@@ -1,4 +1,6 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { User, Bell, Lock, CreditCard, Users, Mail, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,11 +12,22 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 const Settings: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [profileImage, setProfileImage] = useState<string | null>(user?.user_metadata?.avatar_url || null);
+  const [activeTab, setActiveTab] = useState('profile');
   
+  useEffect(() => {
+    // Get tab from URL query parameter
+    const queryParams = new URLSearchParams(location.search);
+    const tab = queryParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [location.search]);
+
   const handleSaveChanges = () => {
     toast({
       title: "Settings updated",
@@ -56,7 +69,7 @@ const Settings: React.FC = () => {
           </div>
           
           <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <Tabs defaultValue="profile">
+            <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab}>
               <div className="border-b border-gray-100">
                 <TabsList className="flex bg-transparent h-auto p-0">
                   <TabsTrigger 
