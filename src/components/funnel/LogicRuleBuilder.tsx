@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 export interface LogicRuleBuilderProps {
   funnelId: string;
   pages: { id: any; name: any; }[];
-  elements: any[]; // Add the elements prop to the interface
+  elements: any[];
 }
 
 const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, elements = [] }) => {
@@ -246,7 +246,7 @@ const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({ funnelId, pages, el
               <label htmlFor="actionTarget" className="text-right">
                 Action Target
               </label>
-               <Select onValueChange={(value) => setActionTarget(value)} defaultValue={actionTarget}>
+              <Select onValueChange={(value) => setActionTarget(value)} defaultValue={actionTarget}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a page" />
                 </SelectTrigger>
