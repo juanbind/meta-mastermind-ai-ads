@@ -79,12 +79,25 @@ const FunnelCanvas: React.FC<FunnelCanvasProps> = ({ onSave, funnelId, initialIt
     if (!onCreatePages) return;
     
     try {
-      // Create the pages based on the template structure
-      await onCreatePages(templatePages);
+      // Get the pre-built pages with content from template structures
+      const fullTemplatePages = templatePages.map(page => {
+        // Find the matching structure in our template definitions
+        const templateData = TEMPLATE_STRUCTURES[templateType as keyof typeof TEMPLATE_STRUCTURES]
+          .find(tpl => tpl.name === page.name);
+        
+        // Return the page with the pre-built content
+        return {
+          ...page,
+          content: templateData?.content || []
+        };
+      });
+      
+      // Create the pages based on the template structure with content
+      await onCreatePages(fullTemplatePages);
       
       toast({
         title: 'Template created',
-        description: `Created a new ${templateType.toLowerCase().replace('_', ' ')} with ${templatePages.length} pages.`
+        description: `Created a new ${templateType.toLowerCase().replace('_', ' ')} with ${templatePages.length} pages including pre-built content.`
       });
       
     } catch (error) {
