@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { ELEMENT_TYPES } from './FunnelElement';
+import React, { useState, useEffect } from 'react';
+import { ELEMENT_TYPES, DEFAULT_ELEMENT_PROPS } from './FunnelElement';
 import { useToast } from '@/hooks/use-toast';
 import { CanvasItem } from './FunnelCanvas';
 import ElementControls from './renderers/ElementControls';
@@ -19,6 +19,7 @@ export interface FunnelRenderedElementProps {
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onDuplicate?: () => void;
   device: 'mobile' | 'tablet' | 'desktop';
 }
 
@@ -31,34 +32,23 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
   onRemove,
   onMoveUp,
   onMoveDown,
+  onDuplicate,
   device
 }) => {
   const [editableContent, setEditableContent] = useState(item.content);
   const [editableProps, setEditableProps] = useState(item.props || {});
   const { toast } = useToast();
   
+  // Reset editable content when item changes
+  useEffect(() => {
+    setEditableContent(item.content);
+    setEditableProps(item.props || {});
+  }, [item.id, item.content, item.props]);
+  
   const handleSave = () => {
     try {
       // For elements with JSON content, validate it can be parsed
-      if (typeof editableContent === 'string' && 
-          [
-            ELEMENT_TYPES.FORM, 
-            ELEMENT_TYPES.MULTIPLE_CHOICE,
-            ELEMENT_TYPES.DROPDOWN,
-            ELEMENT_TYPES.IMAGE_SLIDER,
-            ELEMENT_TYPES.HERO_SECTION,
-            ELEMENT_TYPES.FEATURES_BLOCK,
-            ELEMENT_TYPES.TESTIMONIAL_BLOCK,
-            ELEMENT_TYPES.CTA_BLOCK,
-            ELEMENT_TYPES.FAQ_BLOCK,
-            ELEMENT_TYPES.PRICING_BLOCK,
-            ELEMENT_TYPES.SOCIAL_PROOF,
-            ELEMENT_TYPES.COUNTDOWN,
-            ELEMENT_TYPES.TRUST_BADGES,
-            ELEMENT_TYPES.IMAGE_TEXT_SECTION,
-            ELEMENT_TYPES.LIST_WITH_ICONS,
-            ELEMENT_TYPES.LEAD_CAPTURE_FORM
-          ].includes(item.type)) {
+      if (typeof editableContent === 'string' && needsJsonValidation(item.type)) {
         JSON.parse(editableContent);
       }
       
@@ -76,6 +66,29 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
     }
   };
 
+  // Check if element type needs JSON validation
+  const needsJsonValidation = (type: string): boolean => {
+    const jsonTypes = [
+      ELEMENT_TYPES.FORM, 
+      ELEMENT_TYPES.MULTIPLE_CHOICE,
+      ELEMENT_TYPES.DROPDOWN,
+      ELEMENT_TYPES.IMAGE_SLIDER,
+      ELEMENT_TYPES.HERO_SECTION,
+      ELEMENT_TYPES.FEATURES_BLOCK,
+      ELEMENT_TYPES.TESTIMONIAL_BLOCK,
+      ELEMENT_TYPES.CTA_BLOCK,
+      ELEMENT_TYPES.FAQ_BLOCK,
+      ELEMENT_TYPES.PRICING_BLOCK,
+      ELEMENT_TYPES.SOCIAL_PROOF,
+      ELEMENT_TYPES.COUNTDOWN,
+      ELEMENT_TYPES.TRUST_BADGES,
+      ELEMENT_TYPES.IMAGE_TEXT_SECTION,
+      ELEMENT_TYPES.LIST_WITH_ICONS,
+      ELEMENT_TYPES.LEAD_CAPTURE_FORM
+    ];
+    return jsonTypes.includes(type);
+  };
+  
   // Content blocks that should use ContentBlockRenderer
   const contentBlocks = [
     ELEMENT_TYPES.HERO_SECTION,
@@ -114,6 +127,17 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
       return <BasicElementRenderer type={item.type} content={item.content} props={item.props} />;
     }
   };
+
+  // Get element category class for styling
+  const getElementCategoryClass = () => {
+    if (contentBlocks.includes(item.type)) {
+      return 'border-blue-200 hover:border-blue-300';
+    } else if (formElements.includes(item.type)) {
+      return 'border-green-200 hover:border-green-300';
+    } else {
+      return 'border-purple-200 hover:border-purple-300';
+    }
+  };
   
   return (
     <div className="relative group mb-4">
@@ -126,10 +150,14 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         onRemove={onRemove}
         onMoveUp={onMoveUp}
         onMoveDown={onMoveDown}
+        onDuplicate={onDuplicate}
       />
       
       {/* Element content */}
-      <div className="relative border border-transparent hover:border-gray-300 rounded p-2 transition-all">
+      <div className={`relative border rounded p-2 transition-all ${
+        isEditing ? 'border-purple-400 bg-white shadow-sm' : 
+        `border-transparent ${getElementCategoryClass()}`
+      }`}>
         <div className="absolute top-2 left-2 bg-gray-100 rounded-full p-1 opacity-50">
           <ElementTypeIcon type={item.type} />
         </div>

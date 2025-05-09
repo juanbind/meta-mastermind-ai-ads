@@ -24,24 +24,42 @@ const ContentElementRenderer: React.FC<ContentElementRendererProps> = ({
     const deviceSpecificProps = {
       ...props,
       device,
-      // Add responsive classes based on device
+      // Apply responsive classes based on device
       className: `${props?.className || ''} ${getDeviceSpecificClasses(device)}`,
-      // Add perspective styling
+      // Apply perspective styling for 3D effect
       style: {
         ...(props?.style || {}),
         borderRadius: props?.borderRadius || '8px',
         overflow: 'hidden',
+        transform: props?.perspective ? `perspective(1000px) rotateX(${props.perspectiveAngle || '2deg'})` : 'none',
+        boxShadow: props?.elevation ? getElevationShadow(props.elevation) : 'none',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       }
     };
 
     return (
-      <div className="perspective-content-block">
-        <ContentBlockRenderer 
-          type={type} 
-          content={parsedContent} 
-          props={deviceSpecificProps} 
-          device={device} 
-        />
+      <div className="perspective-content-block relative">
+        {/* Device frame for better preview */}
+        {device !== 'desktop' && (
+          <div className={`absolute inset-0 pointer-events-none border-2 rounded-lg ${
+            device === 'mobile' ? 'border-purple-200' : 'border-purple-100'
+          }`}>
+            {/* Device notch/home indicator */}
+            {device === 'mobile' && (
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-purple-200 rounded-b-lg"></div>
+            )}
+          </div>
+        )}
+        
+        {/* Content rendering */}
+        <div className="relative z-10">
+          <ContentBlockRenderer 
+            type={type} 
+            content={parsedContent} 
+            props={deviceSpecificProps} 
+            device={device} 
+          />
+        </div>
       </div>
     );
   } catch (error) {
@@ -71,6 +89,26 @@ const getDeviceSpecificClasses = (device: 'mobile' | 'tablet' | 'desktop'): stri
       return 'max-w-4xl mx-auto';
     default:
       return '';
+  }
+};
+
+// Helper function to generate elevation shadow based on level
+const getElevationShadow = (elevation: number): string => {
+  switch(elevation) {
+    case 0:
+      return 'none';
+    case 1:
+      return '0 2px 5px rgba(0,0,0,0.1)';
+    case 2:
+      return '0 3px 8px rgba(0,0,0,0.12)';
+    case 3:
+      return '0 5px 15px rgba(0,0,0,0.15)';
+    case 4:
+      return '0 8px 20px rgba(0,0,0,0.18)';
+    case 5:
+      return '0 12px 28px rgba(0,0,0,0.2)';
+    default:
+      return '0 3px 8px rgba(0,0,0,0.12)';
   }
 };
 
