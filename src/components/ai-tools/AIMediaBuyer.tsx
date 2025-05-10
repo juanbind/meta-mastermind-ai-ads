@@ -26,6 +26,91 @@ const objectiveOptions = [
   { value: "traffic", label: "Traffic" }
 ];
 
+// Business type options
+const businessTypes = [
+  // Retail & E-commerce
+  { value: 'apparel', label: 'Apparel & Fashion' },
+  { value: 'beauty', label: 'Beauty & Cosmetics' },
+  { value: 'electronics', label: 'Electronics & Technology' },
+  { value: 'home_decor', label: 'Home Decor & Furniture' },
+  { value: 'jewelry', label: 'Jewelry & Accessories' },
+  { value: 'toys_hobbies', label: 'Toys & Hobbies' },
+  { value: 'specialty_retail', label: 'Specialty Retail' },
+  { value: 'general_ecommerce', label: 'General E-commerce' },
+  
+  // Health & Wellness
+  { value: 'fitness', label: 'Fitness & Gyms' },
+  { value: 'healthcare', label: 'Healthcare & Medical' },
+  { value: 'mental_health', label: 'Mental Health Services' },
+  { value: 'nutrition', label: 'Nutrition & Supplements' },
+  { value: 'spa_wellness', label: 'Spa & Wellness Centers' },
+  { value: 'pharmacy', label: 'Pharmacy' },
+  
+  // Services
+  { value: 'accounting', label: 'Accounting & Financial Services' },
+  { value: 'consulting', label: 'Consulting Services' },
+  { value: 'cleaning', label: 'Cleaning Services' },
+  { value: 'legal', label: 'Legal Services' },
+  { value: 'marketing', label: 'Marketing & PR' },
+  { value: 'photography', label: 'Photography & Videography' },
+  { value: 'repair', label: 'Repair Services' },
+  { value: 'security', label: 'Security Services' },
+  { value: 'coaching', label: 'Coaching & Training' },
+  
+  // Technology
+  { value: 'saas', label: 'SaaS & Software' },
+  { value: 'app_development', label: 'App Development' },
+  { value: 'it_services', label: 'IT Services & Support' },
+  { value: 'web_design', label: 'Web Design & Development' },
+  { value: 'data_analytics', label: 'Data & Analytics' },
+  { value: 'cybersecurity', label: 'Cybersecurity' },
+  { value: 'ai_ml', label: 'AI & Machine Learning' },
+  
+  // Food & Beverage
+  { value: 'restaurant', label: 'Restaurant' },
+  { value: 'cafe', label: 'Cafe & Coffee Shop' },
+  { value: 'bakery', label: 'Bakery' },
+  { value: 'food_truck', label: 'Food Truck' },
+  { value: 'catering', label: 'Catering' },
+  { value: 'bar_nightclub', label: 'Bar & Nightclub' },
+  { value: 'food_delivery', label: 'Food Delivery Service' },
+  
+  // Education
+  { value: 'higher_education', label: 'Higher Education' },
+  { value: 'online_course', label: 'Online Courses & E-Learning' },
+  { value: 'tutoring', label: 'Tutoring & Test Prep' },
+  { value: 'vocational', label: 'Vocational Training' },
+  { value: 'language', label: 'Language Schools' },
+  { value: 'childhood_education', label: 'Early Childhood Education' },
+  
+  // Real Estate & Housing
+  { value: 'real_estate', label: 'Real Estate' },
+  { value: 'property_management', label: 'Property Management' },
+  { value: 'home_services', label: 'Home Services' },
+  { value: 'interior_design', label: 'Interior Design' },
+  { value: 'construction', label: 'Construction' },
+  { value: 'architecture', label: 'Architecture' },
+  
+  // Entertainment & Events
+  { value: 'event_planning', label: 'Event Planning & Services' },
+  { value: 'entertainment', label: 'Entertainment Venue' },
+  { value: 'film_production', label: 'Film & Production' },
+  { value: 'music', label: 'Music & Recording' },
+  { value: 'gaming', label: 'Gaming & eSports' },
+  
+  // Other Industries  
+  { value: 'agriculture', label: 'Agriculture & Farming' },
+  { value: 'automotive', label: 'Automotive' },
+  { value: 'charity', label: 'Charity & Non-profit' },
+  { value: 'manufacturing', label: 'Manufacturing' },
+  { value: 'media_news', label: 'Media & News' },
+  { value: 'pets', label: 'Pet Services & Supplies' },
+  { value: 'sports', label: 'Sports & Recreation' },
+  { value: 'transportation', label: 'Transportation & Logistics' },
+  { value: 'travel', label: 'Travel & Tourism' },
+  { value: 'other', label: 'Other' }
+];
+
 const audienceTypes = [
   { value: "cold", label: "Cold Audience" },
   { value: "warm", label: "Warm Audience" },
@@ -389,7 +474,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             <div className="space-y-2">
               <label className="text-sm font-medium">Business Name <span className="text-red-500">*</span></label>
               <Input 
-                placeholder="E.g., Acme Corporation" 
+                placeholder="Enter your business name" 
                 value={formData.businessName}
                 onChange={(e) => handleInputChange('businessName', e.target.value)}
               />
@@ -398,12 +483,42 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Business Type <span className="text-red-500">*</span></label>
-              <Input 
-                placeholder="E.g., E-commerce Store, SaaS, Local Business" 
+              <Select
                 value={formData.businessType}
-                onChange={(e) => handleInputChange('businessType', e.target.value)}
-              />
+                onValueChange={(value) => handleInputChange('businessType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select business type" />
+                </SelectTrigger>
+                <SelectContent className="max-h-72 overflow-y-auto">
+                  {businessTypes.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-xs text-gray-500">The type or category of your business</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Industry Vertical <span className="text-red-500">*</span></label>
+              <Select
+                value={formData.industryVertical}
+                onValueChange={(value) => handleInputChange('industryVertical', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your industry" />
+                </SelectTrigger>
+                <SelectContent>
+                  {industryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">The industry your business operates in</p>
             </div>
             
             <div className="space-y-2">
@@ -425,26 +540,6 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
               />
               <p className="text-xs text-gray-500">Your main business website address</p>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Industry Vertical <span className="text-red-500">*</span></label>
-              <Select
-                value={formData.industryVertical}
-                onValueChange={(value) => handleInputChange('industryVertical', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  {industryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500">The industry your business operates in</p>
             </div>
           </div>
         );
@@ -984,6 +1079,9 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         ) : null;
+
+      default:
+        return null;
     }
   };
 
