@@ -49,6 +49,12 @@ const Navbar: React.FC = () => {
               Ads Library
             </button>
             <button 
+              onClick={() => navigate('/ai-tools')}
+              className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
+            >
+              AI Tools
+            </button>
+            <button 
               onClick={() => navigate('/funnel-builder')}
               className="text-white hover:text-metamaster-primary font-medium transition-all-ease"
             >
@@ -114,6 +120,15 @@ const Navbar: React.FC = () => {
               className="text-white hover:text-metamaster-primary font-medium py-2"
             >
               Ads Library
+            </button>
+            <button 
+              onClick={() => {
+                navigate('/ai-tools');
+                setMobileMenuOpen(false);
+              }}
+              className="text-white hover:text-metamaster-primary font-medium py-2"
+            >
+              AI Tools
             </button>
             <button 
               onClick={() => {
