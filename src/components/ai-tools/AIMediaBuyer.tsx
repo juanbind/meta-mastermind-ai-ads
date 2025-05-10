@@ -283,36 +283,39 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
     
     switch (currentStep) {
-      case 1: // Campaign & Business Information
+      case 1: // Campaign & Business Information - UPDATED FROM AIMediaBuyerEnhanced
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Campaign & Business Information</h2>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Business Name</label>
+              <label className="text-sm font-medium">Business Name <span className="text-red-500">*</span></label>
               <Input 
                 placeholder="E.g., Acme Fitness" 
                 value={formData.business}
                 onChange={(e) => handleInputChange('business', e.target.value)}
               />
+              <p className="text-xs text-gray-500">The name of your business or brand</p>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Product or Service</label>
+              <label className="text-sm font-medium">Product or Service <span className="text-red-500">*</span></label>
               <Input 
                 placeholder="E.g., Fitness Membership" 
                 value={formData.product}
                 onChange={(e) => handleInputChange('product', e.target.value)}
               />
+              <p className="text-xs text-gray-500">The specific product or service you're advertising</p>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Industry</label>
+              <label className="text-sm font-medium">Industry <span className="text-red-500">*</span></label>
               <Input 
                 placeholder="E.g., Health & Fitness" 
                 value={formData.industry}
                 onChange={(e) => handleInputChange('industry', e.target.value)}
               />
+              <p className="text-xs text-gray-500">Your business category or industry</p>
             </div>
 
             <div className="space-y-2">
@@ -322,6 +325,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 value={formData.websiteUrl}
                 onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
               />
+              <p className="text-xs text-gray-500">Your main website address</p>
             </div>
 
             <div className="space-y-2">
@@ -331,23 +335,28 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 value={formData.salesFunnelUrl}
                 onChange={(e) => handleInputChange('salesFunnelUrl', e.target.value)}
               />
+              <p className="text-xs text-gray-500">The specific landing page for your offer</p>
             </div>
           </div>
         );
         
-      case 2: // Target Audience
+      case 2: // Target Audience - UPDATED FROM AIMediaBuyerEnhanced
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Target Audience</h2>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Audience Description</label>
+              <label className="text-sm font-medium">Audience Description <span className="text-red-500">*</span></label>
               <Textarea 
                 placeholder="Describe your target audience (age, interests, pain points, etc.)"
                 value={formData.audience}
                 onChange={(e) => handleInputChange('audience', e.target.value)}
-                className="min-h-[100px]"
+                className="min-h-[120px]"
               />
+              <p className="text-xs text-gray-500">
+                The more specific you are about who your ideal customers are, the better we can target your ads.
+                Include demographics, interests, behaviors, and pain points.
+              </p>
             </div>
             
             <div className="space-y-2">
@@ -370,26 +379,47 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                   </Button>
                 ))}
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                <strong>Cold:</strong> New prospects who don't know your brand<br/>
+                <strong>Warm:</strong> People who have interacted with your content<br/>
+                <strong>Hot:</strong> People who have shown high interest in your products
+              </p>
             </div>
           </div>
         );
 
-      case 3: // Ideal Customer Profile
+      case 3: // Ideal Customer Profile - UPDATED FROM AIMediaBuyerEnhanced
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ideal Customer Profile</h2>
             
+            <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-4">
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Why this matters</h3>
+              <p className="text-sm text-blue-700">
+                Defining your ideal customer helps our AI create highly targeted campaigns that speak directly 
+                to the people most likely to purchase from you. This leads to lower acquisition costs and higher conversion rates.
+              </p>
+            </div>
+            
             <div className="space-y-2">
-              <label className="text-sm font-medium">Describe Your Ideal Customer</label>
+              <label className="text-sm font-medium">Describe Your Ideal Customer <span className="text-red-500">*</span></label>
               <Textarea 
                 placeholder="Describe your ideal customer in detail - their demographics, behaviors, motivations, and pain points"
                 value={formData.idealCustomerProfile}
                 onChange={(e) => handleInputChange('idealCustomerProfile', e.target.value)}
                 className="min-h-[200px]"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                The more specific you are, the better we can target your ads.
-              </p>
+              <div className="text-xs text-gray-500 mt-2 space-y-1">
+                <p>Include information such as:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Demographics (age, gender, location, income level, etc.)</li>
+                  <li>Psychographics (values, interests, lifestyle, attitudes)</li>
+                  <li>Pain points and challenges they face</li>
+                  <li>Goals and aspirations</li>
+                  <li>Buying behaviors and preferences</li>
+                  <li>Where they spend time online</li>
+                </ul>
+              </div>
             </div>
           </div>
         );
