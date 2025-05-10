@@ -1,7 +1,5 @@
-
 import React from 'react';
 import { Search, Zap, LayoutGrid, BarChart2, Users, Image } from 'lucide-react';
-
 const features = [{
   icon: <Search className="w-6 h-6 text-adking-primary" />,
   title: "Ad Discovery & Research",
@@ -33,7 +31,6 @@ const features = [{
   description: "Manage leads, clients, and team members all in one place.",
   features: ["Multi-user workspaces", "Client folders for agencies", "Client dashboard (white-label)"]
 }];
-
 export function FeatureSection() {
   return <section className="py-16 md:py-20 px-4">
       <div className="text-center mb-12 md:mb-16">
@@ -46,11 +43,7 @@ export function FeatureSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
-        {features.map((feature, index) => (
-          <div 
-            key={index} 
-            className="p-4 md:p-6 border border-adking-gray-300 rounded-xl hover:border-adking-primary/30 transition-all duration-300 bg-white shadow-sm"
-          >
+        {features.map((feature, index) => <div key={index} className="p-4 md:p-6 border border-adking-gray-300 rounded-xl hover:border-adking-primary/30 transition-all duration-300 shadow-sm bg-[#fffbee]">
             <div className="w-12 h-12 rounded-lg bg-adking-primary/10 flex items-center justify-center mb-4 md:mb-6">
               {feature.icon}
             </div>
@@ -61,21 +54,15 @@ export function FeatureSection() {
               {feature.description}
             </p>
             <ul className="space-y-2 md:space-y-3">
-              {feature.features.map((item, i) => (
-                <li key={i} className="flex items-center gap-2 md:gap-3 text-sm md:text-base text-adking-gray-700">
+              {feature.features.map((item, i) => <li key={i} className="flex items-center gap-2 md:gap-3 text-sm md:text-base text-adking-gray-700">
                   <div className="w-1.5 h-1.5 rounded-full bg-adking-primary flex-shrink-0" />
                   {item}
-                </li>
-              ))}
+                </li>)}
             </ul>
-            <a 
-              href="#" 
-              className="inline-block mt-4 md:mt-6 text-sm md:text-base text-adking-primary hover:text-adking-secondary transition-colors font-medium"
-            >
+            <a href="#" className="inline-block mt-4 md:mt-6 text-sm md:text-base text-adking-primary hover:text-adking-secondary transition-colors font-medium">
               Learn more →
             </a>
-          </div>
-        ))}
+          </div>)}
       </div>
     </section>;
 }
