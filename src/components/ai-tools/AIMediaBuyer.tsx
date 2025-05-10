@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -242,8 +241,8 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       
       // Mock generated strategy - in production this would come from your backend
       const mockStrategy: CampaignStrategy = {
-        title: `${formData.objective.charAt(0).toUpperCase() + formData.objective.slice(1)} Campaign for ${formData.product || formData.businessName}`,
-        description: `AI-optimized strategy for ${formData.businessName} targeting ${formData.targetAudience || formData.audience || "relevant audiences"} in the ${formData.industryVertical || formData.industry} industry, focused on ${formData.objective} objectives.`,
+        title: `${formData.objective.charAt(0).toUpperCase() + formData.objective.slice(1)} Campaign for ${formData.product}`,
+        description: `AI-optimized strategy for ${formData.businessName || formData.product} targeting ${formData.targetAudience || formData.audience || "relevant audiences"} in the ${formData.industryVertical || formData.industry} industry, focused on ${formData.objective} objectives.`,
         platforms: formData.platforms,
         budgetAllocation: formData.platforms.map((platform) => ({
           platform,
@@ -715,7 +714,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         );
-      
+
       case 5: // Ad Creative
         return (
           <div className="space-y-6">
@@ -838,71 +837,45 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                       <Target className="mr-2 h-5 w-5 text-metamaster-primary" />
                       Platform Strategy
                     </CardTitle>
+                    <CardDescription>
+                      Recommended platforms and budget allocation
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <p className="text-sm text-metamaster-gray-500">Recommended platforms for your campaign:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {generatedStrategy.platforms.map((platform) => (
-                          <div key={platform} className="flex items-center p-2 border border-metamaster-gray-200 rounded-md">
-                            <Check className="h-5 w-5 text-green-500 mr-2" />
-                            <span className="capitalize">{platform}</span>
-                          </div>
-                        ))}
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Selected Platforms:</h4>
+                        <div className="flex gap-2 flex-wrap">
+                          {generatedStrategy.platforms.map(platform => (
+                            <div key={platform} className="px-3 py-1 bg-metamaster-primary/10 text-metamaster-primary rounded-full text-sm">
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       
-                      <div className="mt-4">
-                        <h4 className="font-medium mb-2">Budget Allocation</h4>
-                        {generatedStrategy.budgetAllocation.map((item) => (
-                          <div key={item.platform} className="flex justify-between items-center mb-1">
-                            <span className="capitalize">{item.platform}</span>
-                            <span className="font-medium">{item.percentage}%</span>
-                          </div>
-                        ))}
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Budget Allocation:</h4>
+                        <div className="space-y-2">
+                          {generatedStrategy.budgetAllocation.map(allocation => (
+                            <div key={allocation.platform} className="flex justify-between items-center">
+                              <span className="text-sm capitalize">{allocation.platform}:</span>
+                              <div className="flex items-center">
+                                <div className="w-32 h-2 bg-gray-200 rounded-full mr-2">
+                                  <div 
+                                    className="h-full bg-metamaster-primary rounded-full" 
+                                    style={{ width: `${allocation.percentage}%` }}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium">{allocation.percentage}%</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center">
-                        <DollarSign className="mr-2 h-4 w-4 text-metamaster-primary" />
-                        Budget Recommendation
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm">
-                        Daily: ${Math.round(formData.budgetRange[0]/30)} - ${Math.round(formData.budgetRange[1]/30)}
-                      </p>
-                      <p className="text-sm">
-                        Monthly: ${formData.budgetRange[0]} - ${formData.budgetRange[1]}
-                      </p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center">
-                        <TrendingUp className="mr-2 h-4 w-4 text-metamaster-primary" />
-                        Expected Results
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm">
-                        Based on your industry and budget, you can expect:
-                      </p>
-                      <p className="text-sm font-medium mt-1">
-                        {formData.objective === 'awareness' && '100K-500K Impressions'}
-                        {formData.objective === 'traffic' && '5K-25K Clicks'}
-                        {formData.objective === 'conversions' && '50-250 Conversions'}
-                        {formData.objective === 'leads' && '100-500 Leads'}
-                        {formData.objective === 'consideration' && '1K-5K Engagement Actions'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
               </TabsContent>
               
               <TabsContent value="audience" className="space-y-4 pt-4">
@@ -912,12 +885,17 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                       <Users className="mr-2 h-5 w-5 text-metamaster-primary" />
                       Audience Strategy
                     </CardTitle>
+                    <CardDescription>
+                      Recommended audience targeting approaches
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {generatedStrategy.audienceTargeting.map((segment, index) => (
-                        <div key={index} className="pb-4 border-b border-metamaster-gray-200 last:border-0">
-                          <h4 className="font-medium mb-2 capitalize">{segment.segment} Audience</h4>
+                    <div className="space-y-6">
+                      {generatedStrategy.audienceTargeting.map(segment => (
+                        <div key={segment.segment} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                          <h4 className="text-sm font-medium mb-2 capitalize">
+                            {segment.segment} Audience Approach:
+                          </h4>
                           <p className="text-sm text-metamaster-gray-600">{segment.approach}</p>
                         </div>
                       ))}
@@ -933,18 +911,21 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                       <Sparkles className="mr-2 h-5 w-5 text-metamaster-primary" />
                       Creative Recommendations
                     </CardTitle>
+                    <CardDescription>
+                      Best practices for your ad creative
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
-                      {generatedStrategy.creativeRecommendations.map((rec, index) => (
-                        <div key={index} className="flex items-start gap-2 pb-2">
-                          <div className="w-6 h-6 rounded-full bg-metamaster-primary text-white flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs font-bold">{index + 1}</span>
-                          </div>
-                          <p className="text-sm">{rec}</p>
-                        </div>
+                    <ul className="space-y-2">
+                      {generatedStrategy.creativeRecommendations.map((tip, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-metamaster-primary/10 text-metamaster-primary text-xs mr-2 mt-0.5">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm">{tip}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -954,61 +935,140 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <TrendingUp className="mr-2 h-5 w-5 text-metamaster-primary" />
-                      Optimization Tips
+                      Optimization Strategy
                     </CardTitle>
+                    <CardDescription>
+                      Tips to maximize campaign performance
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <ul className="space-y-2">
                       {generatedStrategy.optimizationTips.map((tip, index) => (
-                        <div key={index} className="flex items-start gap-2 pb-2">
-                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <p className="text-sm">{tip}</p>
-                        </div>
+                        <li key={index} className="flex items-start">
+                          <Check className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
+                          <span className="text-sm">{tip}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
-            
-            <div className="mt-8">
-              <div className="space-y-4">
-                <FacebookConnection
-                  onConnected={handleFacebookConnection}
-                  isConnected={fbConnected}
-                  accountData={fbAccountData}
-                />
-                
-                <Button 
-                  onClick={handleSubmitCampaign} 
-                  disabled={!fbConnected || isSubmittingCampaign}
-                  className="w-full py-6"
-                >
-                  {isSubmittingCampaign ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Submitting Campaign...
-                    </>
-                  ) : (
-                    <>
-                      Submit Campaign to Facebook
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </div>
+
+            <div className="pt-4 border-t border-gray-200 mt-6">
+              <h3 className="text-lg font-medium mb-4">Launch Your Campaign</h3>
+              <FacebookConnection 
+                onConnected={handleFacebookConnection}
+                isConnected={fbConnected}
+                accountData={fbAccountData}
+              />
+              
+              {fbConnected && (
+                <div className="mt-6">
+                  <Button
+                    onClick={handleSubmitCampaign}
+                    disabled={isSubmittingCampaign}
+                    className="w-full"
+                  >
+                    {isSubmittingCampaign ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2" /> 
+                        Submitting Campaign...
+                      </>
+                    ) : (
+                      <>Launch Campaign on Facebook</>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ) : null;
-
-      default:
-        return null;
     }
   };
 
   return (
-    <div>
-      {renderStep()}
+    <div className="py-2">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-metamaster-primary">AI Media Buyer</h2>
+      </div>
+      
+      {/* Progress indicators - only show for steps 1-6 */}
+      {currentStep < 7 && (
+        <div className="flex mb-6">
+          {[1, 2, 3, 4, 5, 6].map((step) => (
+            <div key={step} className="flex-1 relative">
+              <div 
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm mx-auto z-10 relative
+                  ${currentStep >= step 
+                    ? 'bg-metamaster-primary text-white'
+                    : 'bg-gray-200 text-gray-500'}`
+                }
+              >
+                {step}
+              </div>
+              <div className="text-xs text-center mt-2 text-metamaster-gray-600">
+                {step === 1 && "Business Info"}
+                {step === 2 && "Target Audience"}
+                {step === 3 && "Ideal Customer"}
+                {step === 4 && "Ad Copy"}
+                {step === 5 && "Ad Creative"}
+                {step === 6 && "Budget & Config"}
+              </div>
+              {step < 6 && (
+                <div 
+                  className={`absolute top-4 w-full h-0.5 
+                    ${currentStep > step ? 'bg-metamaster-primary' : 'bg-gray-200'}`
+                  }
+                  style={{ left: '50%' }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <div className="mb-6">
+        {renderStep()}
+      </div>
+      
+      {/* Navigation buttons */}
+      {!campaignCreated && currentStep < 7 && (
+        <div className="flex justify-between pt-4 border-t border-gray-200">
+          {currentStep > 1 && (
+            <Button 
+              variant="outline" 
+              onClick={prevStep}
+              disabled={isGenerating}
+            >
+              Back
+            </Button>
+          )}
+          
+          <Button 
+            onClick={nextStep} 
+            disabled={isGenerating || (currentStep === 6)}
+          >
+            {currentStep < 6 ? (
+              <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
+            ) : (
+              <>Generate Campaign</>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Close button for campaign created or strategy step */}
+      {(campaignCreated || currentStep === 7) && !fbConnected && (
+        <div className="flex justify-end pt-4 border-t border-gray-200">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+          >
+            Close
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
