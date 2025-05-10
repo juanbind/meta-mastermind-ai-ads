@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users 
+} from "lucide-react";
 import FacebookConnection from './FacebookConnection';
 import AdCreativeForm from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
