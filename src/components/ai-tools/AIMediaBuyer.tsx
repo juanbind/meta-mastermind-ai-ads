@@ -1040,6 +1040,13 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
   };
 
+  // Determine step status (active, completed, or default)
+  const getStepStatus = (stepNumber: number) => {
+    if (stepNumber === currentStep) return "active";
+    if (stepNumber < currentStep) return "completed";
+    return "default";
+  };
+
   return (
     <div className="py-2">
       <div className="flex justify-between items-center mb-6">
@@ -1048,36 +1055,34 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       
       {/* Progress indicators - only show for steps 1-6 */}
       {currentStep < 7 && (
-        <div className="flex mb-6">
-          {[1, 2, 3, 4, 5, 6].map((step) => (
-            <div key={step} className="flex-1 relative">
-              <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm mx-auto z-10 relative
-                  ${currentStep >= step 
-                    ? 'bg-metamaster-primary text-white'
-                    : 'bg-gray-200 text-gray-500'}`
-                }
-              >
-                {step}
+        <div className="flex mb-8 ai-media-buyer-steps">
+          {[1, 2, 3, 4, 5, 6].map((step, index) => {
+            const status = getStepStatus(step);
+            return (
+              <div key={step} className="flex-1 flex flex-col items-center">
+                <div className="flex items-center w-full">
+                  <div 
+                    className={`step-circle ${status}`}
+                  >
+                    {status === "completed" ? <Check size={16} /> : step}
+                  </div>
+                  {step < 6 && (
+                    <div 
+                      className={`step-line ${index < currentStep - 1 ? "completed" : ""}`}
+                    />
+                  )}
+                </div>
+                <div className={`step-text ${status}`}>
+                  {step === 1 && "Business Info"}
+                  {step === 2 && "Target Audience"}
+                  {step === 3 && "Ideal Customer"}
+                  {step === 4 && "Ad Copy"}
+                  {step === 5 && "Ad Creative"}
+                  {step === 6 && "Budget & Config"}
+                </div>
               </div>
-              <div className="text-xs text-center mt-2 text-metamaster-gray-600">
-                {step === 1 && "Business Info"}
-                {step === 2 && "Target Audience"}
-                {step === 3 && "Ideal Customer"}
-                {step === 4 && "Ad Copy"}
-                {step === 5 && "Ad Creative"}
-                {step === 6 && "Budget & Config"}
-              </div>
-              {step < 6 && (
-                <div 
-                  className={`absolute top-4 w-full h-0.5 
-                    ${currentStep > step ? 'bg-metamaster-primary' : 'bg-gray-200'}`
-                  }
-                  style={{ left: '50%' }}
-                />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       

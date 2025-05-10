@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -85,8 +84,51 @@ const AIMediaBuyerPage: React.FC = () => {
     });
   };
 
+  // Add custom styling for the progress step circles in the AIMediaBuyer component
+  const customStyles = `
+    .ai-media-buyer-steps .step-circle {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      background-color: #f5f5f5;
+      color: #757575;
+    }
+    .ai-media-buyer-steps .step-circle.active {
+      background-color: #FFD700;
+      color: white;
+    }
+    .ai-media-buyer-steps .step-circle.completed {
+      background-color: #FFD700;
+      color: white;
+    }
+    .ai-media-buyer-steps .step-line {
+      flex: 1;
+      height: 1px;
+      background-color: #e0e0e0;
+    }
+    .ai-media-buyer-steps .step-line.completed {
+      background-color: #FFD700;
+    }
+    .ai-media-buyer-steps .step-text {
+      font-size: 0.75rem;
+      color: #757575;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+    .ai-media-buyer-steps .step-text.active,
+    .ai-media-buyer-steps .step-text.completed {
+      color: #424242;
+      font-weight: 500;
+    }
+  `;
+
   return (
     <div className="min-h-screen bg-adking-gray-100">
+      <style>{customStyles}</style>
       <Sidebar />
       <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
