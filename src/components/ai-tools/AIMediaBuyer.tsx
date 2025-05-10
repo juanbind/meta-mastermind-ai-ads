@@ -731,7 +731,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 4: // Ad Copy - UPDATED to include skip option
+      case 4: // Ad Copy - UPDATED to reduce duplication
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ad Copy</h2>
@@ -745,38 +745,13 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Product URL or Description</label>
-                  <Textarea 
-                    placeholder="Enter your product URL or description" 
-                    value={formData.websiteUrl}
-                    onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-                    className="min-h-[80px]"
+                {/* Embedded Ad Copy Generator - Pass business information from previous steps */}
+                <div className="pt-4">
+                  <AdCopyGenerator 
+                    embedded={true} 
+                    productDetails={formData.businessWebsite || formData.businessDescription} 
+                    offerDescription={formData.mainOfferDescription}
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
-                  <Textarea 
-                    placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
-                    value={formData.mainOfferDescription}
-                    onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
-                    className="min-h-[80px]"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Industry</label>
-                  <Input 
-                    placeholder="Enter your industry (e.g., 'E-commerce', 'Healthcare', 'Education')" 
-                    value={formData.industry}
-                    onChange={(e) => handleInputChange('industry', e.target.value)}
-                  />
-                </div>
-                
-                {/* Embedded Ad Copy Generator */}
-                <div className="pt-4 border-t border-gray-200 mt-6">
-                  <AdCopyGenerator embedded={true} productDetails={formData.websiteUrl} offerDescription={formData.mainOfferDescription} />
                 </div>
               </div>
             )}

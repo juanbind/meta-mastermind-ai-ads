@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,8 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { 
   Loader2, Copy, CheckCircle2, RefreshCw, Sparkles, MessageSquare, Facebook, Instagram, 
@@ -85,9 +84,52 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
     
     setIsGenerating(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
-      // Mock generated ad copies
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/generate-ad-copy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          productDetails: formData.productDetails,
+          mainOffer: formData.offerDescription,
+          adType: formData.adType,
+          platform: formData.platform,
+          tone: formData.toneOfVoice,
+          targetAudience: formData.targetAudience,
+          industry: formData.industry
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log("Generated ad copy:", data);
+      
+      if (data.versions && data.versions.length > 0) {
+        setGeneratedAds(data.versions);
+        setSelectedAd(0);
+        setStep(2);
+        
+        // Scroll to results if in embedded mode
+        if (embedded && resultRef.current) {
+          resultRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        toast({
+          title: "Ad copy generated",
+          description: "We've created compelling ad copy variants for you",
+        });
+      } else {
+        throw new Error("No ad copy variants were generated");
+      }
+    } catch (error) {
+      console.error("Failed to generate ad copy:", error);
+      
+      // If API fails, use mock data for demonstration
       const mockAds = [
         {
           primaryText: "🔥 Transform your business with our innovative solution! Our customers report 35% improved efficiency in just 30 days. Limited-time offer: Get 15% off your first month when you sign up today.",
@@ -108,14 +150,15 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
       
       setGeneratedAds(mockAds);
       setSelectedAd(0);
-      setIsGenerating(false);
       setStep(2);
       
-      // Scroll to results if in embedded mode
-      if (embedded && resultRef.current) {
-        resultRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 2000);
+      toast({
+        title: "Using demo content",
+        description: "We're showing example ad copy since we couldn't connect to the API",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
   const handleCopyToClipboard = (adIndex: number, content: string) => {
