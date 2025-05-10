@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users } from "lucide-react";
 import FacebookConnection from './FacebookConnection';
-import AdCreativeForm from './AdCreativeForm';
+import AdCreativeForm, { AdCreativeData } from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
 
 interface AIMediaBuyerProps {
@@ -78,9 +77,9 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       description: "",
       callToAction: "learn_more",
       destinationUrl: "",
-      mediaType: "manual",
+      mediaType: "manual" as "manual" | "ai",
       mediaUrl: "",
-    }
+    } as AdCreativeData
   });
   
   const [generatedStrategy, setGeneratedStrategy] = useState<CampaignStrategy | null>(null);
@@ -106,7 +105,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     });
   };
 
-  const handleAdCreativeChange = (creativeData: any) => {
+  const handleAdCreativeChange = (creativeData: AdCreativeData) => {
     setFormData((prev) => ({ ...prev, adCreative: creativeData }));
   };
 
