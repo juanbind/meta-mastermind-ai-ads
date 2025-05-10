@@ -36,7 +36,7 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
     platform: "facebook",
     toneOfVoice: "professional",
     targetAudience: "",
-    industry: "ecommerce"
+    industry: ""
   });
   
   const [generatedAds, setGeneratedAds] = useState<any[]>([]);
@@ -377,7 +377,7 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
           <Label htmlFor="industry" className="mb-1">Industry</Label>
           <Input 
             id="industry"
-            placeholder="Enter your industry (e.g., E-commerce, Healthcare)"
+            placeholder="Enter your industry"
             value={formData.industry}
             onChange={(e) => handleInputChange('industry', e.target.value)}
           />
@@ -586,3 +586,4 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
 };
 
 export default AdCopyGenerator;
+
