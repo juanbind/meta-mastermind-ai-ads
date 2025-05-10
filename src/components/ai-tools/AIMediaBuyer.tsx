@@ -12,6 +12,14 @@ import FacebookConnection from './FacebookConnection';
 import AdCreativeForm from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
 
+// Define platform options array
+const platformOptions = [
+  { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
+  { value: "messenger", label: "Messenger" },
+  { value: "audience_network", label: "Audience Network" }
+];
+
 interface AIMediaBuyerProps {
   onClose: () => void;
 }
@@ -88,7 +96,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       description: "",
       callToAction: "learn_more",
       destinationUrl: "",
-      mediaType: "manual" as const,
+      mediaType: "manual" as "manual" | "ai",
       mediaUrl: "",
     }
   });
@@ -343,7 +351,6 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             <div className="space-y-2">
               <label className="text-sm font-medium">Ad Platforms</label>
               <div className="grid grid-cols-2 gap-2">
-                {/* Keep existing platform selection */}
                 {platformOptions.map((platform) => (
                   <Button
                     key={platform.value}
