@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -51,8 +52,8 @@ const CampaignSuccessScreen: React.FC<CampaignSuccessScreenProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-4">
-          <Check className="h-6 w-6 text-green-600" />
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-adking-primary mb-4">
+          <Check className="h-6 w-6 text-adking-dark" />
         </div>
         <h2 className="text-2xl font-bold mb-2">Campaign Successfully Created!</h2>
         <p className="text-gray-600">
