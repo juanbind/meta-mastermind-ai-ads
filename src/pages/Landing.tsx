@@ -27,7 +27,7 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll relative">
-          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-6 font-medium">
+          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-dark rounded-full mb-6 font-medium">
             AdKing AI Now Live!
           </div>
           

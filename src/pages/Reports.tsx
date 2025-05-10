@@ -8,12 +8,12 @@ import { useToast } from '@/components/ui/use-toast';
 
 const EmptyChart: React.FC<{ title: string; icon: React.ReactNode }> = ({ title, icon }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 h-full">
+    <div className="bg-white p-6 rounded-xl shadow-md border border-metamaster-gray-200 h-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium text-metamaster-gray-800">{title}</h3>
         {icon}
       </div>
-      <div className="h-40 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
+      <div className="h-40 flex flex-col items-center justify-center bg-metamaster-gray-50 rounded-lg">
         <AlertCircle size={24} className="text-metamaster-gray-400 mb-2" />
         <p className="text-sm text-metamaster-gray-500">No data available</p>
       </div>
@@ -59,30 +59,32 @@ const Reports: React.FC = () => {
               </TabsList>
               
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={handleDateChange}>
+                <Button variant="outline" size="sm" onClick={handleDateChange} className="border-metamaster-gray-300 text-metamaster-gray-700">
                   <Calendar size={16} className="mr-2" />
                   Last 30 Days
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleExport}>Export</Button>
+                <Button variant="outline" size="sm" onClick={handleExport} className="border-metamaster-gray-300 text-metamaster-gray-700">
+                  Export
+                </Button>
               </div>
             </div>
             
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <EmptyChart title="Campaign Performance" icon={<TrendingUp size={18} className="text-metamaster-gray-400" />} />
-                <EmptyChart title="Lead Acquisition" icon={<Activity size={18} className="text-metamaster-gray-400" />} />
-                <EmptyChart title="Traffic Sources" icon={<PieChart size={18} className="text-metamaster-gray-400" />} />
+                <EmptyChart title="Campaign Performance" icon={<TrendingUp size={18} className="text-metamaster-gray-600" />} />
+                <EmptyChart title="Lead Acquisition" icon={<Activity size={18} className="text-metamaster-gray-600" />} />
+                <EmptyChart title="Traffic Sources" icon={<PieChart size={18} className="text-metamaster-gray-600" />} />
               </div>
               
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+              <div className="bg-white p-6 rounded-xl shadow-md border border-metamaster-gray-200">
                 <h3 className="font-medium mb-4 text-metamaster-gray-800">Performance Overview</h3>
-                <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                  <LineChart size={48} className="text-metamaster-gray-300 mb-3" />
+                <div className="h-64 flex flex-col items-center justify-center bg-metamaster-gray-50 rounded-lg">
+                  <LineChart size={48} className="text-metamaster-gray-400 mb-3" />
                   <h4 className="font-medium text-metamaster-gray-700 mb-2">No Data Available Yet</h4>
-                  <p className="text-metamaster-gray-500 text-center max-w-md">
+                  <p className="text-metamaster-gray-600 text-center max-w-md">
                     Connect your ad accounts or create campaigns to start seeing performance analytics here.
                   </p>
-                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary">
+                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-900">
                     Connect Ad Account
                   </Button>
                 </div>
@@ -90,15 +92,15 @@ const Reports: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="campaigns" className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+              <div className="bg-white p-6 rounded-xl shadow-md border border-metamaster-gray-200">
                 <h3 className="font-medium mb-4 text-metamaster-gray-800">Campaign Analytics</h3>
-                <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                  <BarChart size={48} className="text-metamaster-gray-300 mb-3" />
+                <div className="h-64 flex flex-col items-center justify-center bg-metamaster-gray-50 rounded-lg">
+                  <BarChart size={48} className="text-metamaster-gray-400 mb-3" />
                   <h4 className="font-medium text-metamaster-gray-700 mb-2">No Campaigns Yet</h4>
-                  <p className="text-metamaster-gray-500 text-center max-w-md">
+                  <p className="text-metamaster-gray-600 text-center max-w-md">
                     Create or import campaigns to see detailed analytics and performance metrics.
                   </p>
-                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary">
+                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-900">
                     Create Campaign
                   </Button>
                 </div>
@@ -106,15 +108,15 @@ const Reports: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="funnels" className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+              <div className="bg-white p-6 rounded-xl shadow-md border border-metamaster-gray-200">
                 <h3 className="font-medium mb-4 text-metamaster-gray-800">Funnel Analytics</h3>
-                <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                  <Activity size={48} className="text-metamaster-gray-300 mb-3" />
+                <div className="h-64 flex flex-col items-center justify-center bg-metamaster-gray-50 rounded-lg">
+                  <Activity size={48} className="text-metamaster-gray-400 mb-3" />
                   <h4 className="font-medium text-metamaster-gray-700 mb-2">No Funnels Created Yet</h4>
-                  <p className="text-metamaster-gray-500 text-center max-w-md">
+                  <p className="text-metamaster-gray-600 text-center max-w-md">
                     Build your first funnel to start tracking conversion rates and user journeys.
                   </p>
-                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary">
+                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-900">
                     Build Funnel
                   </Button>
                 </div>
@@ -122,15 +124,15 @@ const Reports: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="leads" className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+              <div className="bg-white p-6 rounded-xl shadow-md border border-metamaster-gray-200">
                 <h3 className="font-medium mb-4 text-metamaster-gray-800">Lead Analytics</h3>
-                <div className="h-64 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                  <PieChart size={48} className="text-metamaster-gray-300 mb-3" />
+                <div className="h-64 flex flex-col items-center justify-center bg-metamaster-gray-50 rounded-lg">
+                  <PieChart size={48} className="text-metamaster-gray-400 mb-3" />
                   <h4 className="font-medium text-metamaster-gray-700 mb-2">No Leads Captured Yet</h4>
-                  <p className="text-metamaster-gray-500 text-center max-w-md">
+                  <p className="text-metamaster-gray-600 text-center max-w-md">
                     Connect your lead capture forms or import leads to see detailed analytics.
                   </p>
-                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary">
+                  <Button className="mt-4 bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-900">
                     Set Up Lead Capture
                   </Button>
                 </div>

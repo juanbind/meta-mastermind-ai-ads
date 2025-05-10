@@ -47,7 +47,7 @@ export function PricingSection() {
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {/* Pro Plan */}
-        <Card className="border-2 border-adking-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all p-1">
+        <Card className="border-2 border-adking-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all p-1 bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold text-adking-dark">Pro</CardTitle>
             <p className="text-adking-gray-600 mt-1">For teams or solo sales reps</p>

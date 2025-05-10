@@ -16,7 +16,7 @@ const NotFound = () => {
           <div 
             ref={el => revealRef(el)}
             data-animation="fade-in"
-            className="reveal-element bg-gradient-to-r from-metamaster-primary to-metamaster-secondary text-white text-6xl font-bold inline-block rounded-xl px-6 py-3 hover-lift"
+            className="reveal-element bg-gradient-to-r from-metamaster-primary to-metamaster-secondary text-metamaster-gray-800 text-6xl font-bold inline-block rounded-xl px-6 py-3 hover-lift"
           >
             404
           </div>
@@ -25,7 +25,7 @@ const NotFound = () => {
         <h1 
           ref={el => revealRef(el)}
           data-animation="fade-up" 
-          className="reveal-element text-3xl font-bold mb-4"
+          className="reveal-element text-3xl font-bold mb-4 text-metamaster-gray-800"
         >
           Page Not Found
         </h1>
@@ -42,7 +42,7 @@ const NotFound = () => {
           <Button 
             ref={el => revealRef(el)}
             data-animation="slide-right"
-            className="bg-metamaster-primary hover:bg-metamaster-secondary button-press reveal-element"
+            className="bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-800 button-press reveal-element"
           >
             <ArrowLeft size={18} className="mr-2" />
             Return to Home

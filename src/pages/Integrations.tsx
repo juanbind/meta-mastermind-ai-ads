@@ -31,7 +31,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({ title, description, i
   };
   
   return (
-    <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100">
+    <div className="bg-white p-5 rounded-xl shadow-md border border-metamaster-gray-200">
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-4">
           <div className="bg-metamaster-gray-100 p-3 rounded-lg">
@@ -50,7 +50,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({ title, description, i
         <Button 
           variant={isConnected ? "outline" : "default"}
           size="sm"
-          className={isConnected ? "border-green-500 text-green-600" : "bg-metamaster-primary hover:bg-metamaster-secondary"}
+          className={isConnected ? "border-green-500 text-green-600" : "bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-900"}
           onClick={handleIntegrationClick}
         >
           {isConnected ? "Connected" : "Connect"}
@@ -67,56 +67,56 @@ const Integrations: React.FC = () => {
     {
       title: "Facebook Ads",
       description: "Connect your Facebook Ad account for ad analysis and optimization.",
-      icon: <Facebook size={24} />,
+      icon: <Facebook size={24} className="text-metamaster-gray-700" />,
       isConnected: false, // Changed to false to match our "no mock data" approach
       category: "Advertising"
     },
     {
       title: "Google Ads",
       description: "Import and analyze your Google Ad campaigns.",
-      icon: <Search size={24} />,
+      icon: <Search size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Advertising"
     },
     {
       title: "Mailchimp",
       description: "Sync your email lists and automate email campaigns.",
-      icon: <Mail size={24} />,
+      icon: <Mail size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Email"
     },
     {
       title: "Stripe",
       description: "Process payments and track revenue from your funnels.",
-      icon: <CreditCard size={24} />,
+      icon: <CreditCard size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Payment"
     },
     {
       title: "Intercom",
       description: "Manage customer conversations and support tickets.",
-      icon: <MessageSquare size={24} />,
+      icon: <MessageSquare size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Support"
     },
     {
       title: "Hubspot CRM",
       description: "Sync contacts and deal information with Hubspot.",
-      icon: <Database size={24} />,
+      icon: <Database size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "CRM"
     },
     {
       title: "WordPress",
       description: "Connect your WordPress site to publish content.",
-      icon: <Globe size={24} />,
+      icon: <Globe size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Website"
     },
     {
       title: "Zapier",
       description: "Connect with thousands of apps through Zapier.",
-      icon: <Database size={24} />,
+      icon: <Database size={24} className="text-metamaster-gray-700" />,
       isConnected: false,
       category: "Automation"
     }
@@ -138,7 +138,7 @@ const Integrations: React.FC = () => {
             <p className="text-metamaster-gray-600">Connect with your favorite marketing tools and services</p>
           </div>
           
-          <div className="bg-white rounded-xl shadow-md p-5 mb-8 border border-gray-100">
+          <div className="bg-white rounded-xl shadow-md p-5 mb-8 border border-metamaster-gray-200">
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Search size={18} className="text-metamaster-gray-500" />
@@ -146,7 +146,7 @@ const Integrations: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search integrations..."
-                className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+                className="pl-10 pr-4 py-2 w-full border border-metamaster-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -167,8 +167,8 @@ const Integrations: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100 text-center">
-              <Search size={48} className="mx-auto text-metamaster-gray-300 mb-3" />
+            <div className="bg-white rounded-xl p-8 shadow-md border border-metamaster-gray-200 text-center">
+              <Search size={48} className="mx-auto text-metamaster-gray-400 mb-3" />
               <h3 className="text-lg font-bold text-metamaster-gray-800 mb-2">No integrations found</h3>
               <p className="text-metamaster-gray-600">
                 Try searching with different keywords or browse all available integrations.

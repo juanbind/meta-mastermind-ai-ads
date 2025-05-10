@@ -88,55 +88,55 @@ const Auth: React.FC = () => {
         </div>
         
         {/* Right Side - Image/Info */}
-        <div className="hidden md:block bg-gradient-to-br from-metamaster-primary/80 to-metamaster-secondary/80 p-12 text-white relative">
+        <div className="hidden md:block bg-gradient-to-br from-metamaster-primary/80 to-metamaster-secondary/80 p-12 text-metamaster-gray-900 relative">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#FFFFFF" d="M40.7,-68.2C52.9,-62.3,63,-49.1,69.5,-34.7C75.9,-20.4,78.8,-5,76.2,9.1C73.6,23.3,65.6,36.3,55.3,47.2C45,58.2,32.3,67.1,18.1,72.4C3.9,77.7,-11.7,79.3,-24,73.7C-36.2,68.1,-45,55.4,-53.8,42.9C-62.6,30.5,-71.3,18.3,-74.5,4.1C-77.7,-10.1,-75.3,-26.3,-67.3,-38.9C-59.2,-51.5,-45.5,-60.5,-31.5,-65.2C-17.6,-70,-8.8,-70.5,3.2,-75.5C15.3,-80.5,28.5,-90.1,40.7,-62.2Z" transform="translate(100 100)" />
+              <path fill="#222222" d="M40.7,-68.2C52.9,-62.3,63,-49.1,69.5,-34.7C75.9,-20.4,78.8,-5,76.2,9.1C73.6,23.3,65.6,36.3,55.3,47.2C45,58.2,32.3,67.1,18.1,72.4C3.9,77.7,-11.7,79.3,-24,73.7C-36.2,68.1,-45,55.4,-53.8,42.9C-62.6,30.5,-71.3,18.3,-74.5,4.1C-77.7,-10.1,-75.3,-26.3,-67.3,-38.9C-59.2,-51.5,-45.5,-60.5,-31.5,-65.2C-17.6,-70,-8.8,-70.5,3.2,-75.5C15.3,-80.5,28.5,-90.1,40.7,-62.2Z" transform="translate(100 100)" />
             </svg>
           </div>
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-4">Transform Your Facebook Ads Strategy</h2>
-            <p className="text-white/80 mb-6">
+            <h2 className="text-3xl font-bold mb-4 text-metamaster-gray-900">Transform Your Facebook Ads Strategy</h2>
+            <p className="text-metamaster-gray-800 mb-6">
               Join thousands of marketers who are discovering winning ads, building high-converting funnels, and scaling their businesses with AdKing.
             </p>
             
             <div className="space-y-4">
               <div className="flex items-center">
-                <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-metamaster-gray-800/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-metamaster-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p>Find winning ads in seconds, not hours</p>
+                <p className="text-metamaster-gray-900">Find winning ads in seconds, not hours</p>
               </div>
               <div className="flex items-center">
-                <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-metamaster-gray-800/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-metamaster-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p>Build high-converting funnels in minutes</p>
+                <p className="text-metamaster-gray-900">Build high-converting funnels in minutes</p>
               </div>
               <div className="flex items-center">
-                <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-metamaster-gray-800/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-metamaster-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p>Get AI-powered campaign suggestions</p>
+                <p className="text-metamaster-gray-900">Get AI-powered campaign suggestions</p>
               </div>
               <div className="flex items-center">
-                <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-metamaster-gray-800/20 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-metamaster-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p>Manage your leads with our integrated CRM</p>
+                <p className="text-metamaster-gray-900">Manage your leads with our integrated CRM</p>
               </div>
             </div>
           </div>
           
-          <div className="absolute bottom-0 right-0 p-4 text-sm text-white/70">
+          <div className="absolute bottom-0 right-0 p-4 text-sm text-metamaster-gray-800">
             Trusted by 10,000+ marketers worldwide
           </div>
         </div>
