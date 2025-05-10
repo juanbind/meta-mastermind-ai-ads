@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -248,7 +249,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       // Mock generated strategy - in production this would come from your backend
       const mockStrategy: CampaignStrategy = {
         title: `${formData.objective.charAt(0).toUpperCase() + formData.objective.slice(1)} Campaign for ${formData.product}`,
-        description: `AI-optimized strategy for ${formData.businessName || formData.business} targeting ${formData.targetAudience || formData.audience || "relevant audiences"} in the ${formData.industryVertical || formData.industry} industry, focused on ${formData.objective} objectives.`,
+        description: `AI-optimized strategy for ${formData.businessName || formData.product} targeting ${formData.targetAudience || formData.audience || "relevant audiences"} in the ${formData.industryVertical || formData.industry} industry, focused on ${formData.objective} objectives.`,
         platforms: formData.platforms,
         budgetAllocation: formData.platforms.map((platform) => ({
           platform,
