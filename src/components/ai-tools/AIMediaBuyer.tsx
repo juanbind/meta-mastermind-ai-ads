@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,16 +20,10 @@ interface AIMediaBuyerProps {
 // Updated Meta campaign objectives based on actual Meta options
 const objectiveOptions = [
   { value: "awareness", label: "Brand Awareness" },
-  { value: "reach", label: "Reach" },
-  { value: "traffic", label: "Traffic" },
-  { value: "engagement", label: "Engagement" },
-  { value: "app_installs", label: "App Installs" },
-  { value: "video_views", label: "Video Views" },
-  { value: "lead_generation", label: "Lead Generation" },
-  { value: "messages", label: "Messages" },
+  { value: "consideration", label: "Consideration" },
   { value: "conversions", label: "Conversions" },
-  { value: "catalog_sales", label: "Catalog Sales" },
-  { value: "store_traffic", label: "Store Traffic" }
+  { value: "leads", label: "Lead Generation" },
+  { value: "traffic", label: "Traffic" }
 ];
 
 const audienceTypes = [
