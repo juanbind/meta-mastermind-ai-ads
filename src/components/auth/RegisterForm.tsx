@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -63,13 +64,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/50 text-red-700 p-3 rounded-lg text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
           {error}
         </div>
       )}
       
       <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1 text-white">
+        <label htmlFor="name" className="block text-sm font-medium mb-1 text-adking-gray-700">
           Full Name
         </label>
         <input
@@ -77,14 +78,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-adking-gray-800 focus:outline-none focus:ring-2 focus:ring-adking-primary"
           placeholder="Your name"
           disabled={isLoading}
         />
       </div>
       
       <div>
-        <label htmlFor="reg-email" className="block text-sm font-medium mb-1 text-white">
+        <label htmlFor="reg-email" className="block text-sm font-medium mb-1 text-adking-gray-700">
           Email Address
         </label>
         <input
@@ -92,14 +93,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-adking-gray-800 focus:outline-none focus:ring-2 focus:ring-adking-primary"
           placeholder="Your email"
           disabled={isLoading}
         />
       </div>
       
       <div>
-        <label htmlFor="reg-password" className="block text-sm font-medium mb-1 text-white">
+        <label htmlFor="reg-password" className="block text-sm font-medium mb-1 text-adking-gray-700">
           Password
         </label>
         <input
@@ -107,18 +108,18 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-adking-gray-800 focus:outline-none focus:ring-2 focus:ring-adking-primary"
           placeholder="Create a password"
           disabled={isLoading}
         />
-        <p className="text-xs text-metamaster-gray-500 mt-1">
+        <p className="text-xs text-adking-gray-500 mt-1">
           Password must be at least 8 characters long
         </p>
       </div>
       
       <Button 
         type="submit" 
-        className="w-full bg-metamaster-primary hover:bg-metamaster-secondary text-white"
+        className="w-full bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white"
         disabled={isLoading}
       >
         {isLoading ? "Creating account..." : "Create account"}

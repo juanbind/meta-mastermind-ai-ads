@@ -26,30 +26,30 @@ const Auth: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-adking-dark via-[#121a2b] to-adking-dark/95">
-      <div className="grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-2xl overflow-hidden w-full max-w-5xl bg-white/5 backdrop-blur-md border border-white/10">
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-2xl overflow-hidden w-full max-w-5xl bg-white border border-gray-200">
         {/* Left Side - Form */}
         <div className="p-8 md:p-12">
           <div className="mb-8">
             <Logo />
           </div>
           
-          <h1 className="text-2xl font-bold mb-2 text-white">
+          <h1 className="text-2xl font-bold mb-2 text-adking-gray-800">
             {activeTab === 'login' ? 'Welcome back' : 'Create your account'}
           </h1>
-          <p className="text-adking-gray-400 mb-6">
+          <p className="text-adking-gray-600 mb-6">
             {activeTab === 'login' 
               ? 'Sign in to access your account.' 
               : 'Get started with AdKing today.'}
           </p>
           
-          <div className="flex border-b border-white/20 mb-6">
+          <div className="flex border-b border-gray-200 mb-6">
             <button
               onClick={() => setActiveTab('login')}
               className={`pb-2 px-4 mr-4 text-sm font-medium ${
                 activeTab === 'login'
                   ? 'text-adking-primary border-b-2 border-adking-primary'
-                  : 'text-adking-gray-400'
+                  : 'text-adking-gray-500'
               }`}
             >
               Sign In
@@ -59,7 +59,7 @@ const Auth: React.FC = () => {
               className={`pb-2 px-4 text-sm font-medium ${
                 activeTab === 'register'
                   ? 'text-adking-primary border-b-2 border-adking-primary'
-                  : 'text-adking-gray-400'
+                  : 'text-adking-gray-500'
               }`}
             >
               Sign Up
@@ -72,7 +72,7 @@ const Auth: React.FC = () => {
             <RegisterForm onSuccess={handleAuthSuccess} />
           )}
           
-          <div className="mt-6 text-center text-sm text-adking-gray-400">
+          <div className="mt-6 text-center text-sm text-adking-gray-600">
             <p>
               {activeTab === 'login' 
                 ? "Don't have an account? " 

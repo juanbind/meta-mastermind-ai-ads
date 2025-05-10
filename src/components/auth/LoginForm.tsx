@@ -39,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1 text-white">
+        <label htmlFor="email" className="block text-sm font-medium mb-1 text-adking-gray-700">
           Email Address
         </label>
         <input
@@ -47,7 +47,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-adking-gray-800 focus:outline-none focus:ring-2 focus:ring-adking-primary"
           placeholder="Your email"
           disabled={isLoading}
         />
@@ -55,12 +55,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       
       <div>
         <div className="flex justify-between items-center mb-1">
-          <label htmlFor="password" className="block text-sm font-medium text-white">
+          <label htmlFor="password" className="block text-sm font-medium text-adking-gray-700">
             Password
           </label>
           <a 
             href="#" 
-            className="text-xs text-metamaster-primary hover:underline"
+            className="text-xs text-adking-primary hover:underline"
           >
             Forgot password?
           </a>
@@ -70,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-metamaster-primary"
+          className="w-full px-4 py-2 rounded-lg bg-white border border-gray-300 text-adking-gray-800 focus:outline-none focus:ring-2 focus:ring-adking-primary"
           placeholder="Your password"
           disabled={isLoading}
         />
@@ -78,22 +78,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       
       <Button 
         type="submit" 
-        className="w-full bg-metamaster-primary hover:bg-metamaster-secondary text-white"
+        className="w-full bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white"
         disabled={isLoading}
       >
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
 
       <div className="relative flex items-center justify-center">
-        <div className="border-t border-white/10 flex-grow"></div>
-        <span className="mx-4 text-sm text-metamaster-gray-400">or continue with</span>
-        <div className="border-t border-white/10 flex-grow"></div>
+        <div className="border-t border-gray-200 flex-grow"></div>
+        <span className="mx-4 text-sm text-adking-gray-500">or continue with</span>
+        <div className="border-t border-gray-200 flex-grow"></div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <button
           type="button"
-          className="flex justify-center items-center py-2 px-4 border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -104,7 +104,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         </button>
         <button
           type="button"
-          className="flex justify-center items-center py-2 px-4 border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill="#1877F2"/>
@@ -112,9 +112,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         </button>
         <button
           type="button"
-          className="flex justify-center items-center py-2 px-4 border border-white/10 rounded-lg hover:bg-white/5"
+          className="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-5 h-5 text-adking-gray-800" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
           </svg>
         </button>
