@@ -80,15 +80,15 @@ const Landing = () => {
         </section>
 
         {/* FAQ Section */}
-        <div className="container mx-auto py-16 md:py-24 px-4 relative bg-adking-gray-100/50">
-          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.05] pointer-events-none"></div>
+        <div className="container mx-auto py-16 md:py-24 px-4 relative">
+          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <FAQ />
         </div>
         
         {/* CTA Section */}
         <div className="bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark py-16 md:py-24 px-4 shadow-inner relative">
           <div className="container mx-auto text-center max-w-3xl relative z-10">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-adking-dark">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Ready to Transform Your Facebook Ad Results?
             </h2>
             <p className="text-lg md:text-xl mb-6 md:mb-8 text-adking-dark/90">
