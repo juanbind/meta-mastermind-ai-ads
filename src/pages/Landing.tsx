@@ -27,13 +27,13 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll relative">
-          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-6 font-medium">
+          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-dark rounded-full mb-6 font-medium">
             AdKing AI Now Live!
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-adking-dark">Run Meta Ad's In Seconds</h1>
           
-          <p className="text-lg text-adking-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">
+          <p className="text-lg text-adking-gray-700 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
@@ -47,32 +47,32 @@ const Landing = () => {
           </Button>
 
           <div className="mt-12 md:mt-20 mb-12 md:mb-20 relative mx-auto max-w-5xl px-4">
-            <div className="aspect-video relative rounded-2xl overflow-hidden bg-adking-gray-100 border border-adking-gray-200 shadow-xl flex flex-col items-center justify-center mx-auto">
+            <div className="aspect-video relative rounded-2xl overflow-hidden bg-adking-gray-100 border border-adking-gray-300 shadow-xl flex flex-col items-center justify-center mx-auto">
               <div className="w-16 h-16 rounded-full bg-adking-primary/20 flex items-center justify-center mx-auto mb-4 animate-glow">
                 <div className="w-8 h-8 rounded-full bg-adking-primary flex items-center justify-center">
                   <ArrowRight className="w-4 h-4 text-adking-dark" />
                 </div>
               </div>
               <p className="text-xl font-semibold text-adking-dark mb-2">VSL Video Coming Soon</p>
-              <p className="text-adking-gray-600">This space is reserved for your VSL video</p>
+              <p className="text-adking-gray-700">This space is reserved for your VSL video</p>
             </div>
           </div>
         </div>
 
         {/* Feature Grid */}
-        <section className="py-16 md:py-24 px-4 bg-adking-gray-100/50 relative">
+        <section className="py-16 md:py-24 px-4 bg-adking-gray-100 relative border-y border-adking-gray-200">
           <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.05] pointer-events-none"></div>
           <FeatureSection />
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-16 md:py-24 px-4 bg-white relative">
+        {/* Pricing Section - White Background */}
+        <section className="py-16 md:py-24 px-4 bg-white relative border-b border-adking-gray-200">
           <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-lg text-adking-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-adking-gray-700 max-w-2xl mx-auto">
               Choose a plan that works best for your business needs. No hidden fees.
             </p>
           </div>

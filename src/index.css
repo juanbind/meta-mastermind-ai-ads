@@ -157,7 +157,7 @@
   }
   
   .glass-effect {
-    @apply backdrop-blur-md bg-white/80 border border-white/50;
+    @apply backdrop-blur-md bg-white/90 border border-adking-gray-200;
   }
   
   .card-shadow {

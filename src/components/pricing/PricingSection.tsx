@@ -17,7 +17,7 @@ export function PricingSection() {
     <div className="w-full max-w-6xl mx-auto px-4">
       {/* Billing Toggle */}
       <div className="flex justify-center mb-12">
-        <div className="bg-adking-gray-100 shadow-md rounded-full p-1 flex items-center">
+        <div className="bg-adking-gray-200 shadow-md rounded-full p-1 flex items-center">
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
@@ -47,14 +47,14 @@ export function PricingSection() {
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {/* Pro Plan */}
-        <Card className="border-2 border-adking-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all p-1">
+        <Card className="border-2 border-adking-gray-300 rounded-xl overflow-hidden hover:shadow-xl transition-all p-1 bg-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold">Pro</CardTitle>
-            <p className="text-adking-gray-600 mt-1">For teams or solo sales reps</p>
+            <CardTitle className="text-2xl font-bold text-adking-dark">Pro</CardTitle>
+            <p className="text-adking-gray-700 mt-1">For teams or solo sales reps</p>
             
             <div className="flex items-baseline mt-4">
               <span className="text-4xl font-bold text-adking-dark">${billingCycle === 'annually' ? '42' : '50'}</span>
-              <span className="text-adking-gray-600 ml-2">/month</span>
+              <span className="text-adking-gray-700 ml-2">/month</span>
             </div>
           </CardHeader>
           
@@ -66,7 +66,7 @@ export function PricingSection() {
               Create Account <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
-            <div className="border-t border-adking-gray-200 mt-6 pt-6 space-y-3">
+            <div className="border-t border-adking-gray-300 mt-6 pt-6 space-y-3">
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-adking-primary mt-0.5" />
                 <span className="text-adking-gray-700">Access to all Ad Tools</span>
@@ -92,14 +92,14 @@ export function PricingSection() {
         </Card>
 
         {/* Enterprise Plan */}
-        <Card className="border-2 border-adking-primary rounded-xl overflow-hidden hover:shadow-xl transition-all relative p-1 bg-gradient-to-b from-white to-adking-gray-100">
+        <Card className="border-2 border-adking-primary rounded-xl overflow-hidden hover:shadow-xl transition-all relative p-1 bg-gradient-to-b from-white to-adking-gray-50">
           <div className="absolute top-0 right-0 bg-adking-primary text-adking-dark text-xs font-bold px-3 py-1 rounded-bl-lg">
             MOST POPULAR
           </div>
           
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold">Enterprise</CardTitle>
-            <p className="text-adking-gray-600 mt-1">For teams of 20 or more</p>
+            <CardTitle className="text-2xl font-bold text-adking-dark">Enterprise</CardTitle>
+            <p className="text-adking-gray-700 mt-1">For teams of 20 or more</p>
             
             <div className="flex items-baseline mt-4">
               <span className="text-4xl font-bold text-adking-dark">Demo For Pricing</span>
@@ -114,7 +114,7 @@ export function PricingSection() {
               Book Demo <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
-            <div className="border-t border-adking-gray-200 mt-6 pt-6 space-y-3">
+            <div className="border-t border-adking-gray-300 mt-6 pt-6 space-y-3">
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-adking-primary mt-0.5" />
                 <span className="text-adking-gray-700">Everything in Pro</span>
