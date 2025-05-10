@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,8 +20,6 @@ import Integrations from "./pages/Integrations";
 import Settings from "./pages/Settings";
 import Creatives from "./pages/Creatives";
 import AIMediaBuyerPage from "./pages/AIMediaBuyerPage";
-import AdCopyGeneratorPage from "./pages/AdCopyGeneratorPage";
-import AdCreativePage from "./pages/AdCreativePage";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -68,16 +65,6 @@ const App = () => (
             <Route path="/ai-tools/media-buyer" element={
               <AuthCheck>
                 <AIMediaBuyerPage />
-              </AuthCheck>
-            } />
-            <Route path="/ai-tools/ad-copy" element={
-              <AuthCheck>
-                <AdCopyGeneratorPage />
-              </AuthCheck>
-            } />
-            <Route path="/ai-tools/ad-creative" element={
-              <AuthCheck>
-                <AdCreativePage />
               </AuthCheck>
             } />
             <Route path="/crm" element={
