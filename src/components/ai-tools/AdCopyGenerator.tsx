@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -68,19 +67,6 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
     { value: "formal", label: "Formal" },
     { value: "inspirational", label: "Inspirational" },
     { value: "urgent", label: "Urgent" }
-  ];
-  
-  const industryOptions = [
-    { value: "ecommerce", label: "E-commerce" },
-    { value: "saas", label: "SaaS" },
-    { value: "finance", label: "Finance & Insurance" },
-    { value: "education", label: "Education" },
-    { value: "healthcare", label: "Healthcare" },
-    { value: "travel", label: "Travel & Hospitality" },
-    { value: "realestate", label: "Real Estate" },
-    { value: "retail", label: "Retail" },
-    { value: "auto", label: "Automotive" },
-    { value: "entertainment", label: "Entertainment" }
   ];
   
   const handleInputChange = (field: string, value: any) => {
@@ -346,19 +332,12 @@ const AdCopyGenerator: React.FC<AdCopyGeneratorProps> = ({
         
         <div>
           <Label htmlFor="industry" className="mb-1">Industry</Label>
-          <Select 
-            value={formData.industry} 
-            onValueChange={(value) => handleInputChange('industry', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select industry" />
-            </SelectTrigger>
-            <SelectContent>
-              {industryOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input 
+            id="industry"
+            placeholder="Enter your industry (e.g., E-commerce, Healthcare)"
+            value={formData.industry}
+            onChange={(e) => handleInputChange('industry', e.target.value)}
+          />
         </div>
       </div>
       
