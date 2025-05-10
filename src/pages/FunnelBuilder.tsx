@@ -8,14 +8,14 @@ import { Info, AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
 const FunnelBuilder: React.FC = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold mb-6 text-adking-dark">Funnel Builder</h1>
+      <h1 className="text-3xl font-bold mb-6">Funnel Builder</h1>
       
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <h2 className="text-xl font-semibold mb-4 text-adking-dark">Funnel Progress</h2>
+          <h2 className="text-xl font-semibold mb-4">Funnel Progress</h2>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-adking-gray-700">Overall Progress</span>
+              <span className="text-sm">Overall Progress</span>
               <Badge variant="success">60%</Badge>
             </div>
             <Progress value={60} className="h-2" />
@@ -24,7 +24,7 @@ const FunnelBuilder: React.FC = () => {
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertTitle>Information</AlertTitle>
-                <AlertDescription className="text-adking-gray-700">
+                <AlertDescription>
                   This is an informational alert for the funnel builder.
                 </AlertDescription>
               </Alert>
@@ -57,31 +57,31 @@ const FunnelBuilder: React.FC = () => {
         </div>
         
         <div>
-          <h2 className="text-xl font-semibold mb-4 text-adking-dark">Funnel Structure</h2>
-          <div className="border border-adking-gray-300 rounded-lg p-4 bg-white shadow-sm">
-            <p className="text-sm text-adking-gray-700 mb-4">
+          <h2 className="text-xl font-semibold mb-4">Funnel Structure</h2>
+          <div className="border rounded-lg p-4">
+            <p className="text-sm text-gray-500 mb-4">
               Your funnel is currently in development. The funnel builder feature will be fully available soon.
             </p>
             
             <div className="space-y-2">
-              <div className="flex justify-between items-center p-2 bg-adking-gray-100 rounded border border-adking-gray-200">
-                <span className="text-adking-gray-800">Landing Page</span>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Landing Page</span>
                 <Badge>Complete</Badge>
               </div>
-              <div className="flex justify-between items-center p-2 bg-adking-gray-100 rounded border border-adking-gray-200">
-                <span className="text-adking-gray-800">Opt-in Form</span>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Opt-in Form</span>
                 <Badge>Complete</Badge>
               </div>
-              <div className="flex justify-between items-center p-2 bg-adking-gray-100 rounded border border-adking-gray-200">
-                <span className="text-adking-gray-800">Sales Page</span>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Sales Page</span>
                 <Badge variant="warning">In Progress</Badge>
               </div>
-              <div className="flex justify-between items-center p-2 bg-adking-gray-100 rounded border border-adking-gray-200">
-                <span className="text-adking-gray-800">Checkout</span>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Checkout</span>
                 <Badge variant="secondary">Not Started</Badge>
               </div>
-              <div className="flex justify-between items-center p-2 bg-adking-gray-100 rounded border border-adking-gray-200">
-                <span className="text-adking-gray-800">Thank You Page</span>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Thank You Page</span>
                 <Badge variant="secondary">Not Started</Badge>
               </div>
             </div>
