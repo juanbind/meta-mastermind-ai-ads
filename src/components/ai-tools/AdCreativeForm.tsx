@@ -10,9 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+export interface AdCreativeData {
+  primaryText: string;
+  headline: string;
+  description: string;
+  callToAction: string;
+  destinationUrl: string;
+  mediaType: "manual" | "ai";
+  mediaUrl: string;
+  aiPrompt?: string;
+  generatedMedia?: string | null;
+}
+
 interface AdCreativeFormProps {
-  onChange: (data: any) => void;
-  initialData?: any;
+  onChange: (data: AdCreativeData) => void;
+  initialData?: AdCreativeData;
 }
 
 const callToActionOptions = [
