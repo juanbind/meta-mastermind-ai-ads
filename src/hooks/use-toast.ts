@@ -1,15 +1,19 @@
-
 import * as React from "react"
-
-import type {
+import {
+  Toast,
   ToastActionElement,
-  ToastProps,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
 } from "@/components/ui/toast"
+import { useToast as useToastOriginal } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
+const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
-type ToasterToast = ToastProps & {
+type ToasterToast = ReturnType<typeof useToastOriginal>["toast"] & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
@@ -26,7 +30,7 @@ const actionTypes = {
 let count = 0
 
 function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER
+  count = (count + 1) % Number.MAX_VALUE
   return count.toString()
 }
 
@@ -91,6 +95,8 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
+      // ! Side effects ! - This could be extracted into a dismissToast() action,
+      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -154,7 +160,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
+      onOpenChange: (open: boolean) => {
         if (!open) dismiss()
       },
     },
@@ -168,7 +174,6 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  // Creating the state inside the function component context
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {
