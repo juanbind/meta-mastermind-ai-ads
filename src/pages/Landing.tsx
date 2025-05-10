@@ -31,7 +31,7 @@ const Landing = () => {
             AdKing AI Now Live!
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-adking-dark to-adking-gray-800 bg-clip-text text-transparent">Run Meta Ad's In Seconds</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-adking-dark">Run Meta Ad's In Seconds</h1>
           
           <p className="text-lg text-adking-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
@@ -47,10 +47,10 @@ const Landing = () => {
           </Button>
 
           <div className="mt-12 md:mt-20 mb-12 md:mb-20 relative mx-auto max-w-5xl px-4">
-            <div className="aspect-video relative rounded-2xl overflow-hidden bg-adking-gray-800/5 border border-adking-gray-200 shadow-xl flex flex-col items-center justify-center mx-auto">
+            <div className="aspect-video relative rounded-2xl overflow-hidden bg-adking-gray-100 border border-adking-gray-200 shadow-xl flex flex-col items-center justify-center mx-auto">
               <div className="w-16 h-16 rounded-full bg-adking-primary/20 flex items-center justify-center mx-auto mb-4 animate-glow">
                 <div className="w-8 h-8 rounded-full bg-adking-primary flex items-center justify-center">
-                  <ArrowRight className="w-4 h-4 text-white" />
+                  <ArrowRight className="w-4 h-4 text-adking-dark" />
                 </div>
               </div>
               <p className="text-xl font-semibold text-adking-dark mb-2">VSL Video Coming Soon</p>
@@ -66,16 +66,12 @@ const Landing = () => {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-16 md:py-24 px-4 bg-white relative">
-          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
+        <section className="py-16 md:py-24 px-4 bg-adking-dark relative">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 to-transparent opacity-40 pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
-            <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-4 font-medium">
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-white md:text-5xl">
               Pricing
-            </div>
-            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">
-              🚀 Try AdKing FREE for 7 Days
             </h2>
-            <p className="text-base md:text-lg text-adking-gray-600">No credit card required – cancel anytime.</p>
           </div>
           <PricingSection />
         </section>

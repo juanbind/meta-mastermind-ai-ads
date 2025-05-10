@@ -1,143 +1,131 @@
 
-import React from 'react';
-import { Check, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Card } from '../ui/card';
 import { useNavigate } from 'react-router-dom';
-
-interface PlanFeature {
-  name: string;
-  included: boolean | string;
-}
-
-interface PricingPlan {
-  name: string;
-  price: string;
-  description: string;
-  features: PlanFeature[];
-  badge?: string;
-  color: string;
-  emoji: string;
-}
 
 export function PricingSection() {
   const navigate = useNavigate();
-
-  const pricingPlans: PricingPlan[] = [
-    {
-      name: "Starter",
-      price: "$50",
-      description: "Perfect for creators, freelancers, and new advertisers.",
-      color: "text-green-500",
-      emoji: "🟢",
-      features: [
-        { name: "Access to all Ad Tools", included: true },
-        { name: "Full Campaign Builder", included: true },
-        { name: "Ad Performance Dashboard", included: true },
-        { name: "Save & Download Ads", included: true },
-        { name: "AI Media Buyer", included: false },
-        { name: "1-on-1 Support", included: false },
-        { name: "Done-For-You Ad Creatives", included: false },
-        { name: "Funnel Builder Access", included: false },
-        { name: "Built-in CRM & Automations", included: false },
-      ]
-    },
-    {
-      name: "Pro",
-      price: "$275",
-      description: "For growing businesses ready to scale profitably.",
-      color: "text-metamaster-primary",
-      emoji: "🔵",
-      features: [
-        { name: "Everything in Starter", included: true },
-        { name: "AI Media Buyer (Run up to 3 Campaigns)", included: true },
-        { name: "1-on-1 Support", included: true },
-        { name: "3 Done-For-You Ad Creatives/month", included: true },
-        { name: "Funnel Builder Access", included: true },
-        { name: "Built-in CRM & Automations", included: true },
-        { name: "White-label Options", included: false },
-        { name: "Multi-Client Management", included: false },
-        { name: "Priority Support", included: false },
-      ],
-      badge: "Most Popular"
-    },
-    {
-      name: "Agency",
-      price: "$500",
-      description: "Built for media buyers, agencies, and power users.",
-      color: "text-red-600",
-      emoji: "🔴",
-      features: [
-        { name: "Everything in Pro", included: true },
-        { name: "Run up to 50 Campaigns", included: true },
-        { name: "50 Done-For-You Ad Creatives/month", included: true },
-        { name: "White-label Options", included: true },
-        { name: "Multi-Client Management", included: true },
-        { name: "Priority Support", included: true },
-        { name: "Advanced Analytics", included: true },
-        { name: "API Access", included: true },
-      ]
-    }
-  ];
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
 
   const handleStartTrial = () => {
     navigate('/auth');
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 max-w-6xl mx-auto px-4">
-      {pricingPlans.map((plan) => (
-        <Card 
-          key={plan.name} 
-          className={`relative p-4 md:p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300 flex flex-col`}
-        >
-          {plan.badge && (
-            <span className="absolute -top-3 right-4 bg-metamaster-primary text-white text-sm px-3 py-1 rounded-full font-medium">
-              {plan.badge}
+    <div className="w-full max-w-6xl mx-auto px-4">
+      {/* Billing Toggle */}
+      <div className="flex justify-center mb-12">
+        <div className="bg-black/30 backdrop-blur-md rounded-full p-1 flex items-center">
+          <button
+            onClick={() => setBillingCycle('monthly')}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+              billingCycle === 'monthly' 
+                ? 'bg-adking-primary text-adking-dark' 
+                : 'text-white/80 hover:text-white'
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle('annually')}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
+              billingCycle === 'annually' 
+                ? 'bg-adking-primary text-adking-dark' 
+                : 'text-white/80 hover:text-white'
+            }`}
+          >
+            Annually
+            <span className="ml-2 text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">
+              Save 15%
             </span>
-          )}
-          <div className="mb-8">
-            <h3 className={`text-xl font-semibold mb-2 ${plan.color}`}>
-              {plan.emoji} {plan.name}
-            </h3>
-            <div className="flex items-baseline mb-2">
-              <span className="text-4xl font-bold text-white">{plan.price}</span>
-              <span className="text-metamaster-gray-300 ml-2">/month</span>
-            </div>
-            <p className="text-metamaster-gray-300 text-lg">{plan.description}</p>
-          </div>
+          </button>
+        </div>
+      </div>
 
-          <div className="space-y-4 flex-grow">
-            {plan.features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3">
-                {feature.included ? (
-                  <div className="w-5 h-5 rounded-full bg-green-500 flex-shrink-0 flex items-center justify-center">
-                    <Check className="w-3 h-3 text-white" />
-                  </div>
-                ) : (
-                  <div className="w-5 h-5 rounded-full bg-metamaster-gray-700 flex-shrink-0 flex items-center justify-center">
-                    <X className="w-3 h-3 text-metamaster-gray-500" />
-                  </div>
-                )}
-                <span className={`${feature.included ? 'text-white font-medium' : 'text-metamaster-gray-400'} text-base`}>
-                  {feature.name}
-                </span>
-              </div>
-            ))}
+      {/* Pricing Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {/* Pro Plan */}
+        <div className="pricing-card p-8">
+          <h3 className="text-2xl font-bold mb-1">Pro</h3>
+          <p className="text-white/70 mb-4">For teams or solo sales reps</p>
+          
+          <div className="flex items-baseline mb-6">
+            <span className="text-4xl font-bold">$50</span>
+            <span className="text-white/70 ml-2">/month</span>
           </div>
 
           <Button 
-            className={`w-full mt-8 py-6 text-lg font-medium rounded-xl ${
-              plan.badge 
-                ? 'bg-metamaster-primary hover:bg-metamaster-primary/90 text-white' 
-                : 'bg-white/5 hover:bg-white/10 border border-white/10 text-white'
-            }`}
+            className="w-full mb-8 py-6 text-lg font-medium rounded-xl bg-white hover:bg-white/90 text-adking-dark border-none"
             onClick={handleStartTrial}
           >
-            Start Free Trial
+            Create Account <ArrowRight className="ml-1 h-5 w-5" />
           </Button>
-        </Card>
-      ))}
+
+          <div className="border-t border-white/10 pt-6 space-y-3">
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Access to all Ad Tools</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Full Campaign Builder</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Ad Performance Dashboard</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Save & Download Ads</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>AI Media Buyer (up to 3 Campaigns)</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Enterprise Plan */}
+        <div className="pricing-card pricing-card-highlight p-8">
+          <h3 className="text-2xl font-bold mb-1">Enterprise</h3>
+          <p className="text-white/70 mb-4">For teams of 20 or more</p>
+          
+          <div className="flex items-baseline mb-6">
+            <span className="text-4xl font-bold">Demo For Pricing</span>
+          </div>
+
+          <Button 
+            className="w-full mb-8 py-6 text-lg font-medium rounded-xl bg-adking-primary hover:bg-adking-primary/90 text-adking-dark border-none"
+            onClick={() => navigate('/contact')}
+          >
+            Book Demo <ArrowRight className="ml-1 h-5 w-5" />
+          </Button>
+
+          <div className="border-t border-white/20 pt-6 space-y-3">
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Everything in Pro</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>AI Call Scoring and Feedback</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Custom enterprise agents</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>Scalable usage Based Billing</span>
+            </div>
+            <div className="pricing-feature">
+              <Check className="h-5 w-5 text-adking-primary" />
+              <span>VIP Customer Support</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
