@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Sparkles, Image as ImageIcon } from "lucide-react";
-import { AdCreativeData } from './AIMediaBuyer';
+import { useToast } from "@/components/ui/use-toast";
 
 interface AdCreativeFormProps {
-  onChange: (data: AdCreativeData) => void;
-  initialData?: Partial<AdCreativeData>;
+  onChange: (data: any) => void;
+  initialData?: any;
 }
 
 const callToActionOptions = [
@@ -26,7 +26,8 @@ const callToActionOptions = [
 ];
 
 const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData = {} }) => {
-  const [adCreative, setAdCreative] = useState<AdCreativeData>({
+  const { toast } = useToast();
+  const [adCreative, setAdCreative] = useState({
     primaryText: initialData.primaryText || '',
     headline: initialData.headline || '',
     description: initialData.description || '',
@@ -38,7 +39,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
     generatedMedia: initialData.generatedMedia || null,
   });
 
-  const [mediaTab, setMediaTab] = useState<string>(adCreative.mediaType);
+  const [mediaTab, setMediaTab] = useState<string>(initialData.mediaType || "manual");
 
   const handleInputChange = (field: string, value: any) => {
     const updatedCreative = { ...adCreative, [field]: value };
@@ -63,13 +64,21 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
 
   const generateAIMedia = () => {
     // In a real implementation, this would call an AI image generation service
-    console.log("Generating AI media with prompt:", adCreative.aiPrompt);
+    toast({
+      title: "Generating AI image",
+      description: "Your AI-generated image is being created...",
+    });
     
     // Mock implementation - would be replaced with actual AI generation
     setTimeout(() => {
       const mockGeneratedImageUrl = "https://placehold.co/600x400/darkblue/white?text=AI+Generated+Image";
       handleInputChange('generatedMedia', mockGeneratedImageUrl);
       handleInputChange('mediaUrl', mockGeneratedImageUrl);
+      
+      toast({
+        title: "Image generated",
+        description: "Your AI-generated image is ready to use",
+      });
     }, 1500);
   };
 
@@ -247,7 +256,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
                       </div>
                       <Button 
                         onClick={generateAIMedia}
-                        disabled={!adCreative.aiPrompt?.trim()}
+                        disabled={!adCreative.aiPrompt.trim()}
                         className="w-full"
                       >
                         <Sparkles size={16} className="mr-2" /> Generate Image

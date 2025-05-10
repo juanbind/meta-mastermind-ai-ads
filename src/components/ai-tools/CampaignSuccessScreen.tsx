@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Check, ExternalLink, Copy } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CampaignSuccessScreenProps {
   campaignData: {
@@ -61,9 +61,9 @@ const CampaignSuccessScreen: React.FC<CampaignSuccessScreenProps> = ({
         </p>
       </div>
 
-      <Alert variant="default" className="bg-green-50 border-green-200">
+      <Alert variant="success" className="bg-green-50">
         <AlertDescription className="flex items-center">
-          <Check className="mr-2 h-4 w-4 text-green-600" />
+          <Check className="mr-2 h-4 w-4" />
           Campaign successfully submitted to Facebook
         </AlertDescription>
       </Alert>

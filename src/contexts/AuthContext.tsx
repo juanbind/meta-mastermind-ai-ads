@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
@@ -32,8 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (_event === 'SIGNED_IN' && !user) {
         toast({
           title: "Welcome to your 7 Day Free No Credit Card Trial of Meta Master!",
-          description: "Need help? Book a Demo Below!",
-          duration: 10000, // Show for 10 seconds
+          description: "Need help? Book a Demo Below!"
         });
       }
     });
@@ -94,8 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         toast({
           title: "Welcome to your 7 Day Free No Credit Card Trial of Meta Master!",
-          description: "Need help? Book a Demo Below!",
-          duration: 10000, // Show for 10 seconds
+          description: "Need help? Book a Demo Below!"
         });
         return { success: true };
       } else {
