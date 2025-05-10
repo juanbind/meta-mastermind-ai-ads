@@ -52,7 +52,7 @@ const Landing = () => {
         </div>
 
         {/* Feature Grid */}
-        <section className="py-16 md:py-24 px-4 relative border-y border-adking-gray-200 bg-slate-50">
+        <section className="py-16 md:py-24 px-4 relative border-y border-adking-gray-200 bg-white">
           <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.05] pointer-events-none"></div>
           <FeatureSection />
         </section>
