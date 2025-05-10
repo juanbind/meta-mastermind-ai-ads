@@ -43,7 +43,7 @@ export function FeatureSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
-        {features.map((feature, index) => <div key={index} className="p-4 md:p-6 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300 bg-[#ffe9ae]/[0.31]">
+        {features.map((feature, index) => <div key={index} className="p-4 md:p-6 backdrop-blur-sm border border-white/10 rounded-xl hover:border-metamaster-primary/30 transition-all duration-300 bg-[#fff8b1]/[0.31]">
             <div className="w-12 h-12 rounded-lg bg-metamaster-primary/10 flex items-center justify-center mb-4 md:mb-6">
               {feature.icon}
             </div>
