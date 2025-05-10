@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -734,19 +735,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       case 4: // Ad Copy - UPDATED to include skip option
         return (
           <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium">Ad Copy</h2>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="skip-ad-copy"
-                  checked={skipAdCopy}
-                  onCheckedChange={setSkipAdCopy}
-                />
-                <label htmlFor="skip-ad-copy" className="text-sm font-medium">
-                  Skip this step
-                </label>
-              </div>
-            </div>
+            <h2 className="text-lg font-medium">Ad Copy</h2>
             
             {!skipAdCopy && (
               <div className="space-y-4">
@@ -774,6 +763,15 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                     value={formData.mainOfferDescription}
                     onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
                     className="min-h-[80px]"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Industry</label>
+                  <Input 
+                    placeholder="Enter your industry (e.g., 'E-commerce', 'Healthcare', 'Education')" 
+                    value={formData.industry}
+                    onChange={(e) => handleInputChange('industry', e.target.value)}
                   />
                 </div>
                 
@@ -1124,6 +1122,19 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             >
               Back
             </Button>
+          )}
+          
+          {currentStep === 4 && (
+            <div className="flex items-center mr-4">
+              <Switch
+                id="skip-ad-copy"
+                checked={skipAdCopy}
+                onCheckedChange={setSkipAdCopy}
+              />
+              <label htmlFor="skip-ad-copy" className="ml-2 text-sm">
+                Skip ad copy generation
+              </label>
+            </div>
           )}
           
           <Button 
