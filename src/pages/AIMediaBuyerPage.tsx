@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,10 +16,17 @@ import {
   ZapOff, 
   TrendingUp,
   FileText,
-  Settings
+  Settings,
+  CheckCircle
 } from 'lucide-react';
-import AIMediaBuyerEnhanced from '@/components/ai-tools/AIMediaBuyerEnhanced';
-import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
+
+import CampaignForm from '@/components/ai-tools/CampaignForm';
+import AdCopyForm from '@/components/ai-tools/AdCopyForm';
+import AdCreativeForm from '@/components/ai-tools/AdCreativeForm';
+import FacebookAdAccountConnection from '@/components/ai-tools/FacebookAdAccountConnection';
+import CampaignSuccessView from '@/components/ai-tools/CampaignSuccessView';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 const AIMediaBuyerPage: React.FC = () => {
   const { toast } = useToast();
@@ -33,24 +39,204 @@ const AIMediaBuyerPage: React.FC = () => {
   const [fbAccessToken, setFbAccessToken] = useState('');
   const [fbAdAccountId, setFbAdAccountId] = useState('');
   const [activeMainTab, setActiveMainTab] = useState('campaigns');
+  const [currentStep, setCurrentStep] = useState(0);
+  const [campaignSubmitted, setCampaignSubmitted] = useState(false);
+
+  // Campaign Data State
+  const [campaignData, setCampaignData] = useState({
+    // Campaign & Business Information
+    businessName: '',
+    campaignName: '',
+    websiteUrl: '',
+    salesFunnelUrl: '',
+    
+    // Budget & Configuration
+    budgetRange: [50, 100], // Min and max budget
+    timeframeValue: 7,
+    timeframeUnit: 'days',
+    
+    // Ad Copy
+    productUrl: '',
+    mainOfferDescription: '',
+    adType: 'promotional',
+    
+    // Ad Creative
+    primaryText: '',
+    headline: '',
+    description: '',
+    callToAction: 'Learn More',
+    destinationUrl: '',
+    mediaUrl: '',
+    
+    // Results
+    campaignId: '',
+    campaignStatus: 'pending' as 'active' | 'pending' | 'error',
+    metaLink: '',
+    adPreviewUrl: '',
+  });
 
   // Connect to Facebook Ad Account
-  const handleConnectFacebook = () => {
-    if (!fbAccessToken || !fbAdAccountId) {
+  const handleConnectFacebook = (token: string, accountId: string) => {
+    setFbConnected(true);
+    setFbAccessToken(token);
+    setFbAdAccountId(accountId);
+  };
+  
+  // Disconnect Facebook Ad Account
+  const handleDisconnectFacebook = () => {
+    setFbConnected(false);
+    setFbAccessToken('');
+    setFbAdAccountId('');
+  };
+
+  // Handle campaign form updates
+  const updateCampaignField = <K extends keyof typeof campaignData>(field: K, value: typeof campaignData[K]) => {
+    setCampaignData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Go to next step
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      launchCampaign();
+    }
+  };
+
+  // Go to previous step
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Launch the campaign
+  const launchCampaign = () => {
+    if (!fbConnected) {
       toast({
-        title: "Missing Information",
-        description: "Please provide both Access Token and Ad Account ID",
+        title: "Facebook Account Not Connected",
+        description: "Please connect your Facebook ad account before launching the campaign",
         variant: "destructive"
       });
       return;
     }
     
-    // Simulate connecting to Facebook
-    setFbConnected(true);
+    // Simulate campaign launch
     toast({
-      title: "Facebook Account Connected",
-      description: "Your ad account has been successfully connected",
+      title: "Launching Campaign",
+      description: "Your campaign is being submitted to Facebook...",
     });
+
+    setTimeout(() => {
+      setCampaignData(prev => ({
+        ...prev,
+        campaignId: `CM_${Math.floor(Math.random() * 1000000)}`,
+        campaignStatus: 'pending',
+        metaLink: 'https://business.facebook.com/adsmanager',
+        adPreviewUrl: prev.mediaUrl || 'https://placeholder.com/600x400',
+      }));
+
+      setCampaignSubmitted(true);
+      toast({
+        title: "Campaign Launch Successful",
+        description: "Your campaign was successfully submitted to Facebook",
+      });
+    }, 2000);
+  };
+
+  // Create a new campaign
+  const createNewCampaign = () => {
+    setCampaignSubmitted(false);
+    setCurrentStep(0);
+    setCampaignData({
+      businessName: '',
+      campaignName: '',
+      websiteUrl: '',
+      salesFunnelUrl: '',
+      budgetRange: [50, 100],
+      timeframeValue: 7,
+      timeframeUnit: 'days',
+      productUrl: '',
+      mainOfferDescription: '',
+      adType: 'promotional',
+      primaryText: '',
+      headline: '',
+      description: '',
+      callToAction: 'Learn More',
+      destinationUrl: '',
+      mediaUrl: '',
+      campaignId: '',
+      campaignStatus: 'pending',
+      metaLink: '',
+      adPreviewUrl: '',
+    });
+  };
+
+  // View my campaigns (placeholder for now)
+  const viewMyCampaigns = () => {
+    toast({
+      title: "View Campaigns",
+      description: "This feature is coming soon!",
+    });
+  };
+  
+  // Validate current step
+  const validateStep = (): boolean => {
+    switch (currentStep) {
+      case 0: // Campaign Info
+        if (!campaignData.businessName || !campaignData.campaignName || !campaignData.websiteUrl) {
+          toast({
+            title: "Missing Information",
+            description: "Please fill in all required fields",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      
+      case 1: // Ad Copy
+        if (!campaignData.mainOfferDescription) {
+          toast({
+            title: "Missing Information",
+            description: "Please provide your main offer description",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      
+      case 2: // Ad Creative
+        if (!campaignData.headline || !campaignData.primaryText) {
+          toast({
+            title: "Missing Information",
+            description: "Please provide both headline and primary text for your ad",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      
+      case 3: // Review & Launch
+        if (!fbConnected) {
+          toast({
+            title: "Facebook Account Not Connected",
+            description: "Please connect your Facebook ad account before launching the campaign",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      
+      default:
+        return true;
+    }
+  };
+  
+  // Handle next button click
+  const handleNext = () => {
+    if (validateStep()) {
+      nextStep();
+    }
   };
 
   // Handle StopLoss Configuration
@@ -77,6 +263,112 @@ const AIMediaBuyerPage: React.FC = () => {
       description: "Budget changes will be applied to your campaigns",
     });
   };
+
+  // Step titles and components
+  const steps = [
+    {
+      title: "Campaign Information",
+      description: "Set up your campaign details",
+      component: (
+        <CampaignForm
+          businessName={campaignData.businessName}
+          campaignName={campaignData.campaignName}
+          websiteUrl={campaignData.websiteUrl}
+          salesFunnelUrl={campaignData.salesFunnelUrl}
+          budgetRange={campaignData.budgetRange}
+          timeframeValue={campaignData.timeframeValue}
+          timeframeUnit={campaignData.timeframeUnit}
+          onBusinessNameChange={(value) => updateCampaignField('businessName', value)}
+          onCampaignNameChange={(value) => updateCampaignField('campaignName', value)}
+          onWebsiteUrlChange={(value) => updateCampaignField('websiteUrl', value)}
+          onSalesFunnelUrlChange={(value) => updateCampaignField('salesFunnelUrl', value)}
+          onBudgetRangeChange={(value) => updateCampaignField('budgetRange', value)}
+          onTimeframeValueChange={(value) => updateCampaignField('timeframeValue', value)}
+          onTimeframeUnitChange={(value) => updateCampaignField('timeframeUnit', value)}
+        />
+      )
+    },
+    {
+      title: "Ad Copy",
+      description: "Create your ad copy",
+      component: (
+        <AdCopyForm
+          productUrl={campaignData.productUrl}
+          mainOfferDescription={campaignData.mainOfferDescription}
+          adType={campaignData.adType}
+          onProductUrlChange={(value) => updateCampaignField('productUrl', value)}
+          onMainOfferDescriptionChange={(value) => updateCampaignField('mainOfferDescription', value)}
+          onAdTypeChange={(value) => updateCampaignField('adType', value)}
+        />
+      )
+    },
+    {
+      title: "Ad Creative",
+      description: "Design your ad creative",
+      component: (
+        <AdCreativeForm
+          primaryText={campaignData.primaryText}
+          headline={campaignData.headline}
+          description={campaignData.description}
+          callToAction={campaignData.callToAction}
+          destinationUrl={campaignData.destinationUrl}
+          mediaUrl={campaignData.mediaUrl}
+          onPrimaryTextChange={(value) => updateCampaignField('primaryText', value)}
+          onHeadlineChange={(value) => updateCampaignField('headline', value)}
+          onDescriptionChange={(value) => updateCampaignField('description', value)}
+          onCallToActionChange={(value) => updateCampaignField('callToAction', value)}
+          onDestinationUrlChange={(value) => updateCampaignField('destinationUrl', value)}
+          onMediaUrlChange={(value) => updateCampaignField('mediaUrl', value)}
+        />
+      )
+    },
+    {
+      title: "Review & Launch",
+      description: "Connect your Facebook account and launch",
+      component: (
+        <div className="space-y-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-medium mb-2">Campaign Summary</h3>
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Business Name</p>
+                    <p className="font-medium">{campaignData.businessName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Campaign Name</p>
+                    <p className="font-medium">{campaignData.campaignName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Budget Range</p>
+                    <p className="font-medium">${campaignData.budgetRange[0]} - ${campaignData.budgetRange[1]} / day</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Duration</p>
+                    <p className="font-medium">{campaignData.timeframeValue} {campaignData.timeframeUnit}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-2">Facebook Ad Account</h3>
+            <FacebookAdAccountConnection
+              isConnected={fbConnected}
+              onConnect={handleConnectFacebook}
+              onDisconnect={handleDisconnectFacebook}
+              accessToken={fbAccessToken}
+              adAccountId={fbAdAccountId}
+              setAccessToken={setFbAccessToken}
+              setAdAccountId={setFbAdAccountId}
+            />
+          </div>
+        </div>
+      )
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
@@ -113,64 +405,111 @@ const AIMediaBuyerPage: React.FC = () => {
             {/* Campaign Creation Tab */}
             <TabsContent value="campaigns" className="space-y-6">
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
-                <div className="mb-6">
-                  <AIMediaBuyerEnhanced />
-                </div>
-                
-                {!fbConnected && (
-                  <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <h3 className="text-amber-800 font-medium flex items-center gap-2">
-                      <AlertTriangle size={18} /> Connect to Facebook Ads
-                    </h3>
-                    <p className="text-amber-700 text-sm mb-4">
-                      To launch campaigns directly to Facebook, please connect your Facebook Ad account.
-                    </p>
+                {!campaignSubmitted ? (
+                  <>
+                    <div className="mb-8">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">Create New Campaign</h2>
+                        <div className="text-sm text-gray-500">Step {currentStep + 1} of {steps.length}</div>
+                      </div>
+                      <Progress 
+                        value={((currentStep + 1) / steps.length) * 100} 
+                        className="mt-2 h-1" 
+                      />
+                      <div className="mt-2 flex justify-between">
+                        {steps.map((step, index) => (
+                          <div key={index} className="flex flex-col items-center">
+                            <div 
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                index < currentStep
+                                  ? 'bg-green-100 text-green-600'
+                                  : index === currentStep
+                                  ? 'bg-blue-100 text-blue-600'
+                                  : 'bg-gray-100 text-gray-400'
+                              }`}
+                            >
+                              {index < currentStep ? (
+                                <CheckCircle size={16} />
+                              ) : (
+                                <span>{index + 1}</span>
+                              )}
+                            </div>
+                            <span className="text-xs mt-1 text-gray-500 hidden md:block">
+                              {step.title}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Facebook Access Token
-                        </label>
-                        <Input 
-                          value={fbAccessToken} 
-                          onChange={(e) => setFbAccessToken(e.target.value)}
-                          placeholder="Enter your Facebook access token"
-                        />
-                      </div>
+                    <div className="mb-8">
+                      <h3 className="text-lg font-medium mb-4">{steps[currentStep].title}</h3>
+                      <p className="text-gray-600 text-sm mb-6">{steps[currentStep].description}</p>
                       
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Ad Account ID
-                        </label>
-                        <Input 
-                          value={fbAdAccountId} 
-                          onChange={(e) => setFbAdAccountId(e.target.value)}
-                          placeholder="Enter your Ad Account ID (e.g., act_123456789)"
-                        />
-                      </div>
+                      {steps[currentStep].component}
+                    </div>
+                    
+                    <div className="flex justify-between pt-4 border-t">
+                      <Button
+                        variant="outline"
+                        onClick={prevStep}
+                        disabled={currentStep === 0}
+                      >
+                        Back
+                      </Button>
                       
-                      <Button onClick={handleConnectFacebook}>
-                        Connect Facebook Account
+                      <Button 
+                        onClick={handleNext}
+                      >
+                        {currentStep < steps.length - 1 ? "Continue" : "Launch Campaign"}
                       </Button>
                     </div>
-                  </div>
-                )}
-                
-                {fbConnected && (
-                  <div className="mt-4">
-                    <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
-                      Launch Campaign to Facebook
-                    </Button>
-                  </div>
+                  </>
+                ) : (
+                  <CampaignSuccessView
+                    campaignId={campaignData.campaignId}
+                    campaignStatus={campaignData.campaignStatus}
+                    campaignName={campaignData.campaignName}
+                    adPreviewUrl={campaignData.adPreviewUrl}
+                    metaLink={campaignData.metaLink}
+                    onViewCampaigns={viewMyCampaigns}
+                    onCreateNew={createNewCampaign}
+                  />
                 )}
               </div>
             </TabsContent>
             
-            {/* Ad Copy Generator Tab */}
+            {/* Ad Copy Tab */}
             <TabsContent value="ad-copy" className="space-y-6">
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                <AdCopyGenerator />
+                <h2 className="text-xl font-semibold mb-4">Ad Copy Generator</h2>
+                <p className="text-gray-600 mb-6">
+                  Generate high-converting ad copy for your campaigns.
+                </p>
+                
+                <div className="space-y-6">
+                  <div>
+                    <AdCopyForm
+                      productUrl={campaignData.productUrl}
+                      mainOfferDescription={campaignData.mainOfferDescription}
+                      adType={campaignData.adType}
+                      onProductUrlChange={(value) => updateCampaignField('productUrl', value)}
+                      onMainOfferDescriptionChange={(value) => updateCampaignField('mainOfferDescription', value)}
+                      onAdTypeChange={(value) => updateCampaignField('adType', value)}
+                    />
+                  </div>
+                  
+                  <Button className="mt-4">
+                    Generate Ad Copy
+                  </Button>
+                  
+                  <div className="mt-6 p-6 border rounded-md bg-gray-50">
+                    <h3 className="text-lg font-medium mb-3">Generated Ad Copy</h3>
+                    <p className="text-gray-500 italic mb-2">
+                      Your generated ad copy will appear here...
+                    </p>
+                  </div>
+                </div>
               </div>
             </TabsContent>
             
@@ -372,7 +711,7 @@ const AIMediaBuyerPage: React.FC = () => {
                       
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium mb-1">
                             Report Name
                           </label>
                           <Input placeholder="E.g., Q3 Performance Summary" />
@@ -380,14 +719,14 @@ const AIMediaBuyerPage: React.FC = () => {
                         
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium mb-1">
                               Start Date
                             </label>
                             <Input type="date" />
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium mb-1">
                               End Date
                             </label>
                             <Input type="date" />
@@ -395,7 +734,7 @@ const AIMediaBuyerPage: React.FC = () => {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium mb-1">
                             Metrics to Include
                           </label>
                           <div className="grid grid-cols-2 gap-2 mt-2">
