@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
@@ -9,13 +9,19 @@ import ProfileDropdown from './auth/ProfileDropdown';
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Removed isScrolled state since we're removing the scroll effect
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
+  
+  // Determine if we're on the home page
+  const isHomePage = location.pathname === '/';
+  
+  // Set the navbar background class based on the current page
+  const navbarBgClass = isHomePage 
+    ? "bg-adking-dark bg-opacity-95 backdrop-blur-md" 
+    : "bg-adking-dark bg-opacity-95 backdrop-blur-md";
 
-  // Removed scroll event listener since we're removing the scroll effect
-
-  return <nav className="fixed top-0 left-0 w-full z-50 bg-adking-dark bg-opacity-95 backdrop-blur-md shadow-md">
+  return <nav className={`fixed top-0 left-0 w-full z-50 ${navbarBgClass} shadow-md`}>
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link to="/" className="flex items-center">
