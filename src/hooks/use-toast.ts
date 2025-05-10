@@ -1,26 +1,19 @@
 
 import * as React from "react"
-import {
-  Toast,
+
+import type {
   ToastActionElement,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
+  ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 5
+const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
-type ToasterToast = {
+type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
-  variant?: "default" | "destructive" | "warning"
-  open: boolean
-  onOpenChange: (open: boolean) => void
 }
 
 const actionTypes = {
@@ -33,7 +26,7 @@ const actionTypes = {
 let count = 0
 
 function genId() {
-  count = (count + 1) % Number.MAX_VALUE
+  count = (count + 1) % Number.MAX_SAFE_INTEGER
   return count.toString()
 }
 
@@ -98,8 +91,6 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -145,7 +136,7 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id" | "open" | "onOpenChange">
+type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
@@ -163,7 +154,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open: boolean) => {
+      onOpenChange: (open) => {
         if (!open) dismiss()
       },
     },
@@ -177,6 +168,7 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
+  // Creating the state inside the function component context
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {

@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Sparkles, Image as ImageIcon } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 
 interface AdCreativeFormProps {
   onChange: (data: any) => void;
@@ -26,7 +25,6 @@ const callToActionOptions = [
 ];
 
 const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData = {} }) => {
-  const { toast } = useToast();
   const [adCreative, setAdCreative] = useState({
     primaryText: initialData.primaryText || '',
     headline: initialData.headline || '',
@@ -39,7 +37,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
     generatedMedia: initialData.generatedMedia || null,
   });
 
-  const [mediaTab, setMediaTab] = useState<string>(initialData.mediaType || "manual");
+  const [mediaTab, setMediaTab] = useState<string>("manual");
 
   const handleInputChange = (field: string, value: any) => {
     const updatedCreative = { ...adCreative, [field]: value };
@@ -64,21 +62,13 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
 
   const generateAIMedia = () => {
     // In a real implementation, this would call an AI image generation service
-    toast({
-      title: "Generating AI image",
-      description: "Your AI-generated image is being created...",
-    });
+    console.log("Generating AI media with prompt:", adCreative.aiPrompt);
     
     // Mock implementation - would be replaced with actual AI generation
     setTimeout(() => {
       const mockGeneratedImageUrl = "https://placehold.co/600x400/darkblue/white?text=AI+Generated+Image";
       handleInputChange('generatedMedia', mockGeneratedImageUrl);
       handleInputChange('mediaUrl', mockGeneratedImageUrl);
-      
-      toast({
-        title: "Image generated",
-        description: "Your AI-generated image is ready to use",
-      });
     }, 1500);
   };
 
@@ -150,7 +140,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
         <div className="space-y-2">
           <Label>Media</Label>
           <Tabs 
-            defaultValue={adCreative.mediaType} 
+            defaultValue="manual" 
             value={mediaTab}
             onValueChange={(value) => {
               setMediaTab(value);
