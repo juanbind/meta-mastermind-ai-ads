@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { 
   PieChart, 
   Target, 
@@ -19,7 +19,7 @@ import {
   FileText,
   Settings
 } from 'lucide-react';
-import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
+import AIMediaBuyerEnhanced from '@/components/ai-tools/AIMediaBuyerEnhanced';
 import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
 
 const AIMediaBuyerPage: React.FC = () => {
@@ -78,14 +78,6 @@ const AIMediaBuyerPage: React.FC = () => {
     });
   };
 
-  const handleClose = () => {
-    // Handle closing of the AIMediaBuyer component
-    toast({
-      title: "Campaign Creation Cancelled",
-      description: "You've exited the campaign creation process"
-    });
-  };
-
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
@@ -123,7 +115,7 @@ const AIMediaBuyerPage: React.FC = () => {
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
                 <div className="mb-6">
-                  <AIMediaBuyer onClose={handleClose} />
+                  <AIMediaBuyerEnhanced />
                 </div>
                 
                 {!fbConnected && (

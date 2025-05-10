@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,19 +17,20 @@ interface AIMediaBuyerProps {
   onClose: () => void;
 }
 
-// Updated Meta campaign objectives based on actual Meta options
+const platformOptions = [
+  { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
+  { value: "tiktok", label: "TikTok" },
+  { value: "google", label: "Google Ads" },
+  { value: "youtube", label: "YouTube" }
+];
+
 const objectiveOptions = [
   { value: "awareness", label: "Brand Awareness" },
-  { value: "reach", label: "Reach" },
-  { value: "traffic", label: "Traffic" },
-  { value: "engagement", label: "Engagement" },
-  { value: "app_installs", label: "App Installs" },
-  { value: "video_views", label: "Video Views" },
-  { value: "lead_generation", label: "Lead Generation" },
-  { value: "messages", label: "Messages" },
+  { value: "consideration", label: "Consideration" },
   { value: "conversions", label: "Conversions" },
-  { value: "catalog_sales", label: "Catalog Sales" },
-  { value: "store_traffic", label: "Store Traffic" }
+  { value: "leads", label: "Lead Generation" },
+  { value: "traffic", label: "Traffic" }
 ];
 
 const audienceTypes = [
@@ -61,16 +63,15 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     product: "",
     industry: "",
     websiteUrl: "",
-    salesFunnelUrl: "", // Added Sales Funnel URL field
+    salesFunnelUrl: "", // New field
     platforms: ["facebook", "instagram"],
     objective: "conversions",
-    budgetRange: [1000, 3000], // Budget range slider
-    timeframeValue: 30,
-    timeframeUnit: "days",
+    budgetRange: [1000, 3000], // Changed from single value to range
+    timeframeValue: 30, // Changed from campaignDuration
+    timeframeUnit: "days", // New field for timeframe unit
     audience: "",
     audienceTypes: ["cold", "warm"],
-    mainOfferDescription: "", // Added Main Offer Description field
-    idealCustomerProfile: "", // Added for Ideal Customer Profile step
+    mainOfferDescription: "", // New field
     adCreative: {
       primaryText: "",
       headline: "",
@@ -115,7 +116,6 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
   };
 
   const nextStep = () => {
-    // Validation for each step
     if (currentStep === 1 && (!formData.business || !formData.product || !formData.industry)) {
       toast({
         title: "Missing information",
@@ -125,25 +125,16 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       return;
     }
     
-    if (currentStep === 2 && !formData.audience) {
+    if (currentStep === 2 && formData.platforms.length === 0) {
       toast({
-        title: "Missing information",
-        description: "Please provide target audience information.",
+        title: "Platform selection required",
+        description: "Please select at least one platform for your campaign.",
         variant: "destructive"
       });
       return;
     }
 
-    if (currentStep === 3 && !formData.idealCustomerProfile) {
-      toast({
-        title: "Missing information",
-        description: "Please provide ideal customer profile information.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (currentStep === 4 && !formData.mainOfferDescription) {
+    if (currentStep === 3 && !formData.mainOfferDescription) {
       toast({
         title: "Missing information",
         description: "Main Offer Description is required.",
@@ -152,7 +143,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       return;
     }
     
-    if (currentStep < 6) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -207,7 +198,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       };
       
       setGeneratedStrategy(mockStrategy);
-      setCurrentStep(7);
+      setCurrentStep(5);
       
       toast({
         title: "Strategy generated!",
@@ -282,7 +273,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
     
     switch (currentStep) {
-      case 1: // Campaign & Business Information
+      case 1:
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Campaign & Business Information</h2>
@@ -334,106 +325,32 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
         
-      case 2: // Target Audience
+      case 2:
         return (
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">Target Audience</h2>
+            <h2 className="text-lg font-medium">Campaign Settings</h2>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Audience Description</label>
-              <Textarea 
-                placeholder="Describe your target audience (age, interests, pain points, etc.)"
-                value={formData.audience}
-                onChange={(e) => handleInputChange('audience', e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Audience Types to Target</label>
-              <div className="grid grid-cols-3 gap-2">
-                {audienceTypes.map((type) => (
+              <label className="text-sm font-medium">Ad Platforms</label>
+              <div className="grid grid-cols-2 gap-2">
+                {platformOptions.map((platform) => (
                   <Button
-                    key={type.value}
+                    key={platform.value}
                     type="button"
-                    variant={formData.audienceTypes.includes(type.value) ? "default" : "outline"}
-                    className={`justify-start ${formData.audienceTypes.includes(type.value) ? "bg-metamaster-primary text-white" : ""}`}
-                    onClick={() => handleMultiSelect('audienceTypes', type.value)}
+                    variant={formData.platforms.includes(platform.value) ? "default" : "outline"}
+                    className={`justify-start ${formData.platforms.includes(platform.value) ? "bg-metamaster-primary text-white" : ""}`}
+                    onClick={() => handleMultiSelect('platforms', platform.value)}
                   >
-                    {formData.audienceTypes.includes(type.value) ? (
+                    {formData.platforms.includes(platform.value) ? (
                       <Check className="mr-2 h-4 w-4" />
                     ) : (
                       <div className="w-4 mr-2" />
                     )}
-                    {type.label}
+                    {platform.label}
                   </Button>
                 ))}
               </div>
             </div>
-          </div>
-        );
-
-      case 3: // Ideal Customer Profile
-        return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium">Ideal Customer Profile</h2>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Describe Your Ideal Customer</label>
-              <Textarea 
-                placeholder="Describe your ideal customer in detail - their demographics, behaviors, motivations, and pain points"
-                value={formData.idealCustomerProfile}
-                onChange={(e) => handleInputChange('idealCustomerProfile', e.target.value)}
-                className="min-h-[200px]"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                The more specific you are, the better we can target your ads.
-              </p>
-            </div>
-          </div>
-        );
-
-      case 4: // Ad Copy
-        return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium">Ad Copy</h2>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Product URL or Description</label>
-              <Textarea 
-                placeholder="Enter your product URL or description" 
-                value={formData.websiteUrl}
-                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-                className="min-h-[80px]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
-              <Textarea 
-                placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
-                value={formData.mainOfferDescription}
-                onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
-                className="min-h-[80px]"
-              />
-            </div>
-          </div>
-        );
-
-      case 5: // Ad Creative
-        return (
-          <div className="space-y-6">
-            <AdCreativeForm 
-              onChange={handleAdCreativeChange}
-              initialData={formData.adCreative}
-            />
-          </div>
-        );
-
-      case 6: // Budget & Configuration
-        return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-medium">Budget & Configuration</h2>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Campaign Objective</label>
@@ -499,27 +416,79 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 </Select>
               </div>
             </div>
+          </div>
+        );
+        
+      case 3:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-lg font-medium">Ad Copy</h2>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Product URL or Description</label>
+              <Textarea 
+                placeholder="Enter your product URL or description" 
+                value={formData.websiteUrl}
+                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
 
-            <div className="pt-6">
-              <Button 
-                onClick={generateCampaignStrategy}
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Campaign Strategy...
-                  </>
-                ) : (
-                  <>Generate AI Campaign Strategy</>
-                )}
-              </Button>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
+              <Textarea 
+                placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
+                value={formData.mainOfferDescription}
+                onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Audience Description</label>
+              <Textarea 
+                placeholder="Describe your target audience (age, interests, pain points, etc.)"
+                value={formData.audience}
+                onChange={(e) => handleInputChange('audience', e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Audience Types to Target</label>
+              <div className="grid grid-cols-3 gap-2">
+                {audienceTypes.map((type) => (
+                  <Button
+                    key={type.value}
+                    type="button"
+                    variant={formData.audienceTypes.includes(type.value) ? "default" : "outline"}
+                    className={`justify-start ${formData.audienceTypes.includes(type.value) ? "bg-metamaster-primary text-white" : ""}`}
+                    onClick={() => handleMultiSelect('audienceTypes', type.value)}
+                  >
+                    {formData.audienceTypes.includes(type.value) ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <div className="w-4 mr-2" />
+                    )}
+                    {type.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         );
 
-      case 7: // Campaign Strategy & Launch
+      case 4:
+        return (
+          <div className="space-y-6">
+            <AdCreativeForm 
+              onChange={handleAdCreativeChange}
+              initialData={formData.adCreative}
+            />
+          </div>
+        );
+        
+      case 5:
         return generatedStrategy ? (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -698,10 +667,10 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
         <h2 className="text-2xl font-bold text-metamaster-primary">AI Media Buyer</h2>
       </div>
       
-      {/* Progress indicators - only show for steps 1-6 */}
-      {currentStep < 7 && (
+      {/* Progress indicators - only show for steps 1-4 */}
+      {currentStep < 5 && (
         <div className="flex mb-6">
-          {[1, 2, 3, 4, 5, 6].map((step) => (
+          {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex-1 relative">
               <div 
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm mx-auto z-10 relative
@@ -714,13 +683,11 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               </div>
               <div className="text-xs text-center mt-2 text-metamaster-gray-600">
                 {step === 1 && "Business Info"}
-                {step === 2 && "Target Audience"}
-                {step === 3 && "Ideal Customer"}
-                {step === 4 && "Ad Copy"}
-                {step === 5 && "Ad Creative"}
-                {step === 6 && "Budget & Config"}
+                {step === 2 && "Campaign Settings"}
+                {step === 3 && "Ad Copy"}
+                {step === 4 && "Creative"}
               </div>
-              {step < 6 && (
+              {step < 4 && (
                 <div 
                   className={`absolute top-4 w-full h-0.5 
                     ${currentStep > step ? 'bg-metamaster-primary' : 'bg-gray-200'}`
@@ -738,40 +705,51 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       </div>
       
       {/* Navigation buttons */}
-      {!campaignCreated && currentStep < 7 && (
-        <div className="flex justify-between pt-4 border-t border-gray-200">
-          {currentStep > 1 && (
-            <Button 
-              variant="outline" 
-              onClick={prevStep}
-              disabled={isGenerating}
-            >
-              Back
-            </Button>
+      {!campaignCreated && (
+        <div className={`flex ${currentStep === 5 ? 'justify-end' : 'justify-between'} pt-4 border-t border-gray-200`}>
+          {currentStep < 5 && (
+            <>
+              {currentStep > 1 && (
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep}
+                  disabled={isGenerating}
+                >
+                  Back
+                </Button>
+              )}
+              
+              {currentStep < 4 ? (
+                <Button onClick={nextStep}>
+                  Continue <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button 
+                  onClick={generateCampaignStrategy}
+                  disabled={isGenerating}
+                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating Strategy...
+                    </>
+                  ) : (
+                    <>Generate Campaign Strategy</>
+                  )}
+                </Button>
+              )}
+            </>
           )}
           
-          <Button 
-            onClick={nextStep} 
-            disabled={isGenerating || (currentStep === 6)}
-          >
-            {currentStep < 6 ? (
-              <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
-            ) : (
-              <>Generate Campaign</>
-            )}
-          </Button>
-        </div>
-      )}
-
-      {/* Close button for campaign created or strategy step */}
-      {(campaignCreated || currentStep === 7) && !fbConnected && (
-        <div className="flex justify-end pt-4 border-t border-gray-200">
-          <Button 
-            variant="outline" 
-            onClick={onClose}
-          >
-            Close
-          </Button>
+          {currentStep === 5 && !fbConnected && (
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+            >
+              Close
+            </Button>
+          )}
         </div>
       )}
     </div>

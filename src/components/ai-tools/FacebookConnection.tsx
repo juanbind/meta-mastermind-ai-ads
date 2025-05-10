@@ -47,7 +47,7 @@ const FacebookConnection: React.FC<FacebookConnectionProps> = ({
       setConnectionProgress(30);
       
       // Validate token format
-      if (!accessToken.startsWith('EAA') && accessToken.length < 20) {
+      if (!accessToken.startsWith('EAA') || accessToken.length < 20) {
         throw new Error("Invalid Facebook access token format");
       }
       
@@ -173,12 +173,12 @@ const FacebookConnection: React.FC<FacebookConnectionProps> = ({
           />
           <p className="text-xs text-gray-500 mt-1">
             <a 
-              href="https://business.facebook.com/settings/system-users" 
+              href="https://developers.facebook.com/tools/explorer/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline flex items-center"
             >
-              Get your token from Facebook Business Settings <ExternalLink className="h-3 w-3 ml-1" />
+              Get your token from Facebook <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </p>
         </div>
