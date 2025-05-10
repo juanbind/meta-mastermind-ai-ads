@@ -75,15 +75,7 @@ const AITools: React.FC = () => {
       description: "Create compelling ad copy that converts using our advanced AI model trained on high-performing ads.",
       icon: <MessageSquare size={24} />,
       buttonText: "Generate Copy",
-      comingSoon: false
-    },
-    {
-      id: "ad-creative",
-      title: "Creative Generator",
-      description: "Generate scroll-stopping ad creative concepts based on your product and target audience.",
-      icon: <Sparkles size={24} />,
-      buttonText: "Generate Creative",
-      comingSoon: false
+      comingSoon: true
     },
     {
       id: "campaign-analyzer",
@@ -91,6 +83,14 @@ const AITools: React.FC = () => {
       description: "Get AI-powered insights and recommendations to improve your campaign performance.",
       icon: <Brain size={24} />,
       buttonText: "Analyze Campaign",
+      comingSoon: true
+    },
+    {
+      id: "creative-generator",
+      title: "Creative Generator",
+      description: "Generate scroll-stopping ad creative concepts based on your product and target audience.",
+      icon: <Sparkles size={24} />,
+      buttonText: "Generate Creative",
       comingSoon: true
     },
     {
@@ -114,10 +114,6 @@ const AITools: React.FC = () => {
   const handleToolClick = (toolId: string) => {
     if (toolId === 'media-buyer') {
       navigate('/ai-tools/media-buyer');
-    } else if (toolId === 'ad-copy') {
-      navigate('/ai-tools/ad-copy');
-    } else if (toolId === 'ad-creative') {
-      navigate('/ai-tools/ad-creative');
     }
   };
 
@@ -139,7 +135,7 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
-                comingSoon={tool.id !== 'media-buyer' && tool.id !== 'ad-copy' && tool.id !== 'ad-creative'}
+                comingSoon={tool.id !== 'media-buyer'}
                 onAction={() => handleToolClick(tool.id)}
               />
             ))}
