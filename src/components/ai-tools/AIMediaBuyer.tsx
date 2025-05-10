@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -973,8 +974,8 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             <div className="mt-8">
               <div className="space-y-4">
                 <FacebookConnection
-                  onConnect={handleFacebookConnection}
-                  connected={fbConnected}
+                  onConnected={handleFacebookConnection}
+                  isConnected={fbConnected}
                   accountData={fbAccountData}
                 />
                 
