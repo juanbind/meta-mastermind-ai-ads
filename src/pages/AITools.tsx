@@ -75,7 +75,7 @@ const AITools: React.FC = () => {
       description: "Create compelling ad copy that converts using our advanced AI model trained on high-performing ads.",
       icon: <MessageSquare size={24} />,
       buttonText: "Generate Copy",
-      comingSoon: true
+      comingSoon: false
     },
     {
       id: "campaign-analyzer",
@@ -114,6 +114,8 @@ const AITools: React.FC = () => {
   const handleToolClick = (toolId: string) => {
     if (toolId === 'media-buyer') {
       navigate('/ai-tools/media-buyer');
+    } else if (toolId === 'ad-copy') {
+      navigate('/ai-tools/ad-copy-generator');
     }
   };
 
@@ -135,7 +137,7 @@ const AITools: React.FC = () => {
                 description={tool.description}
                 icon={tool.icon}
                 buttonText={tool.buttonText}
-                comingSoon={tool.id !== 'media-buyer'}
+                comingSoon={tool.id !== 'media-buyer' && tool.id !== 'ad-copy'}
                 onAction={() => handleToolClick(tool.id)}
               />
             ))}
