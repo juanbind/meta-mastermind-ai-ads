@@ -16,7 +16,7 @@ const Index = () => {
       <div className="text-center">
         <h1 className="text-xl font-medium mb-2 text-adking-dark">Loading AdKing...</h1>
         <div className="w-16 h-1 bg-adking-primary mx-auto rounded-full relative overflow-hidden">
-          <div className="absolute top-0 left-0 h-full w-1/2 bg-white/30 animate-pulse-light"></div>
+          <div className="absolute top-0 left-0 h-full w-1/2 bg-adking-dark/30 animate-pulse-light"></div>
         </div>
       </div>
     </div>

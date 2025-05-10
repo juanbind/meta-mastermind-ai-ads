@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -8,13 +9,16 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
+
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
+  
   const handleGetStarted = () => {
     navigate('/auth');
   };
+  
   return <div className="min-h-screen bg-white relative">
       {/* Background grid pattern - mimicking the reference design */}
       <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
@@ -102,4 +106,5 @@ const Landing = () => {
       <Footer />
     </div>;
 };
+
 export default Landing;
