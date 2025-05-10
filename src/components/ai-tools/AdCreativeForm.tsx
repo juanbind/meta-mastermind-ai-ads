@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Sparkles, Image as ImageIcon } from "lucide-react";
+import { AdCreativeData } from './AIMediaBuyer';
 
 interface AdCreativeFormProps {
-  onChange: (data: any) => void;
-  initialData?: any;
+  onChange: (data: AdCreativeData) => void;
+  initialData?: Partial<AdCreativeData>;
 }
 
 const callToActionOptions = [
@@ -25,7 +26,7 @@ const callToActionOptions = [
 ];
 
 const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData = {} }) => {
-  const [adCreative, setAdCreative] = useState({
+  const [adCreative, setAdCreative] = useState<AdCreativeData>({
     primaryText: initialData.primaryText || '',
     headline: initialData.headline || '',
     description: initialData.description || '',
@@ -37,7 +38,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
     generatedMedia: initialData.generatedMedia || null,
   });
 
-  const [mediaTab, setMediaTab] = useState<string>("manual");
+  const [mediaTab, setMediaTab] = useState<string>(adCreative.mediaType);
 
   const handleInputChange = (field: string, value: any) => {
     const updatedCreative = { ...adCreative, [field]: value };
@@ -140,7 +141,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
         <div className="space-y-2">
           <Label>Media</Label>
           <Tabs 
-            defaultValue="manual" 
+            defaultValue={adCreative.mediaType} 
             value={mediaTab}
             onValueChange={(value) => {
               setMediaTab(value);
@@ -246,7 +247,7 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
                       </div>
                       <Button 
                         onClick={generateAIMedia}
-                        disabled={!adCreative.aiPrompt.trim()}
+                        disabled={!adCreative.aiPrompt?.trim()}
                         className="w-full"
                       >
                         <Sparkles size={16} className="mr-2" /> Generate Image

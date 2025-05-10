@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +18,7 @@ import {
   FileText,
   Settings
 } from 'lucide-react';
-import AIMediaBuyerEnhanced from '@/components/ai-tools/AIMediaBuyerEnhanced';
+import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
 import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
 
 const AIMediaBuyerPage: React.FC = () => {
@@ -115,7 +114,7 @@ const AIMediaBuyerPage: React.FC = () => {
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
                 <div className="mb-6">
-                  <AIMediaBuyerEnhanced />
+                  <AIMediaBuyer onClose={() => console.log("Media buyer closed")} />
                 </div>
                 
                 {!fbConnected && (
