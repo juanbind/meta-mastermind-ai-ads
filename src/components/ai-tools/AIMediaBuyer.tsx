@@ -6,8 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users } from "lucide-react";
+import FacebookConnection from './FacebookConnection';
+import AdCreativeForm from './AdCreativeForm';
+import CampaignSuccessScreen from './CampaignSuccessScreen';
 
 interface AIMediaBuyerProps {
   onClose: () => void;
@@ -29,17 +33,15 @@ const objectiveOptions = [
   { value: "traffic", label: "Traffic" }
 ];
 
-const budgetRangeOptions = [
-  { value: "low", label: "$500 - $2,000" },
-  { value: "medium", label: "$2,000 - $5,000" },
-  { value: "high", label: "$5,000 - $15,000" },
-  { value: "enterprise", label: "$15,000+" }
-];
-
 const audienceTypes = [
   { value: "cold", label: "Cold Audience" },
   { value: "warm", label: "Warm Audience" },
   { value: "hot", label: "Hot Audience" }
+];
+
+const timeframeUnitOptions = [
+  { value: "days", label: "Days" },
+  { value: "weeks", label: "Weeks" }
 ];
 
 type CampaignStrategy = {
@@ -60,14 +62,33 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     business: "",
     product: "",
     industry: "",
+    websiteUrl: "",
+    salesFunnelUrl: "", // New field
     platforms: ["facebook", "instagram"],
     objective: "conversions",
-    budgetRange: "medium",
+    budgetRange: [1000, 3000], // Changed from single value to range
+    timeframeValue: 30, // Changed from campaignDuration
+    timeframeUnit: "days", // New field for timeframe unit
     audience: "",
     audienceTypes: ["cold", "warm"],
+    mainOfferDescription: "", // New field
+    adCreative: {
+      primaryText: "",
+      headline: "",
+      description: "",
+      callToAction: "learn_more",
+      destinationUrl: "",
+      mediaType: "manual",
+      mediaUrl: "",
+    }
   });
   
   const [generatedStrategy, setGeneratedStrategy] = useState<CampaignStrategy | null>(null);
+  const [fbConnected, setFbConnected] = useState(false);
+  const [fbAccountData, setFbAccountData] = useState<any>(null);
+  const [isSubmittingCampaign, setIsSubmittingCampaign] = useState(false);
+  const [campaignCreated, setCampaignCreated] = useState(false);
+  const [createdCampaignData, setCreatedCampaignData] = useState<any>(null);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -83,6 +104,15 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
         return { ...prev, [field]: [...currentValues, value] };
       }
     });
+  };
+
+  const handleAdCreativeChange = (creativeData: any) => {
+    setFormData((prev) => ({ ...prev, adCreative: creativeData }));
+  };
+
+  const handleFacebookConnection = (isConnected: boolean, accountData?: any) => {
+    setFbConnected(isConnected);
+    setFbAccountData(accountData);
   };
 
   const nextStep = () => {
@@ -103,8 +133,17 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       });
       return;
     }
+
+    if (currentStep === 3 && !formData.mainOfferDescription) {
+      toast({
+        title: "Missing information",
+        description: "Main Offer Description is required.",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -151,7 +190,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
         ],
         optimizationTips: [
           "Start with automatic placements but monitor performance to refine later",
-          "Set up daily budget caps of 20-30% of monthly budget divided by 30",
+          `Set up daily budget caps of $${Math.round(formData.budgetRange[0]/30)} - $${Math.round(formData.budgetRange[1]/30)}`,
           "Use CBO (Campaign Budget Optimization) for platforms that support it",
           "Implement a minimum 2-week testing period before major adjustments",
           "Monitor frequency caps to avoid ad fatigue (keep under 2.5 for cold traffic)"
@@ -159,7 +198,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       };
       
       setGeneratedStrategy(mockStrategy);
-      setCurrentStep(4);
+      setCurrentStep(5);
       
       toast({
         title: "Strategy generated!",
@@ -177,12 +216,67 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
   };
 
+  const handleSubmitCampaign = async () => {
+    if (!fbConnected || !fbAccountData) {
+      toast({
+        title: "Facebook account required",
+        description: "Please connect your Facebook Ad Account before launching your campaign.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsSubmittingCampaign(true);
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Mock campaign creation response
+      const mockCampaignData = {
+        id: `23847${Math.floor(Math.random() * 10000000)}`,
+        name: `${formData.product} - ${formData.objective} Campaign`,
+        status: "PENDING",
+        adAccountId: fbAccountData.id,
+        budget: `$${formData.budgetRange[0]} - $${formData.budgetRange[1]} / ${formData.timeframeValue} ${formData.timeframeUnit}`,
+        objective: objectiveOptions.find(obj => obj.value === formData.objective)?.label || formData.objective,
+        adPreviewUrl: formData.adCreative.mediaUrl || "https://placehold.co/600x400/darkblue/white?text=Ad+Preview"
+      };
+      
+      setCreatedCampaignData(mockCampaignData);
+      setCampaignCreated(true);
+      
+      toast({
+        title: "Campaign submitted!",
+        description: "Your campaign has been successfully submitted to Facebook.",
+      });
+    } catch (error) {
+      console.error("Error submitting campaign:", error);
+      toast({
+        title: "Submission failed",
+        description: "There was an error submitting your campaign. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmittingCampaign(false);
+    }
+  };
+
   const renderStep = () => {
+    if (campaignCreated && createdCampaignData) {
+      return (
+        <CampaignSuccessScreen
+          campaignData={createdCampaignData}
+          onClose={onClose}
+        />
+      );
+    }
+    
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">Tell us about your business</h2>
+            <h2 className="text-lg font-medium">Campaign & Business Information</h2>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Business Name</label>
@@ -208,6 +302,24 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 placeholder="E.g., Health & Fitness" 
                 value={formData.industry}
                 onChange={(e) => handleInputChange('industry', e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Website URL</label>
+              <Input 
+                placeholder="E.g., https://www.example.com" 
+                value={formData.websiteUrl}
+                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sales Funnel URL (Optional)</label>
+              <Input 
+                placeholder="E.g., https://www.example.com/offer" 
+                value={formData.salesFunnelUrl}
+                onChange={(e) => handleInputChange('salesFunnelUrl', e.target.value)}
               />
             </div>
           </div>
@@ -261,21 +373,48 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Budget Range (Monthly)</label>
-              <Select
-                value={formData.budgetRange}
-                onValueChange={(value) => handleInputChange('budgetRange', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select budget range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {budgetRangeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="pt-6 pb-2">
+                <Slider
+                  value={formData.budgetRange}
+                  min={500}
+                  max={20000}
+                  step={100}
+                  onValueChange={(value) => handleInputChange('budgetRange', value)}
+                  className="mb-6"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">${formData.budgetRange[0]}</span>
+                  <span className="text-sm font-medium">${formData.budgetRange[1]}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Timeframe</label>
+              <div className="flex gap-2">
+                <Input 
+                  type="number"
+                  value={formData.timeframeValue}
+                  onChange={(e) => handleInputChange('timeframeValue', parseInt(e.target.value) || 0)}
+                  className="w-20"
+                  min={1}
+                />
+                <Select
+                  value={formData.timeframeUnit}
+                  onValueChange={(value) => handleInputChange('timeframeUnit', value)}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Select unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeframeUnitOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         );
@@ -283,7 +422,27 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       case 3:
         return (
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">Audience Information</h2>
+            <h2 className="text-lg font-medium">Ad Copy</h2>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Product URL or Description</label>
+              <Textarea 
+                placeholder="Enter your product URL or description" 
+                value={formData.websiteUrl}
+                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
+              <Textarea 
+                placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
+                value={formData.mainOfferDescription}
+                onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Audience Description</label>
@@ -318,8 +477,18 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
           </div>
         );
-        
+
       case 4:
+        return (
+          <div className="space-y-6">
+            <AdCreativeForm 
+              onChange={handleAdCreativeChange}
+              initialData={formData.adCreative}
+            />
+          </div>
+        );
+        
+      case 5:
         return generatedStrategy ? (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -459,6 +628,34 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 </Card>
               </TabsContent>
             </Tabs>
+
+            <div className="pt-4 border-t border-gray-200 mt-6">
+              <h3 className="text-lg font-medium mb-4">Launch Your Campaign</h3>
+              <FacebookConnection 
+                onConnected={handleFacebookConnection}
+                isConnected={fbConnected}
+                accountData={fbAccountData}
+              />
+              
+              {fbConnected && (
+                <div className="mt-6">
+                  <Button
+                    onClick={handleSubmitCampaign}
+                    disabled={isSubmittingCampaign}
+                    className="w-full"
+                  >
+                    {isSubmittingCampaign ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2" /> 
+                        Submitting Campaign...
+                      </>
+                    ) : (
+                      <>Launch Campaign on Facebook</>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         ) : null;
     }
@@ -470,10 +667,10 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
         <h2 className="text-2xl font-bold text-metamaster-primary">AI Media Buyer</h2>
       </div>
       
-      {/* Progress indicators */}
-      {currentStep < 4 && (
+      {/* Progress indicators - only show for steps 1-4 */}
+      {currentStep < 5 && (
         <div className="flex mb-6">
-          {[1, 2, 3].map((step) => (
+          {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex-1 relative">
               <div 
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm mx-auto z-10 relative
@@ -487,9 +684,10 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               <div className="text-xs text-center mt-2 text-metamaster-gray-600">
                 {step === 1 && "Business Info"}
                 {step === 2 && "Campaign Settings"}
-                {step === 3 && "Audience"}
+                {step === 3 && "Ad Copy"}
+                {step === 4 && "Creative"}
               </div>
-              {step < 3 && (
+              {step < 4 && (
                 <div 
                   className={`absolute top-4 w-full h-0.5 
                     ${currentStep > step ? 'bg-metamaster-primary' : 'bg-gray-200'}`
@@ -507,51 +705,53 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       </div>
       
       {/* Navigation buttons */}
-      <div className={`flex ${currentStep === 4 ? 'justify-end' : 'justify-between'} pt-4 border-t border-gray-200`}>
-        {currentStep < 4 && (
-          <>
-            {currentStep > 1 && (
-              <Button 
-                variant="outline" 
-                onClick={prevStep}
-                disabled={isGenerating}
-              >
-                Back
-              </Button>
-            )}
-            
-            {currentStep < 3 ? (
-              <Button onClick={nextStep}>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={generateCampaignStrategy}
-                disabled={isGenerating}
-                className="bg-metamaster-primary hover:bg-metamaster-secondary"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Strategy...
-                  </>
-                ) : (
-                  <>Generate Campaign Strategy</>
-                )}
-              </Button>
-            )}
-          </>
-        )}
-        
-        {currentStep === 4 && (
-          <Button 
-            variant="outline" 
-            onClick={onClose}
-          >
-            Close
-          </Button>
-        )}
-      </div>
+      {!campaignCreated && (
+        <div className={`flex ${currentStep === 5 ? 'justify-end' : 'justify-between'} pt-4 border-t border-gray-200`}>
+          {currentStep < 5 && (
+            <>
+              {currentStep > 1 && (
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep}
+                  disabled={isGenerating}
+                >
+                  Back
+                </Button>
+              )}
+              
+              {currentStep < 4 ? (
+                <Button onClick={nextStep}>
+                  Continue <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button 
+                  onClick={generateCampaignStrategy}
+                  disabled={isGenerating}
+                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating Strategy...
+                    </>
+                  ) : (
+                    <>Generate Campaign Strategy</>
+                  )}
+                </Button>
+              )}
+            </>
+          )}
+          
+          {currentStep === 5 && !fbConnected && (
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+            >
+              Close
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
