@@ -19,69 +19,100 @@ const Landing = () => {
     navigate('/auth');
   };
   
-  return <div className="min-h-screen hero-gradient dark-gradient">
+  return <div className="min-h-screen bg-white relative">
+      {/* Background grid pattern - mimicking the reference design */}
+      <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
       <Navbar />
       
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
-        <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-slate-50 lg:text-6xl">Run Meta Ad's In Seconds</h1>
-          <p className="text-lg text-metamaster-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!</p>
+        <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll relative">
+          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-6 font-medium">
+            AdKing AI Now Live!
+          </div>
           
-          <Button className="bg-metamaster-primary hover:bg-metamaster-primary/90 text-white text-lg px-6 py-4 md:px-8 md:py-6 rounded-xl h-auto w-full sm:w-auto" size="lg" onClick={handleGetStarted}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-adking-dark to-adking-gray-800 bg-clip-text text-transparent">Run Meta Ad's In Seconds</h1>
+          
+          <p className="text-lg text-adking-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto px-4 py-[3px] md:text-xl">
+            Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
+          </p>
+          
+          <Button 
+            className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" 
+            size="lg" 
+            onClick={handleGetStarted}
+          >
             Get Started
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
 
           <div className="mt-12 md:mt-20 mb-12 md:mb-20 relative mx-auto max-w-5xl px-4">
-            <div className="aspect-video relative rounded-2xl overflow-hidden bg-metamaster-gray-800/50 border border-white/10 flex flex-col items-center justify-center mx-auto transform-none rotate-0\n">
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-metamaster-primary/20 flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-metamaster-primary flex items-center justify-center">
-                  <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-white" />
+            <div className="aspect-video relative rounded-2xl overflow-hidden bg-adking-gray-800/5 border border-adking-gray-200 shadow-xl flex flex-col items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-adking-primary/20 flex items-center justify-center mx-auto mb-4 animate-glow">
+                <div className="w-8 h-8 rounded-full bg-adking-primary flex items-center justify-center">
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </div>
               </div>
-              <p className="text-lg md:text-xl font-semibold text-white mb-2">VSL Video Coming Soon</p>
-              <p className="text-sm md:text-base text-metamaster-gray-300">This space is reserved for your VSL video</p>
+              <p className="text-xl font-semibold text-adking-dark mb-2">VSL Video Coming Soon</p>
+              <p className="text-adking-gray-600">This space is reserved for your VSL video</p>
             </div>
           </div>
         </div>
 
         {/* Feature Grid */}
-        <FeatureSection />
+        <section className="py-16 md:py-24 px-4 bg-adking-gray-100/50 relative">
+          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.05] pointer-events-none"></div>
+          <FeatureSection />
+        </section>
 
         {/* Pricing Section */}
-        <section className="py-16 md:py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
+        <section className="py-16 md:py-24 px-4 bg-white relative">
+          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-slate-50 md:text-5xl">
+            <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-4 font-medium">
+              Pricing
+            </div>
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">
               🚀 Try AdKing FREE for 7 Days
             </h2>
-            <p className="text-base md:text-lg text-metamaster-gray-300">No credit card required – cancel anytime.</p>
+            <p className="text-base md:text-lg text-adking-gray-600">No credit card required – cancel anytime.</p>
           </div>
           <PricingSection />
         </section>
 
         {/* FAQ Section */}
-        <div className="container mx-auto py-16 md:py-20 px-4">
+        <div className="container mx-auto py-16 md:py-24 px-4 relative">
+          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <FAQ />
         </div>
         
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-metamaster-primary/90 to-metamaster-secondary text-white py-16 md:py-20 px-4">
-          <div className="container mx-auto text-center max-w-3xl">
+        <div className="bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark py-16 md:py-24 px-4 shadow-inner relative">
+          <div className="container mx-auto text-center max-w-3xl relative z-10">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               Ready to Transform Your Facebook Ad Results?
             </h2>
-            <p className="text-lg md:text-xl mb-6 md:mb-8 text-white/90">
+            <p className="text-lg md:text-xl mb-6 md:mb-8 text-adking-dark/90">
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button className="bg-white text-metamaster-primary hover:bg-white/90 text-base md:text-lg px-6 py-4 md:px-8 md:py-6 h-auto rounded-xl w-full sm:w-auto" size="lg" onClick={handleGetStarted}>
+              <Button 
+                className="bg-adking-dark text-white hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto shadow-lg" 
+                size="lg" 
+                onClick={handleGetStarted}
+              >
                 Start 7-Day Free Trial
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-white/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-6 h-auto rounded-xl bg-white/5 hover:bg-white/10 text-white w-full sm:w-auto">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={() => navigate('/auth')} 
+                className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl bg-adking-dark/5 hover:bg-adking-dark/10 text-adking-dark w-full sm:w-auto"
+              >
                 Schedule a Demo
               </Button>
             </div>
-            <p className="mt-4 text-sm text-white/80">No credit card required - Cancel anytime</p>
+            <p className="mt-4 text-sm text-adking-dark/80">No credit card required - Cancel anytime</p>
           </div>
         </div>
       </main>

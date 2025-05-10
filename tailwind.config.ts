@@ -25,19 +25,19 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				metamaster: {
-					primary: '#FFD700', // Updated to Primary Yellow
-					secondary: '#FFB300', // Updated to Accent Yellow
-					dark: '#121212', // Updated to Black
+				adking: {
+					primary: '#FFD700', // Primary Yellow
+					secondary: '#FFB300', // Accent Yellow
+					dark: '#121212', // Black
 					gray: {
 						100: '#F5F5F5',
-						200: '#E0E0E0', // Updated to Light Grey
+						200: '#E0E0E0', // Light Grey
 						300: '#BDBDBD', 
 						400: '#9E9E9E',
 						500: '#757575',
 						600: '#616161',
 						700: '#424242',
-						800: '#2A2A2A', // Updated to Dark Grey
+						800: '#2A2A2A', // Dark Grey
 						900: '#212121',
 					},
 				},
@@ -95,6 +95,10 @@ export default {
 				'pulse-light': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' }
+				},
+				'glow': {
+					'0%, 100%': { boxShadow: '0 0 15px rgba(255, 215, 0, 0.5)' },
+					'50%': { boxShadow: '0 0 25px rgba(255, 215, 0, 0.8)' }
 				}
 			},
 			animation: {
@@ -102,7 +106,12 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'fade-up': 'fade-up 0.5s ease-out',
-				'pulse-light': 'pulse-light 2s ease-in-out infinite'
+				'pulse-light': 'pulse-light 2s ease-in-out infinite',
+				'glow': 'glow 2s infinite'
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'grid-pattern': 'linear-gradient(to right, rgba(99, 99, 99, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 99, 99, 0.1) 1px, transparent 1px)',
 			}
 		}
 	},

@@ -46,11 +46,14 @@ const FAQ = () => {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+        <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-primary rounded-full mb-4">
+          FAQ
+        </div>
+        <h2 className="text-4xl font-bold mb-4 text-adking-dark">
           Frequently Asked Questions
         </h2>
-        <p className="text-metamaster-gray-400 text-lg">
-          Find answers to common questions about AdKing.
+        <p className="text-adking-gray-600 text-lg">
+          Still have questions? We've got answers.
         </p>
       </div>
       
@@ -59,12 +62,12 @@ const FAQ = () => {
           <AccordionItem 
             key={index} 
             value={`item-${index}`}
-            className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 px-6"
+            className="bg-white rounded-xl border border-adking-gray-200 px-6 shadow-sm"
           >
-            <AccordionTrigger className="text-lg text-white hover:text-[#FFD700] py-6">
+            <AccordionTrigger className="text-lg text-adking-dark hover:text-adking-primary py-6">
               {faq.question}
             </AccordionTrigger>
-            <AccordionContent className="text-metamaster-gray-400 pb-6 text-base leading-relaxed">
+            <AccordionContent className="text-adking-gray-600 pb-6 text-base leading-relaxed">
               {faq.answer}
             </AccordionContent>
           </AccordionItem>

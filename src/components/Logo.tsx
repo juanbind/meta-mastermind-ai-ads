@@ -24,7 +24,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full' }) => {
       </div>
       
       {variant === 'full' && (
-        <span className="font-bold text-xl bg-gradient-to-r from-[#FFD700] to-[#FFB300] bg-clip-text text-transparent transition-all duration-300 transform hover:scale-105">
+        <span className="font-bold text-xl bg-gradient-to-r from-adking-primary to-adking-secondary bg-clip-text text-transparent transition-all duration-300 transform hover:scale-105">
           AdKing
         </span>
       )}
