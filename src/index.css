@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
@@ -180,7 +181,7 @@
   }
   
   .pricing-card {
-    @apply bg-adking-dark/95 backdrop-blur-xl border border-white/10 text-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-adking-primary/20;
+    @apply bg-white border border-adking-gray-200 text-adking-gray-800 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl;
   }
   
   .pricing-card-highlight {

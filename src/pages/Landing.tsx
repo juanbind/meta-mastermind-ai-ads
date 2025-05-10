@@ -66,12 +66,15 @@ const Landing = () => {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-16 md:py-24 px-4 bg-adking-dark relative">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 to-transparent opacity-40 pointer-events-none"></div>
+        <section className="py-16 md:py-24 px-4 bg-white relative">
+          <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-white md:text-5xl">
-              Pricing
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">
+              Simple, Transparent Pricing
             </h2>
+            <p className="text-lg text-adking-gray-600 max-w-2xl mx-auto">
+              Choose a plan that works best for your business needs. No hidden fees.
+            </p>
           </div>
           <PricingSection />
         </section>
