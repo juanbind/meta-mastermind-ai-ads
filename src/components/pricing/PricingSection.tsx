@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '../ui/card
 
 export function PricingSection() {
   const navigate = useNavigate();
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annually'>('monthly');
 
   const handleStartTrial = () => {
     navigate('/auth');
@@ -15,35 +14,6 @@ export function PricingSection() {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4">
-      {/* Billing Toggle */}
-      <div className="flex justify-center mb-12">
-        <div className="bg-adking-gray-200 shadow-md rounded-full p-1 flex items-center">
-          <button
-            onClick={() => setBillingCycle('monthly')}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              billingCycle === 'monthly' 
-                ? 'bg-adking-primary text-adking-dark shadow-md' 
-                : 'text-adking-gray-700 hover:text-adking-dark'
-            }`}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setBillingCycle('annually')}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-              billingCycle === 'annually' 
-                ? 'bg-adking-primary text-adking-dark shadow-md' 
-                : 'text-adking-gray-700 hover:text-adking-dark'
-            }`}
-          >
-            Annually
-            <span className="ml-2 text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">
-              Save 15%
-            </span>
-          </button>
-        </div>
-      </div>
-
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Starter Plan */}
@@ -53,7 +23,7 @@ export function PricingSection() {
             <p className="text-adking-gray-700 mt-1">Perfect for creators, freelancers, and new advertisers</p>
             
             <div className="flex items-baseline mt-4">
-              <span className="text-4xl font-bold text-adking-dark">${billingCycle === 'annually' ? '42' : '50'}</span>
+              <span className="text-4xl font-bold text-adking-dark">$50</span>
               <span className="text-adking-gray-700 ml-2">/month</span>
             </div>
           </CardHeader>
@@ -102,7 +72,7 @@ export function PricingSection() {
             <p className="text-adking-gray-700 mt-1">For growing businesses ready to scale profitably</p>
             
             <div className="flex items-baseline mt-4">
-              <span className="text-4xl font-bold text-adking-dark">${billingCycle === 'annually' ? '234' : '275'}</span>
+              <span className="text-4xl font-bold text-adking-dark">$275</span>
               <span className="text-adking-gray-700 ml-2">/month</span>
             </div>
           </CardHeader>
@@ -148,7 +118,7 @@ export function PricingSection() {
             <p className="text-adking-gray-700 mt-1">Built for media buyers, agencies, and power users</p>
             
             <div className="flex items-baseline mt-4">
-              <span className="text-4xl font-bold text-adking-dark">${billingCycle === 'annually' ? '425' : '500'}</span>
+              <span className="text-4xl font-bold text-adking-dark">$500</span>
               <span className="text-adking-gray-700 ml-2">/month</span>
             </div>
           </CardHeader>
