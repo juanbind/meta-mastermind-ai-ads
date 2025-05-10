@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign
 import FacebookConnection from './FacebookConnection';
 import AdCreativeForm from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
+import { Switch } from "@/components/ui/switch";
 
 interface AIMediaBuyerProps {
   onClose: () => void;
@@ -43,6 +43,53 @@ const timeframeUnitOptions = [
   { value: "weeks", label: "Weeks" }
 ];
 
+// Gender options
+const genderOptions = [
+  { value: "all", label: "All Genders" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "custom", label: "Custom Gender" }
+];
+
+// Education level options
+const educationOptions = [
+  { value: "high_school", label: "High School" },
+  { value: "college", label: "College" },
+  { value: "grad_school", label: "Graduate School" }
+];
+
+// Income level options
+const incomeOptions = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+  { value: "affluent", label: "Affluent" }
+];
+
+// Industry vertical options
+const industryOptions = [
+  { value: "ecommerce", label: "E-commerce" },
+  { value: "saas", label: "SaaS" },
+  { value: "finance", label: "Finance & Insurance" },
+  { value: "education", label: "Education" },
+  { value: "healthcare", label: "Healthcare" },
+  { value: "travel", label: "Travel & Hospitality" },
+  { value: "realestate", label: "Real Estate" },
+  { value: "retail", label: "Retail" },
+  { value: "auto", label: "Automotive" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "nonprofit", label: "Non-profit" },
+  { value: "other", label: "Other" }
+];
+
+// Custom audience types
+const customAudienceOptions = [
+  { value: "website_visitors", label: "Website Visitors" },
+  { value: "engagement", label: "Engagement" },
+  { value: "customer_list", label: "Customer List" },
+  { value: "app_activity", label: "App Activity" }
+];
+
 type CampaignStrategy = {
   title: string;
   description: string;
@@ -58,20 +105,47 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    business: "",
+    // Campaign basics
+    campaignName: '',
+    objective: 'conversions',
+    
+    // Business information
+    businessName: '',
+    businessType: '',
+    businessDescription: '',
+    businessWebsite: '',
+    industryVertical: '',
+    
+    // Target audience
+    targetAudience: '',
+    targetLocation: '',
+    ageRangeMin: '18',
+    ageRangeMax: '65',
+    gender: 'all',
+    languages: [],
+    education: [],
+    income: [],
+    
+    // Ideal customer profile
+    customerInterests: '',
+    customerBehaviors: '',
+    customerPainPoints: '',
+    customAudiences: [],
+    lookalikes: false,
+    
+    // Keep existing fields that might be used elsewhere
+    platforms: ["facebook", "instagram"],
+    budgetRange: [1000, 3000],
+    timeframeValue: 30,
+    timeframeUnit: "days",
+    audienceTypes: ["cold", "warm"],
+    mainOfferDescription: "",
     product: "",
     industry: "",
     websiteUrl: "",
-    salesFunnelUrl: "", // Added Sales Funnel URL field
-    platforms: ["facebook", "instagram"],
-    objective: "conversions",
-    budgetRange: [1000, 3000], // Budget range slider
-    timeframeValue: 30,
-    timeframeUnit: "days",
+    salesFunnelUrl: "",
     audience: "",
-    audienceTypes: ["cold", "warm"],
-    mainOfferDescription: "", // Added Main Offer Description field
-    idealCustomerProfile: "", // Added for Ideal Customer Profile step
+    idealCustomerProfile: "",
     adCreative: {
       primaryText: "",
       headline: "",
@@ -117,7 +191,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
 
   const nextStep = () => {
     // Validation for each step
-    if (currentStep === 1 && (!formData.business || !formData.product || !formData.industry)) {
+    if (currentStep === 1 && (!formData.businessName || !formData.businessType || !formData.industryVertical)) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields before proceeding.",
@@ -126,19 +200,19 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       return;
     }
     
-    if (currentStep === 2 && !formData.audience) {
+    if (currentStep === 2 && (!formData.targetAudience || !formData.targetLocation)) {
       toast({
         title: "Missing information",
-        description: "Please provide target audience information.",
+        description: "Please provide target audience and location information.",
         variant: "destructive"
       });
       return;
     }
 
-    if (currentStep === 3 && !formData.idealCustomerProfile) {
+    if (currentStep === 3 && (!formData.customerInterests || !formData.customerPainPoints)) {
       toast({
         title: "Missing information",
-        description: "Please provide ideal customer profile information.",
+        description: "Please provide customer interests and pain points information.",
         variant: "destructive"
       });
       return;
@@ -174,7 +248,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       // Mock generated strategy - in production this would come from your backend
       const mockStrategy: CampaignStrategy = {
         title: `${formData.objective.charAt(0).toUpperCase() + formData.objective.slice(1)} Campaign for ${formData.product}`,
-        description: `AI-optimized strategy for ${formData.business} targeting ${formData.audience || "relevant audiences"} in the ${formData.industry} industry, focused on ${formData.objective} objectives.`,
+        description: `AI-optimized strategy for ${formData.businessName || formData.business} targeting ${formData.targetAudience || formData.audience || "relevant audiences"} in the ${formData.industryVertical || formData.industry} industry, focused on ${formData.objective} objectives.`,
         platforms: formData.platforms,
         budgetAllocation: formData.platforms.map((platform) => ({
           platform,
@@ -245,7 +319,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       // Mock campaign creation response
       const mockCampaignData = {
         id: `23847${Math.floor(Math.random() * 10000000)}`,
-        name: `${formData.product} - ${formData.objective} Campaign`,
+        name: `${formData.campaignName || formData.product} - ${formData.objective} Campaign`,
         status: "PENDING",
         adAccountId: fbAccountData.id,
         budget: `$${formData.budgetRange[0]} - $${formData.budgetRange[1]} / ${formData.timeframeValue} ${formData.timeframeUnit}`,
@@ -283,80 +357,222 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
     
     switch (currentStep) {
-      case 1: // Campaign & Business Information - UPDATED FROM AIMediaBuyerEnhanced
+      case 1: // Campaign & Business Information - UPDATED with new structure
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Campaign & Business Information</h2>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Campaign Name <span className="text-red-500">*</span></label>
+              <Input 
+                placeholder="E.g., Summer Sale 2025" 
+                value={formData.campaignName}
+                onChange={(e) => handleInputChange('campaignName', e.target.value)}
+              />
+              <p className="text-xs text-gray-500">A descriptive name for your campaign</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Campaign Objective <span className="text-red-500">*</span></label>
+              <Select
+                value={formData.objective}
+                onValueChange={(value) => handleInputChange('objective', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an objective" />
+                </SelectTrigger>
+                <SelectContent>
+                  {objectiveOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">The primary goal of your advertising campaign</p>
+            </div>
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Business Name <span className="text-red-500">*</span></label>
               <Input 
-                placeholder="E.g., Acme Fitness" 
-                value={formData.business}
-                onChange={(e) => handleInputChange('business', e.target.value)}
+                placeholder="E.g., Acme Corporation" 
+                value={formData.businessName}
+                onChange={(e) => handleInputChange('businessName', e.target.value)}
               />
               <p className="text-xs text-gray-500">The name of your business or brand</p>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Product or Service <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium">Business Type <span className="text-red-500">*</span></label>
               <Input 
-                placeholder="E.g., Fitness Membership" 
-                value={formData.product}
-                onChange={(e) => handleInputChange('product', e.target.value)}
+                placeholder="E.g., E-commerce Store, SaaS, Local Business" 
+                value={formData.businessType}
+                onChange={(e) => handleInputChange('businessType', e.target.value)}
               />
-              <p className="text-xs text-gray-500">The specific product or service you're advertising</p>
+              <p className="text-xs text-gray-500">The type or category of your business</p>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Industry <span className="text-red-500">*</span></label>
-              <Input 
-                placeholder="E.g., Health & Fitness" 
-                value={formData.industry}
-                onChange={(e) => handleInputChange('industry', e.target.value)}
+              <label className="text-sm font-medium">Business Description</label>
+              <Textarea 
+                placeholder="Describe your business and what you offer" 
+                value={formData.businessDescription}
+                onChange={(e) => handleInputChange('businessDescription', e.target.value)}
+                className="min-h-[100px]"
               />
-              <p className="text-xs text-gray-500">Your business category or industry</p>
+              <p className="text-xs text-gray-500">A brief description of your company and its products/services</p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Website URL</label>
+              <label className="text-sm font-medium">Business Website</label>
               <Input 
                 placeholder="E.g., https://www.example.com" 
-                value={formData.websiteUrl}
-                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                value={formData.businessWebsite}
+                onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
               />
-              <p className="text-xs text-gray-500">Your main website address</p>
+              <p className="text-xs text-gray-500">Your main business website address</p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Sales Funnel URL (Optional)</label>
-              <Input 
-                placeholder="E.g., https://www.example.com/offer" 
-                value={formData.salesFunnelUrl}
-                onChange={(e) => handleInputChange('salesFunnelUrl', e.target.value)}
-              />
-              <p className="text-xs text-gray-500">The specific landing page for your offer</p>
+              <label className="text-sm font-medium">Industry Vertical <span className="text-red-500">*</span></label>
+              <Select
+                value={formData.industryVertical}
+                onValueChange={(value) => handleInputChange('industryVertical', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your industry" />
+                </SelectTrigger>
+                <SelectContent>
+                  {industryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">The industry your business operates in</p>
             </div>
           </div>
         );
         
-      case 2: // Target Audience - UPDATED FROM AIMediaBuyerEnhanced
+      case 2: // Target Audience - UPDATED with new structure
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Target Audience</h2>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Audience Description <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium">Target Audience Description <span className="text-red-500">*</span></label>
               <Textarea 
-                placeholder="Describe your target audience (age, interests, pain points, etc.)"
-                value={formData.audience}
-                onChange={(e) => handleInputChange('audience', e.target.value)}
+                placeholder="Describe your target audience in detail"
+                value={formData.targetAudience}
+                onChange={(e) => handleInputChange('targetAudience', e.target.value)}
                 className="min-h-[120px]"
               />
               <p className="text-xs text-gray-500">
-                The more specific you are about who your ideal customers are, the better we can target your ads.
-                Include demographics, interests, behaviors, and pain points.
+                Describe who your ideal customers are, including their demographics, interests, and behaviors
               </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Target Location <span className="text-red-500">*</span></label>
+              <Input 
+                placeholder="E.g., United States, New York City, Europe" 
+                value={formData.targetLocation}
+                onChange={(e) => handleInputChange('targetLocation', e.target.value)}
+              />
+              <p className="text-xs text-gray-500">The geographic areas you want to target</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Age Range</label>
+              <div className="flex items-center gap-3">
+                <Input 
+                  type="number" 
+                  min="13" 
+                  max="65" 
+                  placeholder="Min Age"
+                  value={formData.ageRangeMin}
+                  onChange={(e) => handleInputChange('ageRangeMin', e.target.value)}
+                  className="w-24"
+                />
+                <span>to</span>
+                <Input 
+                  type="number" 
+                  min="13" 
+                  max="65+" 
+                  placeholder="Max Age"
+                  value={formData.ageRangeMax}
+                  onChange={(e) => handleInputChange('ageRangeMax', e.target.value)}
+                  className="w-24"
+                />
+              </div>
+              <p className="text-xs text-gray-500">The age range of your target audience</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Gender</label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleInputChange('gender', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender targeting" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">The gender(s) you want to target</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Education Levels</label>
+              <div className="grid grid-cols-2 gap-2">
+                {educationOptions.map((edu) => (
+                  <Button
+                    key={edu.value}
+                    type="button"
+                    variant={formData.education.includes(edu.value) ? "default" : "outline"}
+                    className={formData.education.includes(edu.value) ? "bg-metamaster-primary text-white" : ""}
+                    onClick={() => handleMultiSelect('education', edu.value)}
+                  >
+                    {formData.education.includes(edu.value) ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <div className="w-4 mr-2" />
+                    )}
+                    {edu.label}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">Education levels to target (optional)</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Income Levels</label>
+              <div className="grid grid-cols-2 gap-2">
+                {incomeOptions.map((inc) => (
+                  <Button
+                    key={inc.value}
+                    type="button"
+                    variant={formData.income.includes(inc.value) ? "default" : "outline"}
+                    className={formData.income.includes(inc.value) ? "bg-metamaster-primary text-white" : ""}
+                    onClick={() => handleMultiSelect('income', inc.value)}
+                  >
+                    {formData.income.includes(inc.value) ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <div className="w-4 mr-2" />
+                    )}
+                    {inc.label}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">Income levels to target (optional)</p>
             </div>
             
             <div className="space-y-2">
@@ -388,7 +604,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 3: // Ideal Customer Profile - UPDATED FROM AIMediaBuyerEnhanced
+      case 3: // Ideal Customer Profile - UPDATED with new structure
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ideal Customer Profile</h2>
@@ -402,24 +618,78 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Describe Your Ideal Customer <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium">Customer Interests <span className="text-red-500">*</span></label>
               <Textarea 
-                placeholder="Describe your ideal customer in detail - their demographics, behaviors, motivations, and pain points"
-                value={formData.idealCustomerProfile}
-                onChange={(e) => handleInputChange('idealCustomerProfile', e.target.value)}
-                className="min-h-[200px]"
+                placeholder="What are your ideal customers interested in?"
+                value={formData.customerInterests}
+                onChange={(e) => handleInputChange('customerInterests', e.target.value)}
+                className="min-h-[100px]"
               />
-              <div className="text-xs text-gray-500 mt-2 space-y-1">
-                <p>Include information such as:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Demographics (age, gender, location, income level, etc.)</li>
-                  <li>Psychographics (values, interests, lifestyle, attitudes)</li>
-                  <li>Pain points and challenges they face</li>
-                  <li>Goals and aspirations</li>
-                  <li>Buying behaviors and preferences</li>
-                  <li>Where they spend time online</li>
-                </ul>
+              <p className="text-xs text-gray-500">
+                List interests, hobbies, activities, and topics your ideal customers care about
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Customer Behaviors</label>
+              <Textarea 
+                placeholder="What online behaviors do your ideal customers exhibit?"
+                value={formData.customerBehaviors}
+                onChange={(e) => handleInputChange('customerBehaviors', e.target.value)}
+                className="min-h-[100px]"
+              />
+              <p className="text-xs text-gray-500">
+                Describe online behaviors like purchasing habits, content consumption, device usage, etc.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Customer Pain Points <span className="text-red-500">*</span></label>
+              <Textarea 
+                placeholder="What problems or challenges does your ideal customer face?"
+                value={formData.customerPainPoints}
+                onChange={(e) => handleInputChange('customerPainPoints', e.target.value)}
+                className="min-h-[100px]"
+              />
+              <p className="text-xs text-gray-500">
+                Describe the problems your customers face that your product/service solves
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Custom Audiences</label>
+              <div className="grid grid-cols-2 gap-2">
+                {customAudienceOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    type="button"
+                    variant={formData.customAudiences.includes(option.value) ? "default" : "outline"}
+                    className={formData.customAudiences.includes(option.value) ? "bg-metamaster-primary text-white" : ""}
+                    onClick={() => handleMultiSelect('customAudiences', option.value)}
+                  >
+                    {formData.customAudiences.includes(option.value) ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <div className="w-4 mr-2" />
+                    )}
+                    {option.label}
+                  </Button>
+                ))}
               </div>
+              <p className="text-xs text-gray-500">
+                Select any custom audience sources you have available
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-2 pt-2">
+              <Switch
+                id="lookalikes-switch"
+                checked={formData.lookalikes}
+                onCheckedChange={(checked) => handleInputChange('lookalikes', checked)}
+              />
+              <label htmlFor="lookalikes-switch" className="text-sm">
+                Create lookalike audiences based on my existing customers
+              </label>
             </div>
           </div>
         );
