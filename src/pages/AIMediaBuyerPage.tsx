@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +18,7 @@ import {
   FileText,
   Settings
 } from 'lucide-react';
-import AIMediaBuyerEnhanced from '@/components/ai-tools/AIMediaBuyerEnhanced';
+import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
 import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
 
 const AIMediaBuyerPage: React.FC = () => {
@@ -78,6 +77,16 @@ const AIMediaBuyerPage: React.FC = () => {
     });
   };
 
+  // Close handler for the AIMediaBuyer component
+  const handleClose = () => {
+    // This is just a placeholder, in a real app you might redirect
+    // or show a different view
+    toast({
+      title: "Campaign Creation Completed",
+      description: "You can start a new campaign or review your existing ones.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
@@ -115,55 +124,8 @@ const AIMediaBuyerPage: React.FC = () => {
               <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
                 <div className="mb-6">
-                  <AIMediaBuyerEnhanced />
+                  <AIMediaBuyer onClose={handleClose} />
                 </div>
-                
-                {!fbConnected && (
-                  <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <h3 className="text-amber-800 font-medium flex items-center gap-2">
-                      <AlertTriangle size={18} /> Connect to Facebook Ads
-                    </h3>
-                    <p className="text-amber-700 text-sm mb-4">
-                      To launch campaigns directly to Facebook, please connect your Facebook Ad account.
-                    </p>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Facebook Access Token
-                        </label>
-                        <Input 
-                          value={fbAccessToken} 
-                          onChange={(e) => setFbAccessToken(e.target.value)}
-                          placeholder="Enter your Facebook access token"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Ad Account ID
-                        </label>
-                        <Input 
-                          value={fbAdAccountId} 
-                          onChange={(e) => setFbAdAccountId(e.target.value)}
-                          placeholder="Enter your Ad Account ID (e.g., act_123456789)"
-                        />
-                      </div>
-                      
-                      <Button onClick={handleConnectFacebook}>
-                        Connect Facebook Account
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                
-                {fbConnected && (
-                  <div className="mt-4">
-                    <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
-                      Launch Campaign to Facebook
-                    </Button>
-                  </div>
-                )}
               </div>
             </TabsContent>
             
