@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -49,8 +50,8 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon, label, isActive, on
       to={to}
       className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all-ease ${
         isActive 
-          ? 'bg-gradient-to-r from-metamaster-primary to-metamaster-secondary text-white' 
-          : 'text-metamaster-gray-600 hover:bg-metamaster-gray-200/50'
+          ? 'bg-gradient-to-r from-adking-primary to-adking-secondary text-white' 
+          : 'text-adking-gray-600 hover:bg-adking-gray-200/50'
       }`}
       onClick={onClick}
     >
@@ -120,7 +121,7 @@ const Sidebar: React.FC = () => {
     <>
       {/* Mobile Menu Toggle Button */}
       <button 
-        className="fixed top-4 left-4 z-50 bg-metamaster-primary p-2 rounded-md text-white md:hidden"
+        className="fixed top-4 left-4 z-50 bg-adking-primary p-2 rounded-md text-white md:hidden"
         onClick={toggleMobileMenu}
         aria-label="Toggle menu"
       >
@@ -149,18 +150,18 @@ const Sidebar: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-full px-3 py-4 border-t border-gray-200">
           <Popover>
             <PopoverTrigger asChild>
-              <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
+              <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-adking-gray-200/50 rounded-lg transition-all-ease">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={avatarUrl} />
-                  <AvatarFallback className="bg-metamaster-gray-800 text-white">
+                  <AvatarFallback className="bg-adking-gray-800 text-white">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate text-metamaster-gray-800">
+                  <p className="text-sm font-medium truncate text-adking-gray-800">
                     {userDisplayName}
                   </p>
-                  <p className="text-xs text-metamaster-gray-500 truncate">
+                  <p className="text-xs text-adking-gray-500 truncate">
                     {user?.email || 'user@example.com'}
                   </p>
                 </div>
@@ -169,35 +170,35 @@ const Sidebar: React.FC = () => {
             <PopoverContent className="w-56 p-0" align="start">
               <div className="py-2">
                 <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                   onClick={() => handleNavigation('profile')}
                 >
                   <Settings size={16} className="mr-2" />
                   Settings
                 </button>
                 <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                   onClick={() => handleNavigation('billing')}
                 >
                   <CreditCard size={16} className="mr-2" />
                   Billing
                 </button>
                 <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                   onClick={() => handleNavigation('security')}
                 >
                   <Lock size={16} className="mr-2" />
                   Security
                 </button>
                 <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                   onClick={() => handleNavigation('team')}
                 >
                   <Users size={16} className="mr-2" />
                   Team
                 </button>
                 <button 
-                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                   onClick={() => handleNavigation('notifications')}
                 >
                   <Bell size={16} className="mr-2" />
@@ -220,7 +221,7 @@ const Sidebar: React.FC = () => {
             <div className="px-6 mb-8 flex justify-between items-center">
               <Logo size="md" />
               <button 
-                className="text-metamaster-gray-600 p-2"
+                className="text-adking-gray-600 p-2"
                 onClick={closeMobileMenu}
               >
                 <X size={20} />
@@ -244,18 +245,18 @@ const Sidebar: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-full px-3 py-4 border-t border-gray-200">
               <Popover>
                 <PopoverTrigger asChild>
-                  <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-metamaster-gray-200/50 rounded-lg transition-all-ease">
+                  <div className="flex items-center space-x-3 px-4 py-2 cursor-pointer hover:bg-adking-gray-200/50 rounded-lg transition-all-ease">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={avatarUrl} />
-                      <AvatarFallback className="bg-metamaster-gray-800 text-white">
+                      <AvatarFallback className="bg-adking-gray-800 text-white">
                         {userInitials}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate text-metamaster-gray-800">
+                      <p className="text-sm font-medium truncate text-adking-gray-800">
                         {userDisplayName}
                       </p>
-                      <p className="text-xs text-metamaster-gray-500 truncate">
+                      <p className="text-xs text-adking-gray-500 truncate">
                         {user?.email || 'user@example.com'}
                       </p>
                     </div>
@@ -264,35 +265,35 @@ const Sidebar: React.FC = () => {
                 <PopoverContent className="w-56 p-0" align="start">
                   <div className="py-2">
                     <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                       onClick={() => handleNavigation('profile')}
                     >
                       <Settings size={16} className="mr-2" />
                       Settings
                     </button>
                     <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                       onClick={() => handleNavigation('billing')}
                     >
                       <CreditCard size={16} className="mr-2" />
                       Billing
                     </button>
                     <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                       onClick={() => handleNavigation('security')}
                     >
                       <Lock size={16} className="mr-2" />
                       Security
                     </button>
                     <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                       onClick={() => handleNavigation('team')}
                     >
                       <Users size={16} className="mr-2" />
                       Team
                     </button>
                     <button 
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-metamaster-gray-100"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-adking-gray-100"
                       onClick={() => handleNavigation('notifications')}
                     >
                       <Bell size={16} className="mr-2" />
