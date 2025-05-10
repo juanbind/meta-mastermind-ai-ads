@@ -46,17 +46,17 @@ const stageBadges = {
   'customer': 'bg-green-100 text-green-800',
 };
 
-const StageCard = ({ stage, count, value }) => {
+const StageCard: React.FC<{ stage: string; count: number; value: number }> = ({ stage, count, value }) => {
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
       <h3 className="font-bold text-lg mb-1">{stage.charAt(0).toUpperCase() + stage.slice(1)}</h3>
       <div className="flex justify-between items-center mb-2">
-        <span className="text-gray-600 text-sm">{count} Leads</span>
+        <span className="text-metamaster-gray-600 text-sm">{count} Leads</span>
         <span className="font-medium">${value.toLocaleString()}</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-metamaster-gray-200 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-yellow-400" 
+          className="h-full bg-metamaster-primary" 
           style={{ width: `${Math.min(100, count * 10)}%` }}
         ></div>
       </div>
@@ -110,15 +110,15 @@ const LeadRow: React.FC<{ lead: Contact; onUpdate: (id: string, updates: Partial
   const stageBadge = stageBadges[lead.stage?.toLowerCase() as keyof typeof stageBadges] || 'bg-gray-100 text-gray-800';
   
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
+    <tr className="hover:bg-metamaster-gray-50 transition-colors">
       <td className="py-3 px-4">
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-yellow-400 text-gray-800 flex items-center justify-center mr-3">
+          <div className="w-8 h-8 rounded-full bg-metamaster-primary text-white flex items-center justify-center mr-3">
             {displayName.charAt(0)}
           </div>
           <div>
             <p className="font-medium">{displayName}</p>
-            <p className="text-xs text-gray-600">{lead.email}</p>
+            <p className="text-xs text-metamaster-gray-600">{lead.email}</p>
           </div>
         </div>
       </td>
@@ -157,7 +157,7 @@ const LeadRow: React.FC<{ lead: Contact; onUpdate: (id: string, updates: Partial
       <td className="py-3 px-4">
         <div className="flex gap-1 flex-wrap">
           {lead.tags?.map((tag, i) => (
-            <span key={i} className="bg-gray-200 px-2 py-0.5 rounded-full text-xs">
+            <span key={i} className="bg-metamaster-gray-200 px-2 py-0.5 rounded-full text-xs">
               {tag}
             </span>
           )) || 'No tags'}
@@ -167,7 +167,7 @@ const LeadRow: React.FC<{ lead: Contact; onUpdate: (id: string, updates: Partial
         <span className="text-sm">${lead.value.toLocaleString()}</span>
       </td>
       <td className="py-3 px-4">
-        <div className="flex items-center text-sm text-gray-600">
+        <div className="flex items-center text-sm text-metamaster-gray-600">
           <Clock size={14} className="mr-1" />
           <span>{formatDate(lead.last_activity || lead.created_at)}</span>
         </div>
@@ -208,7 +208,7 @@ const LeadRow: React.FC<{ lead: Contact; onUpdate: (id: string, updates: Partial
   );
 };
 
-const NewContactDialog = ({ onContactAdded }) => {
+const NewContactDialog: React.FC<{ onContactAdded: () => void }> = ({ onContactAdded }) => {
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -278,7 +278,7 @@ const NewContactDialog = ({ onContactAdded }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 flex items-center">
+        <Button className="bg-metamaster-primary hover:bg-metamaster-secondary text-white flex items-center">
           <Plus size={16} className="mr-2" /> Add Lead
         </Button>
       </DialogTrigger>
@@ -448,19 +448,29 @@ const FacebookIntegrationDialog: React.FC = () => {
   );
 };
 
-const QuickActionCard = ({ icon, title, description, onClick }) => {
+const QuickActionCard: React.FC<{ 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string;
+  onClick?: () => void;
+}> = ({
+  icon,
+  title,
+  description,
+  onClick
+}) => {
   return (
     <div 
-      className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-white rounded-xl p-5 shadow-md border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow"
       onClick={onClick}
     >
       <div className="flex items-center">
-        <div className="bg-yellow-100 w-10 h-10 rounded-lg flex items-center justify-center text-yellow-500 mr-4">
+        <div className="bg-metamaster-primary/10 w-10 h-10 rounded-lg flex items-center justify-center text-metamaster-primary mr-4">
           {icon}
         </div>
         <div>
           <h3 className="font-medium mb-1">{title}</h3>
-          <p className="text-sm text-gray-600">{description}</p>
+          <p className="text-sm text-metamaster-gray-600">{description}</p>
         </div>
       </div>
       <Button variant="ghost" size="icon">
@@ -470,7 +480,7 @@ const QuickActionCard = ({ icon, title, description, onClick }) => {
   );
 };
 
-const CRM = () => {
+const CRM: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [stageData, setStageData] = useState<{stage: string; count: number; value: number}[]>([]);
@@ -575,14 +585,14 @@ const CRM = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
-      <div className="md:ml-[220px] pt-6">
+      <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
           {/* Page Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">Customer Relationship Management</h1>
-            <p className="text-gray-600">Manage your leads and customers in one place</p>
+            <p className="text-metamaster-gray-600">Manage your leads and customers in one place</p>
           </div>
           
           {/* Stage Cards */}
@@ -620,18 +630,18 @@ const CRM = () => {
           </div>
           
           {/* Leads Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-200 flex justify-between items-center flex-wrap gap-4">
               <h2 className="text-lg font-bold">Leads & Customers</h2>
               <div className="flex items-center space-x-3">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <Search size={16} className="text-gray-500" />
+                    <Search size={16} className="text-metamaster-gray-500" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search leads..."
-                    className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm"
+                    className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-metamaster-primary text-sm"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -642,7 +652,7 @@ const CRM = () => {
                 <NewContactDialog onContactAdded={refetch} />
                 <Button 
                   id="add-lead-button" 
-                  className="hidden"
+                  className="hidden" // Hidden button that can be triggered programmatically
                   onClick={() => document.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')?.click()}
                 />
               </div>
@@ -651,19 +661,19 @@ const CRM = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="py-3 px-4 font-medium text-gray-700">
+                  <tr className="bg-metamaster-gray-50 border-b border-gray-200">
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">
                       <div className="flex items-center">
                         Name <ArrowUpDown size={14} className="ml-1" />
                       </div>
                     </th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Phone</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Source</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Stage</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Tags</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Value</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Last Activity</th>
-                    <th className="py-3 px-4 font-medium text-gray-700">Actions</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Phone</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Source</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Stage</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Tags</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Value</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Last Activity</th>
+                    <th className="py-3 px-4 font-medium text-metamaster-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -671,7 +681,7 @@ const CRM = () => {
                     <tr>
                       <td colSpan={8} className="py-8 text-center">
                         <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                        <p className="mt-2 text-sm text-gray-600">Loading leads...</p>
+                        <p className="mt-2 text-sm text-metamaster-gray-600">Loading leads...</p>
                       </td>
                     </tr>
                   ) : isError ? (
@@ -686,7 +696,7 @@ const CRM = () => {
                       <td colSpan={8} className="py-8 text-center">
                         <div className="max-w-md mx-auto">
                           <h3 className="text-lg font-medium mb-2">No leads found</h3>
-                          <p className="text-gray-600 mb-6">
+                          <p className="text-metamaster-gray-600 mb-6">
                             Get started by adding your first lead or connecting your Facebook Ads
                           </p>
                           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -710,7 +720,7 @@ const CRM = () => {
             </div>
             
             <div className="p-5 border-t border-gray-200 flex justify-between items-center">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-metamaster-gray-600">
                 {contactsData ? (
                   `Showing ${(contactsData.page - 1) * contactsData.pageSize + 1}-${Math.min(
                     contactsData.page * contactsData.pageSize,
@@ -734,7 +744,7 @@ const CRM = () => {
                     key={i}
                     variant="outline" 
                     size="sm"
-                    className={page === i + 1 ? "bg-yellow-400 text-gray-800" : ""}
+                    className={page === i + 1 ? "bg-metamaster-primary text-white" : ""}
                     onClick={() => setPage(i + 1)}
                   >
                     {i + 1}
@@ -753,15 +763,15 @@ const CRM = () => {
           </div>
           
           {/* Integration CTA */}
-          <div className="mt-8 bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl p-6 shadow-lg text-white">
+          <div className="mt-8 bg-gradient-to-r from-metamaster-gray-800 to-metamaster-gray-900 rounded-xl p-6 shadow-lg text-white">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-4 md:mb-0">
                 <h3 className="font-bold text-xl mb-2">Connect your favorite tools</h3>
-                <p className="text-gray-300">
+                <p className="text-metamaster-gray-300">
                   Integrate with Facebook, email marketing platforms, calendars, and more to streamline your workflow.
                 </p>
               </div>
-              <Button className="bg-white text-gray-800 hover:bg-white/90">
+              <Button className="bg-white text-metamaster-gray-800 hover:bg-white/90">
                 View Integrations
               </Button>
             </div>
