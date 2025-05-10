@@ -32,21 +32,21 @@ const ToolCard: React.FC<ToolCardProps> = ({ title, description, icon, buttonTex
   return (
     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
       <div className="flex items-start space-x-4">
-        <div className="bg-metamaster-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-metamaster-primary flex-shrink-0">
+        <div className="bg-adking-primary/10 w-12 h-12 rounded-lg flex items-center justify-center text-adking-primary flex-shrink-0">
           {icon}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-lg mb-2 text-metamaster-gray-800">{title}</h3>
+            <h3 className="font-bold text-lg mb-2 text-adking-gray-800">{title}</h3>
             {comingSoon && (
               <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium">
                 Coming Soon
               </span>
             )}
           </div>
-          <p className="text-metamaster-gray-600 mb-4">{description}</p>
+          <p className="text-adking-gray-600 mb-4">{description}</p>
           <Button 
-            className="bg-metamaster-primary hover:bg-metamaster-secondary"
+            className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white"
             onClick={handleToolClick}
           >
             {buttonText}

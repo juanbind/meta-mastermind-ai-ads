@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -85,13 +86,13 @@ const AIMediaBuyerPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-metamaster-gray-100">
+    <div className="min-h-screen bg-adking-gray-100">
       <Sidebar />
       <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2 text-metamaster-gray-800">AI Media Buyer</h1>
-            <p className="text-metamaster-gray-600">Create optimized ad campaigns using AI algorithms trained on high-performing campaigns.</p>
+            <h1 className="text-2xl font-bold mb-2 text-adking-gray-800">AI Media Buyer</h1>
+            <p className="text-adking-gray-600">Create optimized ad campaigns using AI algorithms trained on high-performing campaigns.</p>
           </div>
           
           <Tabs defaultValue="campaigns" value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-6">
@@ -153,7 +154,7 @@ const AIMediaBuyerPage: React.FC = () => {
                         />
                       </div>
                       
-                      <Button onClick={handleConnectFacebook}>
+                      <Button onClick={handleConnectFacebook} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
                         Connect Facebook Account
                       </Button>
                     </div>
@@ -162,7 +163,7 @@ const AIMediaBuyerPage: React.FC = () => {
                 
                 {fbConnected && (
                   <div className="mt-4">
-                    <Button className="bg-metamaster-primary hover:bg-metamaster-secondary">
+                    <Button className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
                       Launch Campaign to Facebook
                     </Button>
                   </div>
@@ -219,7 +220,7 @@ const AIMediaBuyerPage: React.FC = () => {
                       </label>
                     </div>
                     
-                    <Button onClick={handleSaveStopLoss}>
+                    <Button onClick={handleSaveStopLoss} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
                       Save Stop-Loss Rules
                     </Button>
                   </div>
@@ -244,7 +245,7 @@ const AIMediaBuyerPage: React.FC = () => {
                   </div>
                   
                   {fbConnected && (
-                    <Button size="sm" onClick={handleBudgetConfirmation} className="mt-4">
+                    <Button size="sm" onClick={handleBudgetConfirmation} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white mt-4">
                       Configure Budget Rules
                     </Button>
                   )}
@@ -281,7 +282,7 @@ const AIMediaBuyerPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <Button>
+                  <Button className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
                     Save Fatigue Detection Settings
                   </Button>
                 </div>

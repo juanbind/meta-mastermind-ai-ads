@@ -216,7 +216,7 @@ const FacebookConnection: React.FC<FacebookConnectionProps> = ({
       <Button 
         onClick={handleConnect}
         disabled={isConnecting || !accessToken || !adAccountId}
-        className="w-full"
+        className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white w-full"
       >
         {isConnecting ? "Connecting..." : "Connect to Facebook"}
       </Button>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -117,8 +116,7 @@ const CampaignSuccessScreen: React.FC<CampaignSuccessScreenProps> = ({
         
         <CardFooter className="border-t pt-6">
           <Button 
-            className="w-full" 
-            variant="outline"
+            className="w-full bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white" 
             onClick={() => window.open(facebookCampaignUrl, '_blank')}
           >
             <ExternalLink className="mr-2 h-4 w-4" />
@@ -141,7 +139,7 @@ const CampaignSuccessScreen: React.FC<CampaignSuccessScreenProps> = ({
       )}
       
       <div className="pt-4 flex justify-end">
-        <Button onClick={onClose}>
+        <Button onClick={onClose} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
           Done
         </Button>
       </div>
