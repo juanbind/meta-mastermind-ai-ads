@@ -1,63 +1,95 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@/lib/utils"
+import React from "react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Info, AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
 
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-        warning: 
-          "border-yellow-500/50 text-yellow-700 dark:text-yellow-500 dark:border-yellow-500/50 [&>svg]:text-yellow-600",
-        success:
-          "border-green-500/50 text-green-700 dark:text-green-500 dark:border-green-500/50 [&>svg]:text-green-600",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+const FunnelBuilder: React.FC = () => {
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold mb-6">Funnel Builder</h1>
+      
+      <div className="grid gap-6 md:grid-cols-2">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Funnel Progress</h2>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Overall Progress</span>
+              <Badge variant="success">60%</Badge>
+            </div>
+            <Progress value={60} className="h-2" />
+            
+            <div className="mt-8 space-y-4">
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Information</AlertTitle>
+                <AlertDescription>
+                  This is an informational alert for the funnel builder.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  There was an error with your funnel configuration.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert variant="success">
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertTitle>Success</AlertTitle>
+                <AlertDescription>
+                  Your funnel settings have been saved successfully.
+                </AlertDescription>
+              </Alert>
+              
+              <Alert variant="warning">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Warning</AlertTitle>
+                <AlertDescription>
+                  Please complete all required fields before publishing.
+                </AlertDescription>
+              </Alert>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Funnel Structure</h2>
+          <div className="border rounded-lg p-4">
+            <p className="text-sm text-gray-500 mb-4">
+              Your funnel is currently in development. The funnel builder feature will be fully available soon.
+            </p>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Landing Page</span>
+                <Badge>Complete</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Opt-in Form</span>
+                <Badge>Complete</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Sales Page</span>
+                <Badge variant="warning">In Progress</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Checkout</span>
+                <Badge variant="secondary">Not Started</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                <span>Thank You Page</span>
+                <Badge variant="secondary">Not Started</Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-))
-Alert.displayName = "Alert"
-
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h5
-    ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props}
-  />
-))
-AlertTitle.displayName = "AlertTitle"
-
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
-    {...props}
-  />
-))
-AlertDescription.displayName = "AlertDescription"
-
-export { Alert, AlertTitle, AlertDescription }
+export default FunnelBuilder;
