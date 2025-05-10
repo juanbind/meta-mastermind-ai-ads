@@ -6,7 +6,7 @@ import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-metamaster-gray-800/50 border-t border-white/10 pt-16 pb-8 px-4">
+    <footer className="bg-[#2A2A2A]/50 border-t border-white/10 pt-16 pb-8 px-4">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo and Description */}
@@ -16,19 +16,19 @@ const Footer = () => {
               The all-in-one platform for Facebook & Instagram Ad success. Discover winning ads, build campaigns, and scale your business with AI.
             </p>
             <div className="flex mt-6 space-x-4">
-              <a href="#" className="text-metamaster-gray-400 hover:text-metamaster-primary transition-colors">
+              <a href="#" className="text-metamaster-gray-400 hover:text-[#FFD700] transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-metamaster-gray-400 hover:text-metamaster-primary transition-colors">
+              <a href="#" className="text-metamaster-gray-400 hover:text-[#FFD700] transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-metamaster-gray-400 hover:text-metamaster-primary transition-colors">
+              <a href="#" className="text-metamaster-gray-400 hover:text-[#FFD700] transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-metamaster-gray-400 hover:text-metamaster-primary transition-colors">
+              <a href="#" className="text-metamaster-gray-400 hover:text-[#FFD700] transition-colors">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="text-metamaster-gray-400 hover:text-metamaster-primary transition-colors">
+              <a href="#" className="text-metamaster-gray-400 hover:text-[#FFD700] transition-colors">
                 <Mail size={20} />
               </a>
             </div>

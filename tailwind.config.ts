@@ -26,18 +26,18 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				metamaster: {
-					primary: '#1E88E5', // Primary blue
-					secondary: '#0D47A1', // Accent blue
-					dark: '#121212', // Dark black
+					primary: '#FFD700', // Updated to Primary Yellow
+					secondary: '#FFB300', // Updated to Accent Yellow
+					dark: '#121212', // Updated to Black
 					gray: {
 						100: '#F5F5F5',
-						200: '#E0E0E0',
+						200: '#E0E0E0', // Updated to Light Grey
 						300: '#BDBDBD', 
 						400: '#9E9E9E',
 						500: '#757575',
 						600: '#616161',
 						700: '#424242',
-						800: '#2A2A2A', // Dark grey
+						800: '#2A2A2A', // Updated to Dark Grey
 						900: '#212121',
 					},
 				},
