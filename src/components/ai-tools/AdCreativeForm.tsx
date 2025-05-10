@@ -10,9 +10,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
+// Define the interface for AdCreative data
+export interface AdCreativeData {
+  primaryText: string;
+  headline: string;
+  description: string;
+  callToAction: string;
+  destinationUrl: string;
+  mediaType: "manual" | "ai";
+  mediaUrl: string;
+  aiPrompt: string;
+  generatedMedia: string | null;
+}
+
 interface AdCreativeFormProps {
-  onChange: (data: any) => void;
-  initialData?: any;
+  onChange: (data: AdCreativeData) => void;
+  initialData?: Partial<AdCreativeData>;
 }
 
 const callToActionOptions = [
@@ -27,7 +40,7 @@ const callToActionOptions = [
 
 const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData = {} }) => {
   const { toast } = useToast();
-  const [adCreative, setAdCreative] = useState({
+  const [adCreative, setAdCreative] = useState<AdCreativeData>({
     primaryText: initialData.primaryText || '',
     headline: initialData.headline || '',
     description: initialData.description || '',
@@ -153,8 +166,8 @@ const AdCreativeForm: React.FC<AdCreativeFormProps> = ({ onChange, initialData =
             defaultValue={adCreative.mediaType} 
             value={mediaTab}
             onValueChange={(value) => {
-              setMediaTab(value);
-              handleInputChange('mediaType', value);
+              setMediaTab(value as "manual" | "ai");
+              handleInputChange('mediaType', value as "manual" | "ai");
             }}
           >
             <TabsList className="grid grid-cols-2">
