@@ -61,7 +61,7 @@ const Landing = () => {
         <section className="py-16 md:py-24 px-4 bg-white relative border-b border-adking-gray-200">
           <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">Free No Credit Card Trial </h2>
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">Try AdKing FREE for 7 Days </h2>
             <p className="text-lg text-adking-gray-700 max-w-2xl mx-auto">No credit card required – cancel anytime</p>
           </div>
           <PricingSection />
