@@ -49,7 +49,7 @@ export function PricingSection() {
         {/* Pro Plan */}
         <Card className="border-2 border-adking-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all p-1">
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold">Pro</CardTitle>
+            <CardTitle className="text-2xl font-bold text-adking-dark">Pro</CardTitle>
             <p className="text-adking-gray-600 mt-1">For teams or solo sales reps</p>
             
             <div className="flex items-baseline mt-4">
@@ -98,7 +98,7 @@ export function PricingSection() {
           </div>
           
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold">Enterprise</CardTitle>
+            <CardTitle className="text-2xl font-bold text-adking-dark">Enterprise</CardTitle>
             <p className="text-adking-gray-600 mt-1">For teams of 20 or more</p>
             
             <div className="flex items-baseline mt-4">
