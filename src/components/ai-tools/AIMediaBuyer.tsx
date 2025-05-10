@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -446,7 +447,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     }
     
     switch (currentStep) {
-      case 1: // Campaign & Business Information
+      case 1: // Campaign & Business Information - UPDATED with new structure
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Campaign & Business Information</h2>
@@ -544,7 +545,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
         
-      case 2: // Target Audience
+      case 2: // Target Audience - UPDATED with new structure
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Target Audience</h2>
@@ -666,7 +667,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 3: // Ideal Customer Profile
+      case 3: // Ideal Customer Profile - UPDATED
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ideal Customer Profile</h2>
@@ -731,7 +732,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 4: // Ad Copy
+      case 4: // Ad Copy - UPDATED to include skip option
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ad Copy</h2>
@@ -1074,7 +1075,35 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       {/* Progress indicators - only show for steps 1-6 */}
       {currentStep < 7 && (
         <div className="flex mb-6">
-          {/* ... keep existing code (progress indicators) */}
+          {[1, 2, 3, 4, 5, 6].map((step) => (
+            <div key={step} className="flex-1 relative">
+              <div 
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm mx-auto z-10 relative
+                  ${currentStep >= step 
+                    ? 'bg-metamaster-primary text-white'
+                    : 'bg-gray-200 text-gray-500'}`
+                }
+              >
+                {step}
+              </div>
+              <div className="text-xs text-center mt-2 text-metamaster-gray-600">
+                {step === 1 && "Business Info"}
+                {step === 2 && "Target Audience"}
+                {step === 3 && "Ideal Customer"}
+                {step === 4 && "Ad Copy"}
+                {step === 5 && "Ad Creative"}
+                {step === 6 && "Budget & Config"}
+              </div>
+              {step < 6 && (
+                <div 
+                  className={`absolute top-4 w-full h-0.5 
+                    ${currentStep > step ? 'bg-metamaster-primary' : 'bg-gray-200'}`
+                  }
+                  style={{ left: '50%' }}
+                />
+              )}
+            </div>
+          ))}
         </div>
       )}
       
@@ -1095,31 +1124,29 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </Button>
           )}
           
-          <div className="flex-1 flex justify-end items-center gap-4">
-            {currentStep === 4 && (
-              <div className="flex items-center">
-                <Switch
-                  id="skip-ad-copy"
-                  checked={skipAdCopy}
-                  onCheckedChange={setSkipAdCopy}
-                />
-                <label htmlFor="skip-ad-copy" className="ml-2 text-sm">
-                  Skip ad copy generation
-                </label>
-              </div>
+          {currentStep === 4 && (
+            <div className="flex items-center mr-4">
+              <Switch
+                id="skip-ad-copy"
+                checked={skipAdCopy}
+                onCheckedChange={setSkipAdCopy}
+              />
+              <label htmlFor="skip-ad-copy" className="ml-2 text-sm">
+                Skip ad copy generation
+              </label>
+            </div>
+          )}
+          
+          <Button 
+            onClick={nextStep} 
+            disabled={isGenerating || (currentStep === 6)}
+          >
+            {currentStep < 6 ? (
+              <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
+            ) : (
+              <>Generate Campaign</>
             )}
-            
-            <Button 
-              onClick={nextStep} 
-              disabled={isGenerating || (currentStep === 6)}
-            >
-              {currentStep < 6 ? (
-                <>Continue <ArrowRight className="ml-2 h-4 w-4" /></>
-              ) : (
-                <>Generate Campaign</>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
       )}
 
