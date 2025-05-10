@@ -301,13 +301,16 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
       return;
     }
 
-    if (currentStep === 4 && !formData.mainOfferDescription) {
-      toast({
-        title: "Missing information",
-        description: "Main Offer Description is required.",
-        variant: "destructive"
-      });
-      return;
+    // Skip validation on step 4 if skipAdCopy is true
+    if (currentStep === 4) {
+      if (!skipAdCopy && !formData.mainOfferDescription) {
+        toast({
+          title: "Missing information",
+          description: "Main Offer Description is required.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     if (currentStep < 6) {
