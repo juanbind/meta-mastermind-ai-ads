@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, Settings, Menu, X } from 'lucide-react';
@@ -20,7 +19,7 @@ const Navbar: React.FC = () => {
   // Set a fixed white background for the home page navbar, and dark for other pages
   const navbarBgClass = isHomePage ? "bg-white" : "bg-adking-dark bg-opacity-95 backdrop-blur-md";
   return <nav className={`fixed top-0 left-0 w-full z-50 ${navbarBgClass} shadow-md`}>
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between bg-slate-50">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between bg-transparent">
         <div className="flex items-center space-x-8">
           <Link to="/" className="flex items-center">
             <Logo />
