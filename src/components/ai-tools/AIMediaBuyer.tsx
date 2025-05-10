@@ -7,7 +7,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users } from "lucide-react";
+import { 
+  Loader2, ArrowRight, Check, X, Target, Sparkles, TrendingUp, DollarSign, Users
+} from 'lucide-react';
 import FacebookConnection from './FacebookConnection';
 import AdCreativeForm from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
@@ -130,11 +132,20 @@ const genderOptions = [
   { value: "custom", label: "Custom Gender" }
 ];
 
-// Education level options
-const educationOptions = [
-  { value: "high_school", label: "High School" },
-  { value: "college", label: "College" },
-  { value: "grad_school", label: "Graduate School" }
+// Language options
+const languageOptions = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Spanish" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "it", label: "Italian" },
+  { value: "pt", label: "Portuguese" },
+  { value: "zh", label: "Chinese" },
+  { value: "ja", label: "Japanese" },
+  { value: "ko", label: "Korean" },
+  { value: "ar", label: "Arabic" },
+  { value: "hi", label: "Hindi" },
+  { value: "ru", label: "Russian" }
 ];
 
 // Income level options
@@ -159,14 +170,6 @@ const industryOptions = [
   { value: "entertainment", label: "Entertainment" },
   { value: "nonprofit", label: "Non-profit" },
   { value: "other", label: "Other" }
-];
-
-// Custom audience types
-const customAudienceOptions = [
-  { value: "website_visitors", label: "Website Visitors" },
-  { value: "engagement", label: "Engagement" },
-  { value: "customer_list", label: "Customer List" },
-  { value: "app_activity", label: "App Activity" }
 ];
 
 type CampaignStrategy = {
@@ -202,14 +205,12 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
     ageRangeMax: '65',
     gender: 'all',
     languages: [],
-    education: [],
     income: [],
     
     // Ideal customer profile
     customerInterests: '',
     customerBehaviors: '',
     customerPainPoints: '',
-    customAudiences: [],
     lookalikes: false,
     
     // Keep existing fields that might be used elsewhere
@@ -609,26 +610,26 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Education Levels</label>
-              <div className="grid grid-cols-2 gap-2">
-                {educationOptions.map((edu) => (
+              <label className="text-sm font-medium">Languages</label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {languageOptions.map((lang) => (
                   <Button
-                    key={edu.value}
+                    key={lang.value}
                     type="button"
-                    variant={formData.education.includes(edu.value) ? "default" : "outline"}
-                    className={formData.education.includes(edu.value) ? "bg-metamaster-primary text-white" : ""}
-                    onClick={() => handleMultiSelect('education', edu.value)}
+                    variant={formData.languages.includes(lang.value) ? "default" : "outline"}
+                    className={formData.languages.includes(lang.value) ? "bg-metamaster-primary text-white" : ""}
+                    onClick={() => handleMultiSelect('languages', lang.value)}
                   >
-                    {formData.education.includes(edu.value) ? (
+                    {formData.languages.includes(lang.value) ? (
                       <Check className="mr-2 h-4 w-4" />
                     ) : (
                       <div className="w-4 mr-2" />
                     )}
-                    {edu.label}
+                    {lang.label}
                   </Button>
                 ))}
               </div>
-              <p className="text-xs text-gray-500">Education levels to target (optional)</p>
+              <p className="text-xs text-gray-500">Languages spoken by your target audience</p>
             </div>
             
             <div className="space-y-2">
@@ -652,33 +653,6 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                 ))}
               </div>
               <p className="text-xs text-gray-500">Income levels to target (optional)</p>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Audience Types to Target</label>
-              <div className="grid grid-cols-3 gap-2">
-                {audienceTypes.map((type) => (
-                  <Button
-                    key={type.value}
-                    type="button"
-                    variant={formData.audienceTypes.includes(type.value) ? "default" : "outline"}
-                    className={`justify-start ${formData.audienceTypes.includes(type.value) ? "bg-metamaster-primary text-white" : ""}`}
-                    onClick={() => handleMultiSelect('audienceTypes', type.value)}
-                  >
-                    {formData.audienceTypes.includes(type.value) ? (
-                      <Check className="mr-2 h-4 w-4" />
-                    ) : (
-                      <div className="w-4 mr-2" />
-                    )}
-                    {type.label}
-                  </Button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                <strong>Cold:</strong> New prospects who don't know your brand<br/>
-                <strong>Warm:</strong> People who have interacted with your content<br/>
-                <strong>Hot:</strong> People who have shown high interest in your products
-              </p>
             </div>
           </div>
         );
@@ -732,31 +706,6 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
               />
               <p className="text-xs text-gray-500">
                 Describe the problems your customers face that your product/service solves
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Custom Audiences</label>
-              <div className="grid grid-cols-2 gap-2">
-                {customAudienceOptions.map((option) => (
-                  <Button
-                    key={option.value}
-                    type="button"
-                    variant={formData.customAudiences.includes(option.value) ? "default" : "outline"}
-                    className={formData.customAudiences.includes(option.value) ? "bg-metamaster-primary text-white" : ""}
-                    onClick={() => handleMultiSelect('customAudiences', option.value)}
-                  >
-                    {formData.customAudiences.includes(option.value) ? (
-                      <Check className="mr-2 h-4 w-4" />
-                    ) : (
-                      <div className="w-4 mr-2" />
-                    )}
-                    {option.label}
-                  </Button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500">
-                Select any custom audience sources you have available
               </p>
             </div>
             
