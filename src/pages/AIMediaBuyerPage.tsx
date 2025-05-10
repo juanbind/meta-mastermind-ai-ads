@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,7 +19,6 @@ import {
   Settings
 } from 'lucide-react';
 import AIMediaBuyer from '@/components/ai-tools/AIMediaBuyer';
-import AdCopyGenerator from '@/components/ai-tools/AdCopyGenerator';
 
 const AIMediaBuyerPage: React.FC = () => {
   const { toast } = useToast();
@@ -97,12 +95,9 @@ const AIMediaBuyerPage: React.FC = () => {
           </div>
           
           <Tabs defaultValue="campaigns" value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-6">
-            <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
+            <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
               <TabsTrigger value="campaigns" className="flex items-center justify-center gap-2">
                 <Target size={16} /> Campaigns
-              </TabsTrigger>
-              <TabsTrigger value="ad-copy" className="flex items-center justify-center gap-2">
-                <FileText size={16} /> Ad Copy
               </TabsTrigger>
               <TabsTrigger value="automation" className="flex items-center justify-center gap-2">
                 <ZapOff size={16} /> Automations
@@ -172,13 +167,6 @@ const AIMediaBuyerPage: React.FC = () => {
                     </Button>
                   </div>
                 )}
-              </div>
-            </TabsContent>
-            
-            {/* Ad Copy Generator Tab */}
-            <TabsContent value="ad-copy" className="space-y-6">
-              <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                <AdCopyGenerator />
               </div>
             </TabsContent>
             

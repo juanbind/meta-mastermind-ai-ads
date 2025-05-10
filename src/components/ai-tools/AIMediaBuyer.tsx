@@ -13,6 +13,7 @@ import {
 import FacebookConnection from './FacebookConnection';
 import AdCreativeForm from './AdCreativeForm';
 import CampaignSuccessScreen from './CampaignSuccessScreen';
+import AdCopyGenerator from './AdCopyGenerator';
 import { Switch } from "@/components/ui/switch";
 
 interface AIMediaBuyerProps {
@@ -22,8 +23,9 @@ interface AIMediaBuyerProps {
 // Updated Meta campaign objectives based on actual Meta options
 const objectiveOptions = [
   { value: "awareness", label: "Brand Awareness" },
-  { value: "consideration", label: "Consideration" },
-  { value: "conversions", label: "Conversions" },
+  { value: "engagement", label: "Engagement" },
+  { value: "sales", label: "Sales" },
+  { value: "App promotion", label: "App promotion" },
   { value: "leads", label: "Lead Generation" },
   { value: "traffic", label: "Traffic" }
 ];
@@ -186,6 +188,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [skipAdCopy, setSkipAdCopy] = useState(false);
   const [formData, setFormData] = useState({
     // Campaign basics
     campaignName: '',
@@ -313,7 +316,10 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
+    // When navigating back from step 6 and ad copy was skipped
+    if (currentStep === 6 && skipAdCopy) {
+      setCurrentStep(4);
+    } else if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -657,7 +663,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 3: // Ideal Customer Profile - UPDATED with new structure
+      case 3: // Ideal Customer Profile - UPDATED
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-medium">Ideal Customer Profile</h2>
@@ -722,30 +728,65 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
           </div>
         );
 
-      case 4: // Ad Copy
+      case 4: // Ad Copy - UPDATED to include skip option
         return (
           <div className="space-y-4">
-            <h2 className="text-lg font-medium">Ad Copy</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-medium">Ad Copy</h2>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="skip-ad-copy"
+                  checked={skipAdCopy}
+                  onCheckedChange={setSkipAdCopy}
+                />
+                <label htmlFor="skip-ad-copy" className="text-sm font-medium">
+                  Skip this step
+                </label>
+              </div>
+            </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Product URL or Description</label>
-              <Textarea 
-                placeholder="Enter your product URL or description" 
-                value={formData.websiteUrl}
-                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-                className="min-h-[80px]"
-              />
-            </div>
+            {!skipAdCopy && (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-4">
+                  <p className="text-sm text-blue-700">
+                    Create compelling ad copy using our AI assistant. Fill in the following information to generate 
+                    high-converting copy for your campaign.
+                  </p>
+                </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
-              <Textarea 
-                placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
-                value={formData.mainOfferDescription}
-                onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
-                className="min-h-[80px]"
-              />
-            </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Product URL or Description</label>
+                  <Textarea 
+                    placeholder="Enter your product URL or description" 
+                    value={formData.websiteUrl}
+                    onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Main Offer Description <span className="text-red-500">*</span></label>
+                  <Textarea 
+                    placeholder="Describe your main offer (e.g., '20% discount on yearly subscriptions')" 
+                    value={formData.mainOfferDescription}
+                    onChange={(e) => handleInputChange('mainOfferDescription', e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                </div>
+                
+                {/* Embedded Ad Copy Generator */}
+                <div className="pt-4 border-t border-gray-200 mt-6">
+                  <AdCopyGenerator embedded={true} productDetails={formData.websiteUrl} offerDescription={formData.mainOfferDescription} />
+                </div>
+              </div>
+            )}
+            
+            {skipAdCopy && (
+              <div className="text-center py-8 text-gray-500">
+                <p>You've chosen to skip the ad copy generation step.</p>
+                <p className="text-sm mt-2">You can create ad copy later from the Ad Copy Generator tool.</p>
+              </div>
+            )}
           </div>
         );
 
