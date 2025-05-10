@@ -71,7 +71,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="pt-8 border-t border-white/10 text-center">
           <p className="text-metamaster-gray-500 text-sm">
-            © {new Date().getFullYear()} MetaMaster. All rights reserved.
+            © {new Date().getFullYear()} AdKing. All rights reserved.
           </p>
         </div>
       </div>

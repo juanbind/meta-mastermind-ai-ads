@@ -40,7 +40,7 @@ const Auth: React.FC = () => {
           <p className="text-metamaster-gray-400 mb-6">
             {activeTab === 'login' 
               ? 'Sign in to access your account.' 
-              : 'Get started with MetaMaster today.'}
+              : 'Get started with AdKing today.'}
           </p>
           
           <div className="flex border-b border-white/10 mb-6">
@@ -97,7 +97,7 @@ const Auth: React.FC = () => {
           <div className="relative z-10">
             <h2 className="text-3xl font-bold mb-4">Transform Your Facebook Ads Strategy</h2>
             <p className="text-white/80 mb-6">
-              Join thousands of marketers who are discovering winning ads, building high-converting funnels, and scaling their businesses with MetaMaster.
+              Join thousands of marketers who are discovering winning ads, building high-converting funnels, and scaling their businesses with AdKing.
             </p>
             
             <div className="space-y-4">

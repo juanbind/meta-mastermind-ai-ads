@@ -38,8 +38,8 @@ const FAQ = () => {
       answer: "We offer a 14-day money-back guarantee on all plans. If you're not satisfied with your purchase, contact our support team within 14 days of your purchase for a full refund."
     },
     {
-      question: "Do I need any technical skills to use MetaMaster?",
-      answer: "No technical skills are required to use MetaMaster. Our platform is designed with an intuitive, user-friendly interface that makes it easy for anyone to discover winning ads, build campaigns, and manage their marketing efforts."
+      question: "Do I need any technical skills to use AdKing?",
+      answer: "No technical skills are required to use AdKing. Our platform is designed with an intuitive, user-friendly interface that makes it easy for anyone to discover winning ads, build campaigns, and manage their marketing efforts."
     }
   ];
 
@@ -50,7 +50,7 @@ const FAQ = () => {
           Frequently Asked Questions
         </h2>
         <p className="text-metamaster-gray-400 text-lg">
-          Find answers to common questions about MetaMaster.
+          Find answers to common questions about AdKing.
         </p>
       </div>
       

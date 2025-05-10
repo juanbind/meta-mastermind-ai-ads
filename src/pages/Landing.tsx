@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -8,13 +9,16 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
+
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
+  
   const handleGetStarted = () => {
     navigate('/auth');
   };
+  
   return <div className="min-h-screen hero-gradient dark-gradient">
       <Navbar />
       
@@ -48,7 +52,7 @@ const Landing = () => {
         <section className="py-16 md:py-20 px-4 bg-[#121a2b]/50 backdrop-blur-sm">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-slate-50 md:text-5xl">
-              🚀 Try MetaMaster FREE for 7 Days
+              🚀 Try AdKing FREE for 7 Days
             </h2>
             <p className="text-base md:text-lg text-metamaster-gray-300">No credit card required – cancel anytime.</p>
           </div>
@@ -67,7 +71,7 @@ const Landing = () => {
               Ready to Transform Your Facebook Ad Results?
             </h2>
             <p className="text-lg md:text-xl mb-6 md:mb-8 text-white/90">
-              Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with MetaMaster.
+              Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button className="bg-white text-metamaster-primary hover:bg-white/90 text-base md:text-lg px-6 py-4 md:px-8 md:py-6 h-auto rounded-xl w-full sm:w-auto" size="lg" onClick={handleGetStarted}>
@@ -85,4 +89,5 @@ const Landing = () => {
       <Footer />
     </div>;
 };
+
 export default Landing;
