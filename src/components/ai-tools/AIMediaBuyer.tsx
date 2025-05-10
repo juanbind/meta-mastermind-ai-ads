@@ -503,21 +503,11 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium">Industry Vertical <span className="text-red-500">*</span></label>
-              <Select
+              <Input 
+                placeholder="E.g., Fitness, Real Estate, Technology" 
                 value={formData.industryVertical}
-                onValueChange={(value) => handleInputChange('industryVertical', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  {industryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(e) => handleInputChange('industryVertical', e.target.value)}
+              />
               <p className="text-xs text-gray-500">The industry your business operates in</p>
             </div>
             
