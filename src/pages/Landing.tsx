@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -9,16 +8,13 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
-
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
-  
   const handleGetStarted = () => {
     navigate('/auth');
   };
-  
   return <div className="min-h-screen bg-white relative">
       {/* Background grid pattern - mimicking the reference design */}
       <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
@@ -27,7 +23,7 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll relative">
-          <div className="inline-block px-4 py-1 bg-adking-primary/10 text-adking-dark rounded-full mb-6 font-medium">
+          <div className="inline-block px-4 py-1 text-adking-dark rounded-full mb-6 font-medium bg-yellow-300">
             AdKing AI Now Live!
           </div>
           
@@ -37,11 +33,7 @@ const Landing = () => {
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
-          <Button 
-            className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" 
-            size="lg" 
-            onClick={handleGetStarted}
-          >
+          <Button className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" size="lg" onClick={handleGetStarted}>
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
@@ -95,19 +87,10 @@ const Landing = () => {
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button 
-                className="bg-adking-dark text-white hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto shadow-lg" 
-                size="lg" 
-                onClick={handleGetStarted}
-              >
+              <Button className="bg-adking-dark text-white hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto shadow-lg" size="lg" onClick={handleGetStarted}>
                 Start 7-Day Free Trial
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                onClick={() => navigate('/auth')} 
-                className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl bg-adking-dark/5 hover:bg-adking-dark/10 text-adking-dark w-full sm:w-auto"
-              >
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl bg-adking-dark/5 hover:bg-adking-dark/10 text-adking-dark w-full sm:w-auto">
                 Schedule a Demo
               </Button>
             </div>
@@ -119,5 +102,4 @@ const Landing = () => {
       <Footer />
     </div>;
 };
-
 export default Landing;
