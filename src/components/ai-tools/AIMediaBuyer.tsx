@@ -836,3 +836,180 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({ onClose }) => {
                     <CardTitle className="flex items-center">
                       <Target className="mr-2 h-5 w-5 text-metamaster-primary" />
                       Platform Strategy
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-sm text-metamaster-gray-500">Recommended platforms for your campaign:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {generatedStrategy.platforms.map((platform) => (
+                          <div key={platform} className="flex items-center p-2 border border-metamaster-gray-200 rounded-md">
+                            <Check className="h-5 w-5 text-green-500 mr-2" />
+                            <span className="capitalize">{platform}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="mt-4">
+                        <h4 className="font-medium mb-2">Budget Allocation</h4>
+                        {generatedStrategy.budgetAllocation.map((item) => (
+                          <div key={item.platform} className="flex justify-between items-center mb-1">
+                            <span className="capitalize">{item.platform}</span>
+                            <span className="font-medium">{item.percentage}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center">
+                        <DollarSign className="mr-2 h-4 w-4 text-metamaster-primary" />
+                        Budget Recommendation
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">
+                        Daily: ${Math.round(formData.budgetRange[0]/30)} - ${Math.round(formData.budgetRange[1]/30)}
+                      </p>
+                      <p className="text-sm">
+                        Monthly: ${formData.budgetRange[0]} - ${formData.budgetRange[1]}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center">
+                        <TrendingUp className="mr-2 h-4 w-4 text-metamaster-primary" />
+                        Expected Results
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">
+                        Based on your industry and budget, you can expect:
+                      </p>
+                      <p className="text-sm font-medium mt-1">
+                        {formData.objective === 'awareness' && '100K-500K Impressions'}
+                        {formData.objective === 'traffic' && '5K-25K Clicks'}
+                        {formData.objective === 'conversions' && '50-250 Conversions'}
+                        {formData.objective === 'leads' && '100-500 Leads'}
+                        {formData.objective === 'consideration' && '1K-5K Engagement Actions'}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="audience" className="space-y-4 pt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Users className="mr-2 h-5 w-5 text-metamaster-primary" />
+                      Audience Strategy
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {generatedStrategy.audienceTargeting.map((segment, index) => (
+                        <div key={index} className="pb-4 border-b border-metamaster-gray-200 last:border-0">
+                          <h4 className="font-medium mb-2 capitalize">{segment.segment} Audience</h4>
+                          <p className="text-sm text-metamaster-gray-600">{segment.approach}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="creative" className="space-y-4 pt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Sparkles className="mr-2 h-5 w-5 text-metamaster-primary" />
+                      Creative Recommendations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {generatedStrategy.creativeRecommendations.map((rec, index) => (
+                        <div key={index} className="flex items-start gap-2 pb-2">
+                          <div className="w-6 h-6 rounded-full bg-metamaster-primary text-white flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-bold">{index + 1}</span>
+                          </div>
+                          <p className="text-sm">{rec}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="optimization" className="space-y-4 pt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <TrendingUp className="mr-2 h-5 w-5 text-metamaster-primary" />
+                      Optimization Tips
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {generatedStrategy.optimizationTips.map((tip, index) => (
+                        <div key={index} className="flex items-start gap-2 pb-2">
+                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <p className="text-sm">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+            
+            <div className="mt-8">
+              <div className="space-y-4">
+                <FacebookConnection
+                  onConnect={handleFacebookConnection}
+                  connected={fbConnected}
+                  accountData={fbAccountData}
+                />
+                
+                <Button 
+                  onClick={handleSubmitCampaign} 
+                  disabled={!fbConnected || isSubmittingCampaign}
+                  className="w-full py-6"
+                >
+                  {isSubmittingCampaign ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Submitting Campaign...
+                    </>
+                  ) : (
+                    <>
+                      Submit Campaign to Facebook
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      {renderStep()}
+    </div>
+  );
+};
+
+export default AIMediaBuyer;
