@@ -158,7 +158,7 @@ const FunnelRenderedElement: React.FC<FunnelRenderedElementProps> = ({
         isEditing ? 'border-purple-400 bg-white shadow-sm' : 
         `border-transparent ${getElementCategoryClass()}`
       }`}>
-        <div className="absolute top-2 left-2 bg-metamaster-gray-100 rounded-full p-1 opacity-50">
+        <div className="absolute top-2 left-2 bg-gray-100 rounded-full p-1 opacity-50">
           <ElementTypeIcon type={item.type} />
         </div>
         

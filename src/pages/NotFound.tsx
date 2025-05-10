@@ -10,13 +10,13 @@ const NotFound = () => {
   const revealRef = useScrollReveal();
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-metamaster-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-adking-gray-100">
       <div ref={animationRef} className="text-center max-w-md px-4 animate-on-scroll">
         <div className="mb-8">
           <div 
             ref={el => revealRef(el)}
             data-animation="fade-in"
-            className="reveal-element bg-gradient-to-r from-metamaster-primary to-metamaster-secondary text-metamaster-gray-800 text-6xl font-bold inline-block rounded-xl px-6 py-3 hover-lift"
+            className="reveal-element bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark text-6xl font-bold inline-block rounded-xl px-6 py-3 hover-lift"
           >
             404
           </div>
@@ -25,7 +25,7 @@ const NotFound = () => {
         <h1 
           ref={el => revealRef(el)}
           data-animation="fade-up" 
-          className="reveal-element text-3xl font-bold mb-4 text-metamaster-gray-800"
+          className="reveal-element text-3xl font-bold mb-4 text-adking-dark"
         >
           Page Not Found
         </h1>
@@ -33,7 +33,7 @@ const NotFound = () => {
         <p 
           ref={el => revealRef(el)}
           data-animation="fade-up"
-          className="reveal-element text-metamaster-gray-600 mb-8"
+          className="reveal-element text-adking-gray-700 mb-8"
         >
           The page you're looking for doesn't exist or has been moved.
         </p>
@@ -42,7 +42,7 @@ const NotFound = () => {
           <Button 
             ref={el => revealRef(el)}
             data-animation="slide-right"
-            className="bg-metamaster-primary hover:bg-metamaster-secondary text-metamaster-gray-800 button-press reveal-element"
+            className="bg-adking-primary hover:bg-adking-secondary text-adking-dark button-press reveal-element"
           >
             <ArrowLeft size={18} className="mr-2" />
             Return to Home
