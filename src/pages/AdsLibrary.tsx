@@ -38,7 +38,7 @@ const FilterButton: React.FC<{
       </Button>
       
       {showDropdown && options && <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md border border-gray-100 z-10 min-w-[150px]">
-          {options.map(option => <button key={option} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" onClick={() => {
+          {options.map(option => <button key={option} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-adking-gray-800 text-sm" onClick={() => {
         onOptionClick?.(option);
         setShowDropdown(false);
       }}>
