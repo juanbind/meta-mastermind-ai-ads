@@ -112,8 +112,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         // Dark text on light backgrounds
         '!text-adking-gray-800': variant === 'outline' || variant === 'ghost',
         
-        // Secondary button text color
-        '!text-adking-dark': variant === 'secondary',
+        // Secondary button has dark text (removed duplicate '!text-adking-dark' property)
       },
       // Additional styling for selected state
       selected && "bg-gradient-to-r from-adking-primary to-adking-secondary font-bold shadow-md border border-amber-400 z-10"
