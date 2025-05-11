@@ -83,10 +83,10 @@ const Landing = () => {
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" onClick={handleGetStarted} className="font-normal text-slate-50">
+              <Button size="lg" onClick={handleGetStarted} className="bg-adking-dark hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto shadow-lg text-slate-50">
                 Start 7-Day Free Trial
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto bg-slate-50 text-adking-primary">
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl bg-adking-dark/5 hover:bg-adking-dark/10 text-adking-dark w-full sm:w-auto">
                 Schedule a Demo
               </Button>
             </div>
