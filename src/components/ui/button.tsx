@@ -19,6 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -86,9 +87,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return startIcon
     }
     
+    // Special handling for focused/selected state to prevent white-on-white
+    const buttonClass = cn(
+      buttonVariants({ variant, size, state, className }),
+      // Ensure selected/active state maintains visibility with gradient background if needed
+      props.selected && variant !== "gradient" ? "bg-gradient-to-r from-adking-primary to-adking-secondary text-white" : ""
+    )
+    
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, state, className }))}
+        className={buttonClass}
         ref={ref}
         disabled={isDisabled}
         {...props}
