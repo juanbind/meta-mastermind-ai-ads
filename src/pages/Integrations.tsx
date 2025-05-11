@@ -1,12 +1,9 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { Facebook, Mail, CreditCard, MessageSquare, Database, Globe, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface IntegrationCardProps {
   title: string;
@@ -14,17 +11,25 @@ interface IntegrationCardProps {
   icon: React.ReactNode;
   isConnected: boolean;
   category: string;
-  onConnect: () => void;
 }
 
-const IntegrationCard: React.FC<IntegrationCardProps> = ({ 
-  title, 
-  description, 
-  icon, 
-  isConnected, 
-  category,
-  onConnect 
-}) => {
+const IntegrationCard: React.FC<IntegrationCardProps> = ({ title, description, icon, isConnected, category }) => {
+  const { toast } = useToast();
+  
+  const handleIntegrationClick = () => {
+    if (isConnected) {
+      toast({
+        title: `${title} is already connected`,
+        description: "You can manage your connection in the settings page.",
+      });
+    } else {
+      toast({
+        title: `${title} Integration`,
+        description: "This integration will be available soon.",
+      });
+    }
+  };
+  
   return (
     <div className="bg-white p-5 rounded-xl shadow-md border border-adking-gray-300">
       <div className="flex items-start justify-between">
@@ -46,7 +51,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
           variant={isConnected ? "outline" : "default"}
           size="sm"
           className={isConnected ? "border-green-500 text-green-600" : "bg-adking-primary hover:bg-adking-secondary text-adking-dark"}
-          onClick={onConnect}
+          onClick={handleIntegrationClick}
         >
           {isConnected ? "Connected" : "Connect"}
         </Button>
@@ -57,59 +62,13 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({
 
 const Integrations: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [connectedIntegrations, setConnectedIntegrations] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Check for existing integrations
-  React.useEffect(() => {
-    const checkIntegrations = async () => {
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        // Check Facebook integration
-        const { data: facebookData } = await supabase
-          .from('facebook_integrations')
-          .select('*')
-          .eq('user_id', user.id);
-          
-        if (facebookData && facebookData.length > 0) {
-          setConnectedIntegrations(prev => [...prev, 'Facebook Ads']);
-        }
-      } catch (error) {
-        console.error("Error checking integrations:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkIntegrations();
-  }, [user]);
-  
-  const handleIntegrationClick = (integrationName: string) => {
-    switch (integrationName) {
-      case 'Facebook Ads':
-        navigate('/facebook-integration');
-        break;
-      default:
-        toast({
-          title: `${integrationName} Integration`,
-          description: "This integration will be available soon.",
-        });
-    }
-  };
   
   const integrations = [
     {
       title: "Facebook Ads",
       description: "Connect your Facebook Ad account for ad analysis and optimization.",
       icon: <Facebook size={24} className="text-adking-dark" />,
-      isConnected: connectedIntegrations.includes('Facebook Ads'),
+      isConnected: false, // Changed to false to match our "no mock data" approach
       category: "Advertising"
     },
     {
@@ -194,11 +153,7 @@ const Integrations: React.FC = () => {
             </div>
           </div>
           
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-adking-primary"></div>
-            </div>
-          ) : filteredIntegrations.length > 0 ? (
+          {filteredIntegrations.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {filteredIntegrations.map((integration, index) => (
                 <IntegrationCard 
@@ -208,7 +163,6 @@ const Integrations: React.FC = () => {
                   icon={integration.icon}
                   isConnected={integration.isConnected}
                   category={integration.category}
-                  onConnect={() => handleIntegrationClick(integration.title)}
                 />
               ))}
             </div>
