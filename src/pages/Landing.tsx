@@ -86,7 +86,7 @@ const Landing = () => {
               <Button size="lg" onClick={handleGetStarted} className="bg-adking-dark hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto w-full sm:w-auto shadow-lg text-slate-50 rounded-xl">
                 Start 7-Day Free Trial
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl bg-adking-dark/5 hover:bg-adking-dark/10 w-full sm:w-auto text-slate-50">
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto bg-slate-50 text-adking-primary">
                 Schedule a Demo
               </Button>
             </div>
