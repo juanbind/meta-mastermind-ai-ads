@@ -99,22 +99,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
       
-      // Specific text coloring based on variant/context with !important to ensure it overrides other styles
+      // Text coloring based on variant to ensure proper contrast
       {
         // Dark text for gradient backgrounds (yellow/gold gradients)
-        "text-adking-dark": 
+        "!text-adking-dark": 
           effectiveVariant === 'gradient' || 
           selected ||
           className?.includes('bg-metamaster-primary') || 
           className?.includes('bg-adking-primary'),
         
         // White text for dark backgrounds
-        "text-white": 
+        "!text-white": 
           effectiveVariant === 'default' || 
           effectiveVariant === 'destructive',
           
         // Dark grey text for outline/ghost/secondary variants
-        "text-adking-gray-800": 
+        "!text-adking-gray-800": 
           (effectiveVariant === 'outline' || 
           effectiveVariant === 'ghost' || 
           effectiveVariant === 'secondary') && 
@@ -122,7 +122,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       },
       
       // Additional styling for selected state - ensuring visibility with high contrast border
-      selected && "font-bold shadow-md border-2 border-amber-500 z-10"
+      selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
+      
+      // Ensure hover states maintain proper text contrast
+      "hover:text-adking-dark hover:font-medium",
+      effectiveVariant === 'default' && "hover:text-white",
+      effectiveVariant === 'destructive' && "hover:text-white",
     )
     
     return (
