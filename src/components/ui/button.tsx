@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -102,30 +102,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Specific text coloring based on variant/context with !important to ensure it overrides other styles
       {
         // Dark text for gradient backgrounds (yellow/gold gradients)
-        "!text-adking-dark": 
+        "text-adking-dark": 
           effectiveVariant === 'gradient' || 
           selected ||
           className?.includes('bg-metamaster-primary') || 
           className?.includes('bg-adking-primary'),
         
         // White text for dark backgrounds
-        "!text-white": 
+        "text-white": 
           effectiveVariant === 'default' || 
           effectiveVariant === 'destructive',
           
-        // Dark grey text for outline/ghost variants
-        "!text-adking-gray-800": 
-          effectiveVariant === 'outline' || 
+        // Dark grey text for outline/ghost/secondary variants
+        "text-adking-gray-800": 
+          (effectiveVariant === 'outline' || 
           effectiveVariant === 'ghost' || 
-          effectiveVariant === 'secondary',
-          
-        // Special styling for secondary variant with non-gradient
-        "!text-adking-gray-800": 
-          variant === 'secondary' && !selected,
+          effectiveVariant === 'secondary') && 
+          !selected,
       },
       
       // Additional styling for selected state - ensuring visibility with high contrast border
-      selected && "font-bold shadow-md border border-amber-400 z-10"
+      selected && "font-bold shadow-md border-2 border-amber-500 z-10"
     )
     
     return (
