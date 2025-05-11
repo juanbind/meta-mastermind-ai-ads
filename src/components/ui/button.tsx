@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary !text-adking-dark hover:opacity-90",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -98,22 +98,29 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Enhanced button class with guaranteed text contrast
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
-      // Ensure proper text contrast for each variant
+      
+      // Ensure proper text contrast for each variant with higher specificity
       {
-        // Always dark text on gradient/yellow backgrounds
-        '!text-adking-dark': variant === 'gradient' || 
-                             selected || 
-                             className?.includes('bg-metamaster-primary') || 
-                             className?.includes('bg-adking-primary') ||
-                             variant === 'secondary',
+        // Dark text for light backgrounds (yellow/gold gradients, light backgrounds)
+        'text-adking-dark !important': 
+          variant === 'gradient' || 
+          selected || 
+          className?.includes('bg-metamaster-primary') || 
+          className?.includes('bg-adking-primary') ||
+          variant === 'secondary',
         
-        // Always white text on dark backgrounds
-        '!text-white': variant === 'default' || variant === 'destructive',
+        // White text for dark backgrounds
+        'text-white !important': 
+          variant === 'default' || 
+          variant === 'destructive',
         
-        // Dark text on light backgrounds
-        '!text-adking-gray-800': variant === 'outline' || variant === 'ghost',
+        // Dark grey text for outline/ghost variants
+        'text-adking-gray-800 !important': 
+          variant === 'outline' || 
+          variant === 'ghost',
       },
-      // Additional styling for selected state
+      
+      // Additional styling for selected state - ensuring visibility
       selected && "bg-gradient-to-r from-adking-primary to-adking-secondary font-bold shadow-md border border-amber-400 z-10"
     )
     

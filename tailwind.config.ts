@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -28,7 +27,7 @@ export default {
 				adking: {
 					primary: '#FFD700', // Primary Yellow
 					secondary: '#FFB300', // Accent Yellow
-					dark: '#121212', // Black
+					dark: '#121212', // Black - ensuring high contrast with yellow
 					gray: {
 						100: '#F5F5F5',
 						200: '#E0E0E0', // Light Grey
