@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -30,7 +31,7 @@ import FacebookIntegration from './pages/FacebookIntegration';
 
 // Context Providers
 import { AuthProvider } from './contexts/AuthContext';
-import AuthCheck from './components/auth/AuthCheck';
+import { AuthCheck } from './components/auth/AuthCheck';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
