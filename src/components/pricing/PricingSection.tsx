@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -24,7 +25,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button onClick={handleStartTrial} className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover text-slate-50">
+            <Button onClick={handleStartTrial} className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-dark/90 text-slate-50">
               7-Day Free Trial <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
