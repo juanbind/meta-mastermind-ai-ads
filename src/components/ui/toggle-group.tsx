@@ -46,8 +46,8 @@ const ToggleGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        // Add gradient background for selected state to ensure visibility
-        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white",
+        // Ensure selected state is highly visible with consistent styling
+        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white data-[state=on]:border-none data-[state=on]:shadow-sm",
         className
       )}
       {...props}

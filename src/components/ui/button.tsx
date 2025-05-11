@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -48,7 +49,7 @@ export interface ButtonProps
   loading?: boolean
   startIcon?: React.ReactNode
   endIcon?: React.ReactNode
-  selected?: boolean // Added the selected property to fix the TypeScript error
+  selected?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -62,7 +63,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     startIcon, 
     endIcon, 
     disabled,
-    selected, // Make sure to destructure the selected prop
+    selected,
     children, 
     ...props 
   }, ref) => {
@@ -88,18 +89,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return startIcon
     }
     
-    // Improved handling for selected state - ensure text is always visible
-    // For default, outline, secondary, and ghost variants that might have contrast issues when selected
+    // Use gradient variant for selected buttons to ensure visibility
     let effectiveVariant = variant;
-    if (selected) {
-      // If already using gradient, keep it, otherwise switch to gradient for better visibility
-      if (variant !== "gradient") {
-        effectiveVariant = "gradient";
-      }
+    if (selected && variant !== 'gradient') {
+      effectiveVariant = 'gradient';
     }
     
     const buttonClass = cn(
-      buttonVariants({ variant: effectiveVariant, size, state, className })
+      buttonVariants({ variant: effectiveVariant, size, state, className }),
+      selected && variant !== 'gradient' && "bg-gradient-to-r from-adking-primary to-adking-secondary text-white"
     )
     
     return (

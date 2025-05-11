@@ -35,7 +35,11 @@ const Toggle = React.forwardRef<
 >(({ className, variant, size, ...props }, ref) => (
   <TogglePrimitive.Root
     ref={ref}
-    className={cn(toggleVariants({ variant, size, className }))}
+    className={cn(
+      toggleVariants({ variant, size, className }),
+      // Add strong visual indication for selected state
+      "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white"
+    )}
     {...props}
   />
 ))
