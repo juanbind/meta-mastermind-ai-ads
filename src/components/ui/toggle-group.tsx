@@ -46,8 +46,10 @@ const ToggleGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        // Ensure selected state is highly visible with consistent styling
-        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white data-[state=on]:border-none data-[state=on]:shadow-sm",
+        // Enhanced styling for significantly more visible selected state
+        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white data-[state=on]:border-none data-[state=on]:shadow-md data-[state=on]:font-bold data-[state=on]:z-10",
+        // Add distinct border shadow contrast against white background
+        "border border-transparent data-[state=on]:border-amber-400",
         className
       )}
       {...props}

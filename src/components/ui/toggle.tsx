@@ -37,8 +37,9 @@ const Toggle = React.forwardRef<
     ref={ref}
     className={cn(
       toggleVariants({ variant, size, className }),
-      // Add strong visual indication for selected state
-      "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white"
+      // Dramatically enhanced visual indicator for selected state
+      // Bold yellow gradient with shadow for depth and distinction
+      "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white data-[state=on]:border-none data-[state=on]:font-bold data-[state=on]:shadow-md"
     )}
     {...props}
   />
