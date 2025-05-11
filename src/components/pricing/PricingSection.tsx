@@ -113,7 +113,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button onClick={() => navigate('/contact')} className="w-full py-6 text-lg font-medium rounded-xl border-none text-slate-50 bg-neutral-950 hover:bg-neutral-800">
+            <Button onClick={() => navigate('/contact')} className="w-full py-6 text-lg font-medium rounded-xl border-none bg-neutral-950 hover:bg-neutral-800 text-slate-50">
               Book Demo <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
