@@ -1088,7 +1088,7 @@ const AIMediaBuyer: React.FC<AIMediaBuyerProps> = ({
               </label>
             </div>}
           
-          <Button onClick={nextStep} disabled={isGenerating || currentStep === 6} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white">
+          <Button onClick={nextStep} disabled={isGenerating || currentStep === 6} className="bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-slate-50">
             {currentStep < 6 ? <>Continue <ArrowRight className="ml-2 h-4 w-4" /></> : <>Generate Campaign</>}
           </Button>
         </div>}
