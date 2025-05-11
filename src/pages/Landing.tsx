@@ -33,7 +33,7 @@ const Landing = () => {
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
-          <Button className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" size="lg" onClick={handleGetStarted}>
+          <Button size="lg" onClick={handleGetStarted} className="<div class=\"flex items-center justify-center min-h-screen\">\n  <button class=\"bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300\">\n    Your Button Text\n  </button>\n</div>">
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
