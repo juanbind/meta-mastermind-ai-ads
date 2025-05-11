@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -89,11 +88,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return startIcon
     }
     
-    // Special handling for focused/selected state to prevent white-on-white
+    // Improved handling for selected state - ensure text is always visible
+    // For default, outline, secondary, and ghost variants that might have contrast issues when selected
+    let effectiveVariant = variant;
+    if (selected) {
+      // If already using gradient, keep it, otherwise switch to gradient for better visibility
+      if (variant !== "gradient") {
+        effectiveVariant = "gradient";
+      }
+    }
+    
     const buttonClass = cn(
-      buttonVariants({ variant, size, state, className }),
-      // Ensure selected/active state maintains visibility with gradient background if needed
-      selected && variant !== "gradient" ? "bg-gradient-to-r from-adking-primary to-adking-secondary text-white" : ""
+      buttonVariants({ variant: effectiveVariant, size, state, className })
     )
     
     return (
@@ -101,12 +107,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={buttonClass}
         ref={ref}
         disabled={isDisabled}
+        aria-selected={selected}
         {...props}
       >
         {renderStateIcon()}
-        
         {children}
-        
         {!loading && state !== "loading" && endIcon}
       </Comp>
     )
