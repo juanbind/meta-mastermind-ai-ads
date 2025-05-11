@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -12,6 +13,7 @@ const toggleVariants = cva(
         default: "bg-transparent",
         outline:
           "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-white hover:opacity-90",
       },
       size: {
         default: "h-10 px-3",
