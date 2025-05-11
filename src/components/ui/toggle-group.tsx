@@ -47,13 +47,15 @@ const ToggleGroupItem = React.forwardRef<
           size: context.size || size,
         }),
         // Default state with visible text
-        "text-adking-gray-700",
+        "!text-adking-gray-700 bg-white",
         // Enhanced selected state styling with guaranteed text contrast
         "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:!text-adking-dark data-[state=on]:border-none data-[state=on]:shadow-md data-[state=on]:font-bold data-[state=on]:z-10",
         // Add distinct border for better contrast
-        "border border-transparent data-[state=on]:border-amber-400",
+        "border border-gray-200 data-[state=on]:border-amber-400",
         // Ensure hover states maintain proper text contrast
-        "hover:text-adking-dark hover:font-medium",
+        "hover:!bg-gray-100 hover:!text-adking-dark hover:font-medium",
+        // Focus state styling
+        "focus-visible:!bg-gray-100 focus-visible:!text-adking-dark focus-visible:!border-adking-primary",
         className
       )}
       {...props}

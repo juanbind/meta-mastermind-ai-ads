@@ -14,7 +14,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-white hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -121,13 +121,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           !selected,
       },
       
+      // Explicit background colors for better visibility
+      {
+        "bg-white": 
+          effectiveVariant === 'outline' || 
+          effectiveVariant === 'ghost'
+      },
+      
       // Additional styling for selected state - ensuring visibility with high contrast border
       selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
       
       // Ensure hover states maintain proper text contrast
-      "hover:text-adking-dark hover:font-medium",
-      effectiveVariant === 'default' && "hover:text-white",
-      effectiveVariant === 'destructive' && "hover:text-white",
+      "hover:!text-adking-dark hover:font-medium",
+      (effectiveVariant === 'default' || effectiveVariant === 'destructive') && "hover:!text-white",
+      
+      // Focus states
+      "focus-visible:!text-adking-dark focus-visible:font-medium",
+      (effectiveVariant === 'default' || effectiveVariant === 'destructive') && "focus-visible:!text-white"
     )
     
     return (
