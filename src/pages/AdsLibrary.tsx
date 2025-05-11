@@ -9,15 +9,20 @@ import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 
 // Filter button component
-const FilterButton: React.FC<{ 
+const FilterButton: React.FC<{
   label: string;
   isActive: boolean;
   onClick: () => void;
   options?: string[];
   onOptionClick?: (option: string) => void;
-}> = ({ label, isActive, onClick, options, onOptionClick }) => {
+}> = ({
+  label,
+  isActive,
+  onClick,
+  options,
+  onOptionClick
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
-
   const handleClick = () => {
     onClick();
     if (!options?.length) {
@@ -26,108 +31,80 @@ const FilterButton: React.FC<{
       setShowDropdown(!showDropdown);
     }
   };
-
-  return (
-    <div className="relative">
-      <Button 
-        variant={isActive ? "default" : "outline"} 
-        size="sm" 
-        className={`flex items-center ${isActive ? 'bg-metamaster-primary' : ''}`}
-        onClick={handleClick}
-      >
+  return <div className="relative">
+      <Button variant={isActive ? "default" : "outline"} size="sm" className={`flex items-center ${isActive ? 'bg-metamaster-primary' : ''}`} onClick={handleClick}>
         {label}
         <ChevronDown size={16} className="ml-2" />
       </Button>
       
-      {showDropdown && options && (
-        <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md border border-gray-100 z-10 min-w-[150px]">
-          {options.map((option) => (
-            <button
-              key={option}
-              className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm"
-              onClick={() => {
-                onOptionClick?.(option);
-                setShowDropdown(false);
-              }}
-            >
+      {showDropdown && options && <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md border border-gray-100 z-10 min-w-[150px]">
+          {options.map(option => <button key={option} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" onClick={() => {
+        onOptionClick?.(option);
+        setShowDropdown(false);
+      }}>
               {option}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+            </button>)}
+        </div>}
+    </div>;
 };
 
 // Media preview component to handle different media types with better error handling
-const MediaPreview: React.FC<{ 
-  ad: Ad, 
-  className?: string 
-}> = ({ ad, className = "" }) => {
+const MediaPreview: React.FC<{
+  ad: Ad;
+  className?: string;
+}> = ({
+  ad,
+  className = ""
+}) => {
   const [mediaError, setMediaError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  
+
   // Enhanced fallback to handle various media scenarios with real Meta ad assets
   if (ad.video_url && !mediaError) {
-    return (
-      <div className={`relative ${className} bg-gray-100`}>
-        {!isVideoLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
+    return <div className={`relative ${className} bg-gray-100`}>
+        {!isVideoLoaded && <div className="absolute inset-0 flex items-center justify-center">
             <Loader size={24} className="animate-spin text-metamaster-primary" />
-          </div>
-        )}
-        <video 
-          src={ad.video_url} 
-          className={`w-full h-full object-cover ${isVideoLoaded ? '' : 'opacity-0'}`}
-          controls
-          onLoadedData={() => setIsVideoLoaded(true)}
-          onError={() => {
-            console.error("Error loading video:", ad.video_url);
-            setMediaError(true);
-          }}
-          poster={ad.image_url || undefined}
-        />
-      </div>
-    );
+          </div>}
+        <video src={ad.video_url} className={`w-full h-full object-cover ${isVideoLoaded ? '' : 'opacity-0'}`} controls onLoadedData={() => setIsVideoLoaded(true)} onError={() => {
+        console.error("Error loading video:", ad.video_url);
+        setMediaError(true);
+      }} poster={ad.image_url || undefined} />
+      </div>;
   }
-  
+
   // Image display with improved error handling for Meta ad images
-  return (
-    <div className={`relative ${className} bg-gray-100`}>
-      {!isImageLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center">
+  return <div className={`relative ${className} bg-gray-100`}>
+      {!isImageLoaded && <div className="absolute inset-0 flex items-center justify-center">
           <Loader size={24} className="animate-spin text-metamaster-primary" />
-        </div>
-      )}
-      <img 
-        src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} 
-        alt={ad.title || ad.advertiser_name || 'Ad'} 
-        className={`w-full h-full object-cover ${isImageLoaded ? '' : 'opacity-0'}`}
-        onLoad={() => setIsImageLoaded(true)}
-        onError={(e) => {
-          console.error("Error loading image:", ad.image_url);
-          const target = e.target as HTMLImageElement;
-          target.src = 'https://placehold.co/600x400/EEE/999?text=No+Preview+Available';
-          setIsImageLoaded(true);
-        }}
-        referrerPolicy="no-referrer" // Add this to handle Facebook CORS issues
-        crossOrigin="anonymous" // Add this to handle Facebook CORS issues
-      />
-    </div>
-  );
+        </div>}
+      <img src={ad.image_url || 'https://placehold.co/600x400/EEE/999?text=No+Image'} alt={ad.title || ad.advertiser_name || 'Ad'} className={`w-full h-full object-cover ${isImageLoaded ? '' : 'opacity-0'}`} onLoad={() => setIsImageLoaded(true)} onError={e => {
+      console.error("Error loading image:", ad.image_url);
+      const target = e.target as HTMLImageElement;
+      target.src = 'https://placehold.co/600x400/EEE/999?text=No+Preview+Available';
+      setIsImageLoaded(true);
+    }} referrerPolicy="no-referrer" // Add this to handle Facebook CORS issues
+    crossOrigin="anonymous" // Add this to handle Facebook CORS issues
+    />
+    </div>;
 };
 
 // Ad card component
-const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
-  const { toast } = useToast();
+const AdCard: React.FC<{
+  ad: Ad;
+}> = ({
+  ad
+}) => {
+  const {
+    toast
+  } = useToast();
   const [saved, setSaved] = useState(false);
-  
   const handleSave = async () => {
     try {
       // Get user's default collection or create one if it doesn't exist
-      const { data: user } = await supabase.auth.getUser();
-      
+      const {
+        data: user
+      } = await supabase.auth.getUser();
       if (!user?.user?.id) {
         toast({
           title: "Authentication required",
@@ -136,59 +113,43 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
         });
         return;
       }
-      
-      const { data: collections } = await supabase
-        .from('ad_collections')
-        .select('id')
-        .eq('user_id', user.user.id)
-        .eq('name', 'My Saved Ads')
-        .limit(1);
-        
+      const {
+        data: collections
+      } = await supabase.from('ad_collections').select('id').eq('user_id', user.user.id).eq('name', 'My Saved Ads').limit(1);
       let collectionId: string;
-        
       if (!collections || collections.length === 0) {
         // Create default collection
-        const { data: newCollection } = await supabase
-          .from('ad_collections')
-          .insert({
-            name: 'My Saved Ads',
-            description: 'Default collection for saved ads',
-            user_id: user.user.id,
-            is_public: false
-          })
-          .select()
-          .single();
-          
+        const {
+          data: newCollection
+        } = await supabase.from('ad_collections').insert({
+          name: 'My Saved Ads',
+          description: 'Default collection for saved ads',
+          user_id: user.user.id,
+          is_public: false
+        }).select().single();
         if (!newCollection) throw new Error('Failed to create collection');
         collectionId = newCollection.id;
       } else {
         collectionId = collections[0].id;
       }
-      
       if (saved) {
         // Remove from collection
-        const { error } = await supabase
-          .from('collection_ads')
-          .delete()
-          .eq('ad_id', ad.id)
-          .eq('collection_id', collectionId);
-          
+        const {
+          error
+        } = await supabase.from('collection_ads').delete().eq('ad_id', ad.id).eq('collection_id', collectionId);
         if (error) throw error;
-        
         toast({
           title: "Ad removed from saved",
-          description: "Ad removed from your saved collection",
+          description: "Ad removed from your saved collection"
         });
       } else {
         // Save to collection
         await saveAdToCollection(ad.id, collectionId);
-        
         toast({
           title: "Ad saved to library",
-          description: "You can find this ad in your saved collection",
+          description: "You can find this ad in your saved collection"
         });
       }
-      
       setSaved(!saved);
     } catch (error) {
       console.error('Error saving ad:', error);
@@ -199,11 +160,9 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
       });
     }
   };
-  
   const handleShare = () => {
     // Generate Meta ad URL based on platform and IDs
     let metaAdUrl = '';
-    
     if (ad.original_url) {
       // Use the original URL if available
       metaAdUrl = ad.original_url;
@@ -217,7 +176,7 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
       // Fallback to internal URL
       metaAdUrl = `${window.location.origin}/ads/${ad.ad_id || ad.id}`;
     }
-    
+
     // Try to use the native share API if available
     if (navigator.share) {
       navigator.share({
@@ -234,12 +193,11 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
       copyToClipboard(metaAdUrl);
     }
   };
-  
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       toast({
         title: "Share link copied",
-        description: "Original Meta ad link has been copied to your clipboard",
+        description: "Original Meta ad link has been copied to your clipboard"
       });
     }).catch(err => {
       console.error('Error copying to clipboard:', err);
@@ -250,26 +208,14 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
       });
     });
   };
-  
-  return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+  return <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
       <div className="relative h-64 bg-gray-100">
         <MediaPreview ad={ad} className="h-full" />
         <div className="absolute top-3 right-3 flex space-x-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="bg-white/90 backdrop-blur-sm h-8 w-8"
-            onClick={handleSave}
-          >
+          <Button variant="outline" size="icon" className="bg-white/90 backdrop-blur-sm h-8 w-8" onClick={handleSave}>
             <BookmarkPlus size={16} className={saved ? "text-metamaster-primary" : ""} />
           </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="bg-white/90 backdrop-blur-sm h-8 w-8"
-            onClick={handleShare}
-          >
+          <Button variant="outline" size="icon" className="bg-white/90 backdrop-blur-sm h-8 w-8" onClick={handleShare}>
             <Share size={16} />
           </Button>
         </div>
@@ -299,26 +245,18 @@ const AdCard: React.FC<{ ad: Ad }> = ({ ad }) => {
           <div className="bg-gray-50 p-2 rounded">
             <span className="text-metamaster-gray-500">Impressions</span>
             <p className="font-semibold text-metamaster-gray-800">
-              {ad.estimated_metrics?.impressions_high ? 
-                `${Math.round(ad.estimated_metrics.impressions_low / 1000)}k-${Math.round(ad.estimated_metrics.impressions_high / 1000)}k` : 
-                'Unknown'}
+              {ad.estimated_metrics?.impressions_high ? `${Math.round(ad.estimated_metrics.impressions_low / 1000)}k-${Math.round(ad.estimated_metrics.impressions_high / 1000)}k` : 'Unknown'}
             </p>
           </div>
           <div className="bg-gray-50 p-2 rounded">
             <span className="text-metamaster-gray-500">Engagement</span>
             <p className="font-semibold text-metamaster-gray-800">
-              {ad.engagement ? 
-                `${typeof ad.engagement === 'string' ? ad.engagement : 
-                  (ad.estimated_metrics?.engagement_rate ? 
-                    `${(ad.estimated_metrics.engagement_rate * 100).toFixed(1)}%` : 
-                    'Unknown')}` : 
-                'Unknown'}
+              {ad.engagement ? `${typeof ad.engagement === 'string' ? ad.engagement : ad.estimated_metrics?.engagement_rate ? `${(ad.estimated_metrics.engagement_rate * 100).toFixed(1)}%` : 'Unknown'}` : 'Unknown'}
             </p>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
 
 // Main component
@@ -326,7 +264,9 @@ const AdsLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [filters, setFilters] = useState<Record<string, any>>({});
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(24); // Show 24 ads per page
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -334,11 +274,16 @@ const AdsLibrary: React.FC = () => {
   const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false);
 
   // Query for fetching ads - using correct React Query v5 syntax
-  const { data, isLoading, refetch, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    refetch,
+    isError
+  } = useQuery({
     queryKey: ['ads', searchQuery, filters, page, pageSize],
-    queryFn: () => fetchAds({ 
-      query: searchQuery, 
-      platform: filters['Platform'], 
+    queryFn: () => fetchAds({
+      query: searchQuery,
+      platform: filters['Platform'],
       format: filters['Ad Format'],
       page,
       pageSize
@@ -358,7 +303,6 @@ const AdsLibrary: React.FC = () => {
       }
     }
   });
-  
   const filterOptions = {
     "Platform": ["Facebook", "Instagram", "All"],
     "Niche": ["Fashion", "Fitness", "Real Estate", "E-commerce", "Coaching", "Tech", "Beauty", "All"],
@@ -367,28 +311,26 @@ const AdsLibrary: React.FC = () => {
     "Engagement": ["High (>5%)", "Medium (2-5%)", "Low (<2%)", "All"],
     "Running Time": ["Active", "Inactive", "All"]
   };
-  
   const handleSearch = () => {
     setPage(1); // Reset to first page
     setLoadError(null);
     refetch();
-    
     if (searchQuery.trim()) {
       toast({
         title: "Search initiated",
-        description: "Searching for ads related to '" + searchQuery + "'...",
+        description: "Searching for ads related to '" + searchQuery + "'..."
       });
     }
   };
-  
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter === activeFilter ? null : filter);
   };
-  
   const handleFilterOptionClick = (filter: string, option: string) => {
     if (option === "All") {
       // Remove this filter
-      const newFilters = { ...filters };
+      const newFilters = {
+        ...filters
+      };
       delete newFilters[filter];
       setFilters(newFilters);
     } else {
@@ -398,42 +340,36 @@ const AdsLibrary: React.FC = () => {
         [filter]: option
       });
     }
-    
     setPage(1); // Reset to first page
-    
+
     toast({
       title: `Filter: ${filter} - ${option}`,
-      description: option === "All" ? `Removed ${filter.toLowerCase()} filter` : `Applied filter to show ads by ${option}`,
+      description: option === "All" ? `Removed ${filter.toLowerCase()} filter` : `Applied filter to show ads by ${option}`
     });
-    
     refetch();
   };
-  
   const loadMore = async () => {
-    if (isLoadingMore || (data?.isLastPage)) return;
-    
+    if (isLoadingMore || data?.isLastPage) return;
     setIsLoadingMore(true);
     setPage(page + 1);
     await refetch();
     setIsLoadingMore(false);
   };
-  
+
   // Initial data loading with improved implementation for real Meta ads
   useEffect(() => {
     const loadInitialAds = async () => {
       if (isInitialDataLoaded) return; // Prevent multiple calls
-      
+
       setIsInitialDataLoaded(true);
-      
       try {
         console.log("Starting to populate ad library with real Meta ads");
         // Try to populate ad library on first load
         const result = await populateAdLibrary();
         console.log("Populate result:", result);
-        
         if (result && result.success) {
           refetch();
-          
+
           // Show appropriate toast based on data source
           if (result.source && result.source.includes("Sample")) {
             toast({
@@ -444,7 +380,7 @@ const AdsLibrary: React.FC = () => {
           } else {
             toast({
               title: "Meta Ad Library Loaded",
-              description: `Successfully loaded ${result.ads_count} real ads from Meta Ad Library.`,
+              description: `Successfully loaded ${result.ads_count} real ads from Meta Ad Library.`
             });
           }
         } else {
@@ -461,12 +397,9 @@ const AdsLibrary: React.FC = () => {
         refetch();
       }
     };
-    
     loadInitialAds();
   }, [refetch, toast]);
-  
-  return (
-    <div className="min-h-screen bg-metamaster-gray-100">
+  return <div className="min-h-screen bg-metamaster-gray-100">
       <Sidebar />
       <div className="md:ml-64 pt-8">
         <div className="container mx-auto px-4 pb-12">
@@ -483,130 +416,82 @@ const AdsLibrary: React.FC = () => {
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                   <Search size={18} className="text-metamaster-gray-500" />
                 </div>
-                <Input
-                  type="text"
-                  placeholder="Search for ads (e.g., fitness, ecommerce, coaching)"
-                  className="pl-10 pr-4 py-2 w-full"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
+                <Input type="text" placeholder="Search for ads (e.g., fitness, ecommerce, coaching)" className="pl-10 pr-4 py-2 w-full" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
               </div>
               
               <div className="flex gap-2 flex-wrap">
-                <Button 
-                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
-                  onClick={handleSearch}
-                >
+                <Button onClick={handleSearch} className="bg-metamaster-primary hover:bg-Adking-Primary">
                   <Search size={18} className="mr-2" /> Search
                 </Button>
               </div>
             </div>
             
             <div className="mt-4 flex flex-wrap gap-2">
-              {Object.keys(filterOptions).map((filter) => (
-                <FilterButton 
-                  key={filter}
-                  label={filter}
-                  isActive={activeFilter === filter || filters[filter] !== undefined}
-                  onClick={() => handleFilterClick(filter)}
-                  options={filterOptions[filter as keyof typeof filterOptions]}
-                  onOptionClick={(option) => handleFilterOptionClick(filter, option)}
-                />
-              ))}
+              {Object.keys(filterOptions).map(filter => <FilterButton key={filter} label={filter} isActive={activeFilter === filter || filters[filter] !== undefined} onClick={() => handleFilterClick(filter)} options={filterOptions[filter as keyof typeof filterOptions]} onOptionClick={option => handleFilterOptionClick(filter, option)} />)}
             </div>
           </div>
           
           {/* Loading state */}
-          {isLoading && !data && (
-            <div className="text-center py-12">
+          {isLoading && !data && <div className="text-center py-12">
               <Loader size={48} className="animate-spin text-metamaster-primary mx-auto mb-4" />
               <p className="text-metamaster-gray-600">Loading ads from Meta Ad Library...</p>
-            </div>
-          )}
+            </div>}
           
           {/* Error state */}
-          {loadError && !isLoading && (
-            <div className="bg-white rounded-xl p-6 shadow-md border border-red-100 text-center mb-8">
+          {loadError && !isLoading && <div className="bg-white rounded-xl p-6 shadow-md border border-red-100 text-center mb-8">
               <div className="flex flex-col items-center justify-center">
                 <AlertCircle size={48} className="text-red-500 mb-4" />
                 <h3 className="text-xl font-bold text-metamaster-gray-800 mb-2">Error Loading Ads</h3>
                 <p className="text-metamaster-gray-600 mb-6 max-w-md mx-auto">
                   {loadError}
                 </p>
-                <Button 
-                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
-                  onClick={() => {
-                    setLoadError(null);
-                    refetch();
-                  }}
-                >
+                <Button className="bg-metamaster-primary hover:bg-metamaster-secondary" onClick={() => {
+              setLoadError(null);
+              refetch();
+            }}>
                   Try Again
                 </Button>
               </div>
-            </div>
-          )}
+            </div>}
           
           {/* Ads Grid */}
-          {!isLoading && data?.data && data.data.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {data.data.map((ad) => (
-                <AdCard key={ad.id} ad={ad} />
-              ))}
-            </div>
-          ) : (!isLoading && !loadError) ? (
-            <div className="bg-white rounded-xl p-10 shadow-md border border-gray-100 text-center">
+          {!isLoading && data?.data && data.data.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {data.data.map(ad => <AdCard key={ad.id} ad={ad} />)}
+            </div> : !isLoading && !loadError ? <div className="bg-white rounded-xl p-10 shadow-md border border-gray-100 text-center">
               <div className="flex flex-col items-center justify-center">
                 <AlertCircle size={48} className="text-metamaster-gray-400 mb-4" />
                 <h3 className="text-xl font-bold text-metamaster-gray-800 mb-2">No Ads Found</h3>
                 <p className="text-metamaster-gray-600 mb-6 max-w-md mx-auto">
                   Try different search terms or filtering options to find relevant ads.
                 </p>
-                <Button 
-                  className="bg-metamaster-primary hover:bg-metamaster-secondary"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setFilters({});
-                    refetch();
-                  }}
-                >
+                <Button className="bg-metamaster-primary hover:bg-metamaster-secondary" onClick={() => {
+              setSearchQuery('');
+              setFilters({});
+              refetch();
+            }}>
                   View All Ads
                 </Button>
               </div>
-            </div>
-          ) : null}
+            </div> : null}
           
           {/* Results Found Text */}
-          {data?.data && data.data.length > 0 && !isLoading && (
-            <div className="mt-6 mb-4">
+          {data?.data && data.data.length > 0 && !isLoading && <div className="mt-6 mb-4">
               <p className="text-metamaster-gray-600">
                 Showing {data.data.length} {data.count && data.count > data.data.length ? `of ${data.count}` : ''} real ads from Meta Ad Library
               </p>
-            </div>
-          )}
+            </div>}
           
           {/* Load More Button */}
-          {data?.data && data.data.length > 0 && !isLoading && data.count && data.count > data.data.length && !data.isLastPage && (
-            <div className="mt-8 text-center">
-              <Button 
-                variant="outline" 
-                className="px-8"
-                onClick={loadMore}
-                disabled={isLoadingMore || (data?.isLastPage)}
-              >
-                {isLoadingMore ? (
-                  <>
+          {data?.data && data.data.length > 0 && !isLoading && data.count && data.count > data.data.length && !data.isLastPage && <div className="mt-8 text-center">
+              <Button variant="outline" className="px-8" onClick={loadMore} disabled={isLoadingMore || data?.isLastPage}>
+                {isLoadingMore ? <>
                     <Loader size={16} className="animate-spin mr-2" />
                     Loading...
-                  </>
-                ) : "Load More"}
+                  </> : "Load More"}
               </Button>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AdsLibrary;
