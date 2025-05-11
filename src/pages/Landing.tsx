@@ -33,7 +33,7 @@ const Landing = () => {
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
-          <Button size="lg" onClick={handleGetStarted} className="<div class=\"flex items-center justify-center min-h-screen\">\n  <button class=\"bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300\">\n    Your Button Text\n  </button>\n</div>">
+          <Button className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" size="lg" onClick={handleGetStarted}>
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
@@ -83,7 +83,7 @@ const Landing = () => {
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" onClick={handleGetStarted} className="bg-adking-dark hover:bg-adking-gray-800 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto w-full sm:w-auto shadow-lg text-slate-50 rounded-xl">
+              <Button size="lg" onClick={handleGetStarted} className="font-normal text-slate-50">
                 Start 7-Day Free Trial
               </Button>
               <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto rounded-xl w-full sm:w-auto bg-slate-50 text-adking-primary">
