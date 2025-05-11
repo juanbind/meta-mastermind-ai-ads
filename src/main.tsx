@@ -44,7 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/auth" element={<Auth />} />
 
             {/* Protected Routes */}
-            <Route element={<AuthCheck />}>
+            <Route element={<AuthCheck>Protected routes</AuthCheck>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/funnel-builder" element={<FunnelBuilder />} />
               <Route path="/reports" element={<Reports />} />
