@@ -1,19 +1,14 @@
-
 import React from 'react';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '../ui/card';
-
 export function PricingSection() {
   const navigate = useNavigate();
-
   const handleStartTrial = () => {
     navigate('/auth');
   };
-
-  return (
-    <div className="w-full max-w-6xl mx-auto px-4">
+  return <div className="w-full max-w-6xl mx-auto px-4">
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Starter Plan */}
@@ -29,10 +24,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button 
-              className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-gray-800 text-white border-none"
-              onClick={handleStartTrial}
-            >
+            <Button onClick={handleStartTrial} className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-gray-800 border-none text-slate-50">
               7-Day Free Trial <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
@@ -78,10 +70,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button 
-              className="w-full py-6 text-lg font-medium rounded-xl bg-adking-primary hover:bg-adking-secondary text-adking-dark border-none"
-              onClick={handleStartTrial}
-            >
+            <Button className="w-full py-6 text-lg font-medium rounded-xl bg-adking-primary hover:bg-adking-secondary text-adking-dark border-none" onClick={handleStartTrial}>
               7-Day Free Trial <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
@@ -124,10 +113,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button 
-              className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-gray-800 text-white border-none"
-              onClick={() => navigate('/contact')}
-            >
+            <Button onClick={() => navigate('/contact')} className="w-full py-6 text-lg font-medium rounded-xl border-none text-slate-50 bg-neutral-950 hover:bg-neutral-800">
               Book Demo <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
@@ -176,6 +162,5 @@ export function PricingSection() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
