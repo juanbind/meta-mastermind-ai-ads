@@ -95,18 +95,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       effectiveVariant = 'gradient';
     }
     
-    // Enhanced button class with text color protection
+    // Enhanced button class with guaranteed text contrast
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
-      // Ensure text is visible by adding text color based on background
-      variant === 'gradient' && '!text-adking-dark',
-      selected && variant !== 'gradient' && "bg-gradient-to-r from-adking-primary to-adking-secondary !text-adking-dark font-bold shadow-md border border-amber-400 z-10",
-      // Ensure white text on colored backgrounds
-      (variant === 'default' || variant === 'destructive') && '!text-white',
-      // Ensure dark text on light backgrounds
-      variant === 'outline' && '!text-adking-gray-800',
-      // Secondary button text color
-      variant === 'secondary' && '!text-adking-dark'
+      // Ensure proper text contrast for each variant
+      {
+        // Always dark text on gradient/yellow backgrounds
+        '!text-adking-dark': variant === 'gradient' || 
+                             selected || 
+                             className?.includes('bg-metamaster-primary') || 
+                             className?.includes('bg-adking-primary'),
+        
+        // Always white text on dark backgrounds
+        '!text-white': variant === 'default' || variant === 'destructive',
+        
+        // Dark text on light backgrounds
+        '!text-adking-gray-800': variant === 'outline' || variant === 'ghost',
+        
+        // Secondary button text color
+        '!text-adking-dark': variant === 'secondary',
+      },
+      // Additional styling for selected state
+      selected && "bg-gradient-to-r from-adking-primary to-adking-secondary font-bold shadow-md border border-amber-400 z-10"
     )
     
     return (

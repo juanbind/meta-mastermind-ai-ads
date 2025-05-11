@@ -7,45 +7,65 @@ import { Input } from '@/components/ui/input';
 import { fetchAds, saveAdToCollection, populateAdLibrary, Ad } from '@/lib/ads';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-// Filter button component
+// Filter button component - improved with proper dropdown display
 const FilterButton: React.FC<{
   label: string;
   isActive: boolean;
   onClick: () => void;
   options?: string[];
   onOptionClick?: (option: string) => void;
+  selectedOption?: string;
 }> = ({
   label,
   isActive,
   onClick,
   options,
-  onOptionClick
+  onOptionClick,
+  selectedOption
 }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const handleClick = () => {
-    onClick();
-    if (!options?.length) {
-      setShowDropdown(false);
-    } else {
-      setShowDropdown(!showDropdown);
-    }
-  };
-  return <div className="relative">
-      <Button variant={isActive ? "default" : "outline"} size="sm" className={`flex items-center ${isActive ? 'bg-metamaster-primary' : ''}`} onClick={handleClick}>
-        {label}
-        <ChevronDown size={16} className="ml-2" />
-      </Button>
-      
-      {showDropdown && options && <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md border border-gray-100 z-10 min-w-[150px]">
-          {options.map(option => <button key={option} className="block w-full text-left px-4 py-2 hover:bg-gray-50 text-adking-gray-800 text-sm" onClick={() => {
-        onOptionClick?.(option);
-        setShowDropdown(false);
-      }}>
+  // Use shadcn/ui's DropdownMenu instead of custom dropdown implementation
+  if (options?.length) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant={isActive ? "default" : "outline"} 
+            size="sm" 
+            className={`flex items-center justify-between gap-2 ${isActive ? 'bg-metamaster-primary text-adking-dark' : ''}`}
+          >
+            {/* Show selected option label if available */}
+            {isActive && selectedOption ? `${label}: ${selectedOption}` : label}
+            <ChevronDown size={16} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-[200px]">
+          {options.map(option => (
+            <DropdownMenuItem 
+              key={option} 
+              onClick={() => onOptionClick?.(option)}
+              className={`${selectedOption === option ? 'bg-gray-100 font-medium' : ''}`}
+            >
               {option}
-            </button>)}
-        </div>}
-    </div>;
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+  
+  // For buttons without dropdown options
+  return (
+    <Button 
+      variant={isActive ? "default" : "outline"} 
+      size="sm" 
+      className={`flex items-center ${isActive ? 'bg-metamaster-primary text-adking-dark' : ''}`} 
+      onClick={onClick}
+    >
+      {label}
+    </Button>
+  );
 };
 
 // Media preview component to handle different media types with better error handling
@@ -416,18 +436,35 @@ const AdsLibrary: React.FC = () => {
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                   <Search size={18} className="text-metamaster-gray-500" />
                 </div>
-                <Input type="text" placeholder="Search for ads (e.g., fitness, ecommerce, coaching)" className="pl-10 pr-4 py-2 w-full" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
+                <Input 
+                  type="text" 
+                  placeholder="Search for ads (e.g., fitness, ecommerce, coaching)" 
+                  className="pl-10 pr-4 py-2 w-full" 
+                  value={searchQuery} 
+                  onChange={e => setSearchQuery(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && handleSearch()} 
+                />
               </div>
               
               <div className="flex gap-2 flex-wrap">
-                <Button onClick={handleSearch} className="bg-metamaster-primary hover:bg-Adking-Primary bg-adking-primary">
+                <Button onClick={handleSearch} className="bg-metamaster-primary hover:bg-Adking-Primary bg-adking-primary text-adking-dark">
                   <Search size={18} className="mr-2" /> Search
                 </Button>
               </div>
             </div>
             
             <div className="mt-4 flex flex-wrap gap-2">
-              {Object.keys(filterOptions).map(filter => <FilterButton key={filter} label={filter} isActive={activeFilter === filter || filters[filter] !== undefined} onClick={() => handleFilterClick(filter)} options={filterOptions[filter as keyof typeof filterOptions]} onOptionClick={option => handleFilterOptionClick(filter, option)} />)}
+              {Object.keys(filterOptions).map(filter => (
+                <FilterButton 
+                  key={filter} 
+                  label={filter} 
+                  isActive={filters[filter] !== undefined} 
+                  onClick={() => handleFilterClick(filter)} 
+                  options={filterOptions[filter as keyof typeof filterOptions]} 
+                  onOptionClick={option => handleFilterOptionClick(filter, option)}
+                  selectedOption={filters[filter]}
+                />
+              ))}
             </div>
           </div>
           
