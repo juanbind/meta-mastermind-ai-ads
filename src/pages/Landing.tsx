@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -8,13 +9,16 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
+
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
+  
   const handleGetStarted = () => {
     navigate('/auth');
   };
+  
   return <div className="min-h-screen bg-white relative">
       {/* Background grid pattern - mimicking the reference design */}
       <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
@@ -33,7 +37,7 @@ const Landing = () => {
             Never pay for a Marketing agency, CRM, or Media Buyer again! We are used by Top Ad Agencies and Businesses running Meta Ad's to Maximize Your Ad Spend and ROI!
           </p>
           
-          <Button className="bg-adking-primary hover:bg-adking-secondary text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" size="lg" onClick={handleGetStarted}>
+          <Button className="bg-adking-primary hover:bg-adking-secondary !text-adking-dark font-medium text-lg px-6 py-4 md:px-8 md:py-5 rounded-xl h-auto w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300" size="lg" onClick={handleGetStarted}>
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
@@ -61,7 +65,7 @@ const Landing = () => {
         <section className="py-16 md:py-24 px-4 bg-white relative border-b border-adking-gray-200">
           <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">Try AdKing FREE for 7 Days </h2>
+            <h2 className="text-3xl font-bold mb-3 md:mb-4 text-adking-dark md:text-5xl">Try AdKing FREE for 7 Days </h2>
             <p className="text-lg text-adking-gray-700 max-w-2xl mx-auto">No credit card required – cancel anytime</p>
           </div>
           <PricingSection />
@@ -83,10 +87,10 @@ const Landing = () => {
               Join thousands of advertisers who are discovering winning ads, creating better campaigns, and scaling their businesses with AdKing.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" onClick={handleGetStarted} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto w-full sm:w-auto rounded-xl bg-adking-dark text-slate-50">
+              <Button size="lg" onClick={handleGetStarted} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto w-full sm:w-auto rounded-xl bg-adking-dark !text-white">
                 Start 7-Day Free Trial
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto text-adking-dark w-full sm:w-auto rounded-xl bg-slate-50">
+              <Button variant="outline" size="lg" onClick={() => navigate('/auth')} className="border-2 border-adking-dark/20 text-base md:text-lg px-6 py-4 md:px-8 md:py-5 h-auto !text-adking-dark w-full sm:w-auto rounded-xl bg-slate-50">
                 Schedule a Demo
               </Button>
             </div>
@@ -98,4 +102,5 @@ const Landing = () => {
       <Footer />
     </div>;
 };
+
 export default Landing;

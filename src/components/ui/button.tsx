@@ -97,9 +97,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
-      // Default unselected state with visible text (removed navy text color)
-      !selected && variant !== 'gradient' && "text-adking-gray-700",
-      // Enhanced styling for selected buttons
+      // Removed the default text color to allow className to override
       selected && variant !== 'gradient' && "bg-gradient-to-r from-adking-primary to-adking-secondary text-white font-bold shadow-md border border-amber-400 z-10"
     )
     

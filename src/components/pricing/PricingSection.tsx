@@ -27,7 +27,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button onClick={handleStartTrial} className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-dark/90 text-white">
+            <Button onClick={handleStartTrial} className="w-full py-6 text-lg font-medium rounded-xl bg-adking-dark hover:bg-adking-dark/90 !text-white">
               7-Day Free Trial <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
@@ -73,7 +73,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button className="w-full py-6 text-lg font-medium rounded-xl bg-adking-primary hover:bg-adking-secondary text-adking-dark border-none" onClick={handleStartTrial}>
+            <Button className="w-full py-6 text-lg font-medium rounded-xl bg-adking-primary hover:bg-adking-secondary !text-adking-dark border-none" onClick={handleStartTrial}>
               7-Day Free Trial <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
@@ -116,7 +116,7 @@ export function PricingSection() {
           </CardHeader>
           
           <CardContent className="pt-4">
-            <Button onClick={() => navigate('/contact')} className="w-full py-6 text-lg font-medium rounded-xl border-none text-white bg-neutral-950 hover:bg-neutral-800">
+            <Button onClick={() => navigate('/contact')} className="w-full py-6 text-lg font-medium rounded-xl border-none !text-white bg-neutral-950 hover:bg-neutral-800">
               Book Demo <ArrowRight className="ml-1 h-5 w-5" />
             </Button>
 
