@@ -49,6 +49,7 @@ export interface ButtonProps
   loading?: boolean
   startIcon?: React.ReactNode
   endIcon?: React.ReactNode
+  selected?: boolean // Added the selected property to fix the TypeScript error
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -61,7 +62,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     loading = false, 
     startIcon, 
     endIcon, 
-    disabled, 
+    disabled,
+    selected, // Make sure to destructure the selected prop
     children, 
     ...props 
   }, ref) => {
@@ -91,7 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant, size, state, className }),
       // Ensure selected/active state maintains visibility with gradient background if needed
-      props.selected && variant !== "gradient" ? "bg-gradient-to-r from-adking-primary to-adking-secondary text-white" : ""
+      selected && variant !== "gradient" ? "bg-gradient-to-r from-adking-primary to-adking-secondary text-white" : ""
     )
     
     return (
