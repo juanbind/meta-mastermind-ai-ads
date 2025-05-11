@@ -57,7 +57,7 @@ Format your response as a JSON object with this structure:
 }`;
 
     const completion = await openai.createChatCompletion({
-      model: "gpt-4", // Use GPT-4 for high quality
+      model: "gpt-4o-mini", // Updated to use an available model
       messages: [
         { role: "system", content: "You are an expert advertising copywriter who specializes in creating high-converting ad copy for various platforms." },
         { role: "user", content: prompt }
