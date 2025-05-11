@@ -37,8 +37,8 @@ const Toggle = React.forwardRef<
     ref={ref}
     className={cn(
       toggleVariants({ variant, size, className }),
-      // Ensure text is always visible regardless of state
-      "text-adking-gray-800",
+      // Default state with visible text (removed text-adking-gray-800)
+      "text-adking-gray-700",
       // Enhanced selected state with high visibility
       "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-white data-[state=on]:border-none data-[state=on]:font-bold data-[state=on]:shadow-md"
     )}
