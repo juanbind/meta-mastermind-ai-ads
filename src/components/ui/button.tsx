@@ -19,7 +19,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary hover:opacity-90 text-white",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary !text-adking-dark hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -95,10 +95,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       effectiveVariant = 'gradient';
     }
     
+    // Enhanced button class with text color protection
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
-      // Removed the default text color to allow className to override
-      selected && variant !== 'gradient' && "bg-gradient-to-r from-adking-primary to-adking-secondary text-white font-bold shadow-md border border-amber-400 z-10"
+      // Ensure text is visible by adding text color based on background
+      variant === 'gradient' && '!text-adking-dark',
+      selected && variant !== 'gradient' && "bg-gradient-to-r from-adking-primary to-adking-secondary !text-adking-dark font-bold shadow-md border border-amber-400 z-10",
+      // Ensure white text on colored backgrounds
+      (variant === 'default' || variant === 'destructive') && '!text-white',
+      // Ensure dark text on light backgrounds
+      variant === 'outline' && '!text-adking-gray-800',
+      // Secondary button text color
+      variant === 'secondary' && '!text-adking-dark'
     )
     
     return (
