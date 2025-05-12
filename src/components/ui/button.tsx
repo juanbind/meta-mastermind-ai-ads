@@ -96,8 +96,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
       
-      // Selected state with clear visual indicator - always on top of other styles
-      selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
+      // Selected state with yellow gradient background
+      selected && "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark font-semibold shadow-md border border-amber-400 z-10",
       
       // Disabled state with visible but muted appearance
       isDisabled && "opacity-50 bg-gray-200 text-gray-500 border border-gray-300 pointer-events-none",
