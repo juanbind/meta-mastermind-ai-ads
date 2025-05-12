@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-// Filter button component - improved with proper dropdown display
+// Filter button component - improved with proper yellow gradient for selected state
 const FilterButton: React.FC<{
   label: string;
   isActive: boolean;
@@ -31,9 +31,10 @@ const FilterButton: React.FC<{
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
-            variant={isActive ? "default" : "outline"} 
+            variant={isActive ? "gradient" : "outline"} 
             size="sm" 
-            className={`flex items-center justify-between gap-2 ${isActive ? 'bg-metamaster-primary text-adking-dark' : ''}`}
+            className="flex items-center justify-between gap-2"
+            selected={isActive}
           >
             {/* Show selected option label if available */}
             {isActive && selectedOption ? `${label}: ${selectedOption}` : label}
@@ -55,12 +56,13 @@ const FilterButton: React.FC<{
     );
   }
   
-  // For buttons without dropdown options
+  // For buttons without dropdown options - use selected prop and gradient variant when active
   return (
     <Button 
-      variant={isActive ? "default" : "outline"} 
-      size="sm" 
-      className={`flex items-center ${isActive ? 'bg-metamaster-primary text-adking-dark' : ''}`} 
+      variant={isActive ? "gradient" : "outline"} 
+      size="sm"
+      selected={isActive}
+      className="flex items-center"
       onClick={onClick}
     >
       {label}
@@ -447,7 +449,11 @@ const AdsLibrary: React.FC = () => {
               </div>
               
               <div className="flex gap-2 flex-wrap">
-                <Button onClick={handleSearch} className="bg-metamaster-primary hover:bg-Adking-Primary bg-adking-primary text-adking-dark">
+                <Button 
+                  onClick={handleSearch} 
+                  variant="gradient"
+                  className="text-adking-dark"
+                >
                   <Search size={18} className="mr-2" /> Search
                 </Button>
               </div>

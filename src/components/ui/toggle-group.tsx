@@ -50,7 +50,7 @@ const ToggleGroupItem = React.forwardRef<
         // Default state with proper contrast
         "bg-white text-gray-700 border border-gray-200",
         
-        // Enhanced selected state with high contrast
+        // Enhanced selected state with yellow gradient
         "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-adking-dark data-[state=on]:font-semibold data-[state=on]:shadow-md data-[state=on]:border-amber-400 data-[state=on]:z-10",
         
         // Hover state with clear distinction and proper contrast
