@@ -89,7 +89,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return startIcon
     }
     
-    // Always use gradient variant for selected buttons to ensure visibility
+    // Use gradient variant for selected buttons to ensure visibility
     let effectiveVariant = variant;
     if (selected && variant !== 'gradient') {
       effectiveVariant = 'gradient';
@@ -99,45 +99,71 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
       
-      // Text coloring based on variant to ensure proper contrast
+      // Default text coloring based on variant to ensure proper contrast
       {
-        // Dark text for gradient backgrounds (yellow/gold gradients)
-        "!text-adking-dark": 
+        // Dark text for light backgrounds (like white, yellow, gold)
+        "text-adking-gray-800": 
+          effectiveVariant === 'outline' || 
+          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'secondary',
+          
+        // Dark text for gradient variants (yellow/gold gradients)
+        "text-adking-dark font-medium": 
           effectiveVariant === 'gradient' || 
           selected ||
           className?.includes('bg-metamaster-primary') || 
           className?.includes('bg-adking-primary'),
-        
+          
         // White text for dark backgrounds
-        "!text-white": 
+        "text-white": 
           effectiveVariant === 'default' || 
           effectiveVariant === 'destructive',
-          
-        // Dark grey text for outline/ghost/secondary variants
-        "!text-adking-gray-800": 
-          (effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost' || 
-          effectiveVariant === 'secondary') && 
-          !selected,
       },
       
       // Explicit background colors for better visibility
       {
-        "bg-white": 
-          effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost'
+        "bg-white": effectiveVariant === 'outline' || effectiveVariant === 'ghost'
       },
       
-      // Additional styling for selected state - ensuring visibility with high contrast border
+      // Hover states with guaranteed contrast
+      {
+        "hover:bg-gray-100 hover:text-adking-dark": 
+          effectiveVariant === 'outline' || 
+          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'secondary',
+        
+        "hover:text-white": effectiveVariant === 'default' || effectiveVariant === 'destructive',
+        
+        "hover:text-adking-dark hover:font-medium": effectiveVariant === 'gradient'
+      },
+      
+      // Additional styling for selected state with high contrast
       selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
       
-      // Ensure hover states maintain proper text contrast
-      "hover:!text-adking-dark hover:font-medium",
-      (effectiveVariant === 'default' || effectiveVariant === 'destructive') && "hover:!text-white",
+      // Focus states with guaranteed contrast
+      {
+        "focus-visible:bg-gray-200 focus-visible:text-adking-dark": 
+          effectiveVariant === 'outline' || 
+          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'secondary',
+        
+        "focus-visible:text-white": 
+          effectiveVariant === 'default' || 
+          effectiveVariant === 'destructive',
+      },
       
-      // Focus states
-      "focus-visible:!text-adking-dark focus-visible:font-medium",
-      (effectiveVariant === 'default' || effectiveVariant === 'destructive') && "focus-visible:!text-white"
+      // Active states with guaranteed contrast
+      {
+        "active:bg-gray-300 active:text-adking-dark": 
+          effectiveVariant === 'outline' || 
+          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'secondary',
+        
+        "active:text-white": effectiveVariant === 'default' || effectiveVariant === 'destructive',
+      },
+      
+      // Disabled state with visible but muted appearance
+      isDisabled && "opacity-50 bg-gray-100 text-gray-500 pointer-events-none",
     )
     
     return (

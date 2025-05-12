@@ -19,8 +19,8 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-10 w-full items-center justify-between rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-      "!text-adking-gray-800 hover:!bg-gray-50 focus:!border-adking-primary",
-      "data-[state=open]:!border-adking-primary data-[state=open]:!bg-gray-50",
+      "text-adking-gray-800 hover:bg-gray-50 focus:border-adking-primary",
+      "data-[state=open]:border-adking-primary data-[state=open]:bg-gray-50",
       className
     )}
     {...props}
@@ -69,7 +69,7 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold !text-adking-gray-800", className)}
+    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold text-adking-gray-800", className)}
     {...props}
   />
 ))
@@ -83,9 +83,9 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      "!text-adking-gray-800 hover:!bg-gray-100 hover:!text-adking-dark focus:!bg-gray-100 focus:!text-adking-dark",
-      "data-[highlighted]:!bg-gray-200 data-[highlighted]:!text-adking-dark",
-      "data-[state=checked]:!bg-gray-200 data-[state=checked]:!text-adking-dark",
+      "text-adking-gray-800 hover:bg-gray-100 hover:text-adking-dark focus:bg-gray-100 focus:text-adking-dark",
+      "data-[highlighted]:bg-gray-200 data-[highlighted]:text-adking-dark",
+      "data-[state=checked]:bg-gray-200 data-[state=checked]:text-adking-dark",
       className
     )}
     {...props}
