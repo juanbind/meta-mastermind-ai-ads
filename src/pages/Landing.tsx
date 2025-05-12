@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -9,16 +8,13 @@ import FAQ from '@/components/FAQ';
 import { FeatureSection } from '@/components/features/FeatureSection';
 import { PricingSection } from '@/components/pricing/PricingSection';
 import { useScrollAnimation, useScrollReveal } from '@/hooks/useScrollAnimation';
-
 const Landing = () => {
   const heroRef = useScrollAnimation();
   const revealRef = useScrollReveal();
   const navigate = useNavigate();
-  
   const handleGetStarted = () => {
     navigate('/auth');
   };
-  
   return <div className="min-h-screen bg-white relative">
       {/* Background grid pattern - mimicking the reference design */}
       <div className="absolute inset-0 bg-grid-pattern bg-[size:30px_30px] opacity-[0.03] pointer-events-none"></div>
@@ -27,9 +23,7 @@ const Landing = () => {
       <main className="pt-20 md:pt-32">
         {/* Hero Section */}
         <div ref={heroRef} className="container mx-auto text-center max-w-4xl mb-12 md:mb-20 px-4 animate-on-scroll relative">
-          <div className="inline-block px-4 py-1 text-adking-dark rounded-full mb-6 font-medium bg-yellow-300">
-            AdKing AI Now Live!
-          </div>
+          <div className="inline-block px-4 py-1 text-adking-dark rounded-full mb-6 font-medium bg-yellow-300">AdKing AI In Development!</div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 text-adking-dark">Run Meta Ad's In Seconds</h1>
           
@@ -50,7 +44,7 @@ const Landing = () => {
                 </div>
               </div>
               <p className="text-xl font-semibold text-adking-dark mb-2">VSL Video Coming Soon</p>
-              <p className="text-adking-gray-700">This space is reserved for your VSL video</p>
+              <p className="text-adking-gray-700">space reserved for  VSL</p>
             </div>
           </div>
         </div>
@@ -102,5 +96,4 @@ const Landing = () => {
       <Footer />
     </div>;
 };
-
 export default Landing;
