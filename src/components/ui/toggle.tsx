@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -37,14 +37,19 @@ const Toggle = React.forwardRef<
     ref={ref}
     className={cn(
       toggleVariants({ variant, size, className }),
-      // Default state with improved visibility
-      "bg-white text-adking-gray-700 border border-gray-200",
-      // Enhanced selected state with guaranteed text contrast
-      "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-adking-dark data-[state=on]:font-bold data-[state=on]:shadow-md data-[state=on]:border-amber-400",
-      // Ensure hover states have clear visual distinction with proper text contrast
-      "hover:bg-gray-100 hover:text-adking-dark hover:border-gray-300",
+      
+      // Default state with clear contrast
+      "bg-white text-gray-700 border border-gray-200",
+      
+      // Enhanced selected state with high contrast
+      "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-adking-dark data-[state=on]:font-semibold data-[state=on]:shadow-md data-[state=on]:border-amber-400",
+      
+      // Hover state with clear distinction and proper contrast
+      "hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300",
+      
       // Focus state styling for accessibility
-      "focus-visible:bg-gray-100 focus-visible:text-adking-dark focus-visible:border-adking-primary",
+      "focus-visible:bg-gray-100 focus-visible:text-gray-900 focus-visible:border-adking-primary",
+      
       className
     )}
     {...props}

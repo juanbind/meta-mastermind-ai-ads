@@ -46,14 +46,19 @@ const ToggleGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
-        // Default state with improved visibility
-        "bg-white text-adking-gray-700 border border-gray-200",
-        // Enhanced selected state with guaranteed text contrast
-        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-adking-dark data-[state=on]:font-bold data-[state=on]:shadow-md data-[state=on]:border-amber-400 data-[state=on]:z-10",
-        // Ensure hover states have clear visual distinction with proper text contrast
-        "hover:bg-gray-100 hover:text-adking-dark hover:border-gray-300",
-        // Focus state styling for accessibility
-        "focus-visible:bg-gray-100 focus-visible:text-adking-dark focus-visible:border-adking-primary",
+        
+        // Default state with proper contrast
+        "bg-white text-gray-700 border border-gray-200",
+        
+        // Enhanced selected state with high contrast
+        "data-[state=on]:bg-gradient-to-r data-[state=on]:from-adking-primary data-[state=on]:to-adking-secondary data-[state=on]:text-adking-dark data-[state=on]:font-semibold data-[state=on]:shadow-md data-[state=on]:border-amber-400 data-[state=on]:z-10",
+        
+        // Hover state with clear distinction and proper contrast
+        "hover:bg-gray-100 hover:text-gray-900 hover:border-gray-300",
+        
+        // Focus state for accessibility
+        "focus-visible:bg-gray-100 focus-visible:text-gray-900 focus-visible:border-adking-primary",
+        
         className
       )}
       {...props}

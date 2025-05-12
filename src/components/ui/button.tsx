@@ -10,14 +10,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-white hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default: "bg-primary text-white hover:bg-primary/90 hover:text-white",
+        destructive: "bg-destructive text-white hover:bg-destructive/90 hover:text-white",
+        outline: "border border-input bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "bg-transparent text-gray-800 hover:bg-gray-100 hover:text-gray-900",
         link: "text-primary underline-offset-4 hover:underline",
         gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark hover:opacity-90",
       },
@@ -89,7 +86,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return startIcon
     }
     
-    // Use gradient variant for selected buttons to ensure visibility
+    // Determine effective variant based on selected state
     let effectiveVariant = variant;
     if (selected && variant !== 'gradient') {
       effectiveVariant = 'gradient';
@@ -99,71 +96,86 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
       
-      // Default text coloring based on variant to ensure proper contrast
+      // Base text colors for each variant
       {
-        // Dark text for light backgrounds (like white, yellow, gold)
-        "text-adking-gray-800": 
+        // Dark text on light backgrounds
+        "text-gray-800": 
           effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost' || 
-          effectiveVariant === 'secondary',
+          effectiveVariant === 'ghost',
           
-        // Dark text for gradient variants (yellow/gold gradients)
+        // Dark text for gradient variants
         "text-adking-dark font-medium": 
-          effectiveVariant === 'gradient' || 
-          selected ||
-          className?.includes('bg-metamaster-primary') || 
-          className?.includes('bg-adking-primary'),
+          effectiveVariant === 'gradient' || selected,
           
-        // White text for dark backgrounds
+        // White text on dark backgrounds  
         "text-white": 
           effectiveVariant === 'default' || 
-          effectiveVariant === 'destructive',
-      },
-      
-      // Explicit background colors for better visibility
-      {
-        "bg-white": effectiveVariant === 'outline' || effectiveVariant === 'ghost'
+          effectiveVariant === 'destructive' ||
+          effectiveVariant === 'secondary',
       },
       
       // Hover states with guaranteed contrast
       {
-        "hover:bg-gray-100 hover:text-adking-dark": 
+        "hover:bg-gray-100 hover:text-gray-900": 
           effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'ghost',
+          
+        "hover:bg-primary/80 hover:text-white": 
+          effectiveVariant === 'default',
+          
+        "hover:bg-destructive/80 hover:text-white": 
+          effectiveVariant === 'destructive',
+          
+        "hover:bg-secondary/80 hover:text-white": 
           effectiveVariant === 'secondary',
-        
-        "hover:text-white": effectiveVariant === 'default' || effectiveVariant === 'destructive',
-        
-        "hover:text-adking-dark hover:font-medium": effectiveVariant === 'gradient'
+          
+        "hover:opacity-90 hover:text-adking-dark": 
+          effectiveVariant === 'gradient',
       },
-      
-      // Additional styling for selected state with high contrast
-      selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
       
       // Focus states with guaranteed contrast
       {
-        "focus-visible:bg-gray-200 focus-visible:text-adking-dark": 
+        "focus:bg-gray-200 focus:text-gray-900": 
           effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost' || 
-          effectiveVariant === 'secondary',
-        
-        "focus-visible:text-white": 
-          effectiveVariant === 'default' || 
+          effectiveVariant === 'ghost',
+          
+        "focus:bg-primary/70 focus:text-white": 
+          effectiveVariant === 'default',
+          
+        "focus:bg-destructive/70 focus:text-white": 
           effectiveVariant === 'destructive',
+          
+        "focus:bg-secondary/70 focus:text-white": 
+          effectiveVariant === 'secondary',
+          
+        "focus:opacity-85 focus:text-adking-dark": 
+          effectiveVariant === 'gradient',
       },
       
       // Active states with guaranteed contrast
       {
-        "active:bg-gray-300 active:text-adking-dark": 
+        "active:bg-gray-300 active:text-gray-900": 
           effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost' || 
+          effectiveVariant === 'ghost',
+          
+        "active:bg-primary/60 active:text-white": 
+          effectiveVariant === 'default',
+          
+        "active:bg-destructive/60 active:text-white": 
+          effectiveVariant === 'destructive',
+          
+        "active:bg-secondary/60 active:text-white": 
           effectiveVariant === 'secondary',
-        
-        "active:text-white": effectiveVariant === 'default' || effectiveVariant === 'destructive',
+          
+        "active:opacity-80 active:text-adking-dark": 
+          effectiveVariant === 'gradient',
       },
       
+      // Selected state with visible indicator
+      selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
+      
       // Disabled state with visible but muted appearance
-      isDisabled && "opacity-50 bg-gray-100 text-gray-500 pointer-events-none",
+      isDisabled && "opacity-50 bg-gray-200 text-gray-500 border border-gray-300 pointer-events-none",
     )
     
     return (
