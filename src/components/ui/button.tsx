@@ -10,13 +10,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-white hover:bg-primary/90 hover:text-white",
-        destructive: "bg-destructive text-white hover:bg-destructive/90 hover:text-white",
-        outline: "border border-input bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-transparent text-gray-800 hover:bg-gray-100 hover:text-gray-900",
-        link: "text-primary underline-offset-4 hover:underline",
-        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark hover:opacity-90",
+        default: "bg-primary text-white hover:bg-primary/90 hover:text-white focus:bg-primary/80 active:bg-primary/70",
+        destructive: "bg-destructive text-white hover:bg-destructive/90 hover:text-white focus:bg-destructive/80 active:bg-destructive/70",
+        outline: "border border-input bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 active:bg-gray-200",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground focus:bg-secondary/70 active:bg-secondary/60",
+        ghost: "bg-transparent text-gray-800 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 active:bg-gray-200",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary/90 focus:text-primary/80 active:text-primary/70",
+        gradient: "bg-gradient-to-r from-adking-primary to-adking-secondary text-adking-dark hover:opacity-90 focus:opacity-85 active:opacity-80",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -96,82 +96,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonClass = cn(
       buttonVariants({ variant: effectiveVariant, size, state, className }),
       
-      // Base text colors for each variant
-      {
-        // Dark text on light backgrounds
-        "text-gray-800": 
-          effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost',
-          
-        // Dark text for gradient variants
-        "text-adking-dark font-medium": 
-          effectiveVariant === 'gradient' || selected,
-          
-        // White text on dark backgrounds  
-        "text-white": 
-          effectiveVariant === 'default' || 
-          effectiveVariant === 'destructive' ||
-          effectiveVariant === 'secondary',
-      },
-      
-      // Hover states with guaranteed contrast
-      {
-        "hover:bg-gray-100 hover:text-gray-900": 
-          effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost',
-          
-        "hover:bg-primary/80 hover:text-white": 
-          effectiveVariant === 'default',
-          
-        "hover:bg-destructive/80 hover:text-white": 
-          effectiveVariant === 'destructive',
-          
-        "hover:bg-secondary/80 hover:text-white": 
-          effectiveVariant === 'secondary',
-          
-        "hover:opacity-90 hover:text-adking-dark": 
-          effectiveVariant === 'gradient',
-      },
-      
-      // Focus states with guaranteed contrast
-      {
-        "focus:bg-gray-200 focus:text-gray-900": 
-          effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost',
-          
-        "focus:bg-primary/70 focus:text-white": 
-          effectiveVariant === 'default',
-          
-        "focus:bg-destructive/70 focus:text-white": 
-          effectiveVariant === 'destructive',
-          
-        "focus:bg-secondary/70 focus:text-white": 
-          effectiveVariant === 'secondary',
-          
-        "focus:opacity-85 focus:text-adking-dark": 
-          effectiveVariant === 'gradient',
-      },
-      
-      // Active states with guaranteed contrast
-      {
-        "active:bg-gray-300 active:text-gray-900": 
-          effectiveVariant === 'outline' || 
-          effectiveVariant === 'ghost',
-          
-        "active:bg-primary/60 active:text-white": 
-          effectiveVariant === 'default',
-          
-        "active:bg-destructive/60 active:text-white": 
-          effectiveVariant === 'destructive',
-          
-        "active:bg-secondary/60 active:text-white": 
-          effectiveVariant === 'secondary',
-          
-        "active:opacity-80 active:text-adking-dark": 
-          effectiveVariant === 'gradient',
-      },
-      
-      // Selected state with visible indicator
+      // Selected state with clear visual indicator - always on top of other styles
       selected && "font-bold shadow-md border-2 border-amber-500 dark:border-amber-400 z-10",
       
       // Disabled state with visible but muted appearance
