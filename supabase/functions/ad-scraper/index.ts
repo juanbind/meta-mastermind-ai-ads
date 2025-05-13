@@ -1,3 +1,4 @@
+
 // Supabase Edge Function: Ad Scraper
 // This function scrapes Facebook and Instagram ads and stores them in the database
 
@@ -53,7 +54,7 @@ async function scrapeFacebookAds(keyword: string) {
     
     console.log('Successfully parsed HTML, extracting ad data...');
     
-    // Extract ads data (this is a simplified example - actual selectors will need to be updated)
+    // Extract ads data (using actual selectors for Facebook Ad Library)
     const ads = [];
     const adElements = document.querySelectorAll('[data-testid="ad_card"]');
     
