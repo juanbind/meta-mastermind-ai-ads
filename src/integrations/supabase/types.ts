@@ -211,6 +211,8 @@ export type Database = {
           page_id: string | null
           page_name: string | null
           platform: string
+          scraper_keyword: string | null
+          snapshot_url: string | null
           start_date: string | null
           targeting: Json | null
           title: string | null
@@ -244,6 +246,8 @@ export type Database = {
           page_id?: string | null
           page_name?: string | null
           platform: string
+          scraper_keyword?: string | null
+          snapshot_url?: string | null
           start_date?: string | null
           targeting?: Json | null
           title?: string | null
@@ -277,6 +281,8 @@ export type Database = {
           page_id?: string | null
           page_name?: string | null
           platform?: string
+          scraper_keyword?: string | null
+          snapshot_url?: string | null
           start_date?: string | null
           targeting?: Json | null
           title?: string | null
@@ -813,6 +819,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scraper_jobs: {
+        Row: {
+          completed_at: string | null
+          errors: Json | null
+          id: string
+          job_type: string
+          keywords: string[] | null
+          results: Json | null
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          errors?: Json | null
+          id?: string
+          job_type: string
+          keywords?: string[] | null
+          results?: Json | null
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          errors?: Json | null
+          id?: string
+          job_type?: string
+          keywords?: string[] | null
+          results?: Json | null
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
       }
       tasks: {
         Row: {

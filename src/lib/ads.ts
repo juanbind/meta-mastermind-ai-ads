@@ -1,3 +1,4 @@
+
 import { supabase } from './supabase';
 
 // Interface definitions for type safety
@@ -33,6 +34,8 @@ export interface Ad {
   language: string | null;
   user_id: string | null;
   created_at: string | null;
+  snapshot_url: string | null;
+  scraper_keyword: string | null;
 }
 
 export interface AdCollection {
@@ -244,12 +247,71 @@ export async function fetchAdInsights(adId: string) {
   }
 }
 
-// Populate the Ad Library with Meta ads - improved to prioritize real ads
+// Function to manually trigger the ad scraper
+export async function triggerAdScraper(keywords?: string[]) {
+  try {
+    console.log("Manually triggering ad scraper");
+    
+    const response = await fetch(
+      `https://mbbfcjdfdkoggherfmff.functions.supabase.co/ad-scraper`, 
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          run_id: crypto.randomUUID(),
+          keywords: keywords,
+          timestamp: new Date().toISOString()
+        })
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Error triggering ad scraper: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log("Ad scraper triggered:", result);
+    
+    return result;
+  } catch (error) {
+    console.error('Error triggering ad scraper:', error);
+    throw error;
+  }
+}
+
+// Get recent scraper job status
+export async function getScraperJobStatus() {
+  try {
+    const { data, error } = await supabase
+      .from('scraper_jobs')
+      .select('*')
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .single();
+      
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No jobs found
+        return null;
+      }
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching scraper job status:', error);
+    throw error;
+  }
+}
+
+// Populate the Ad Library with scraped ads
 export async function populateAdLibrary() {
   try {
     console.log("Starting populateAdLibrary function");
     
-    // Check existing ads count before making the call
+    // Check existing ads count
     const { data: existingAdsCount, error: countError } = await supabase
       .from('ads')
       .select('count');
@@ -260,88 +322,33 @@ export async function populateAdLibrary() {
       console.log(`Found ${existingAdsCount[0]?.count || 0} existing ads`);
     }
     
-    // Always call the edge function to ensure we have the latest ads
-    try {
-      console.log("Calling edge function to populate ad library");
-      
-      // Use AbortSignal for better timeout control - increased to 5 minutes
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
-      
-      const response = await fetch(
-        `https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, 
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal
-        }
-      );
-      
-      // Clear the timeout
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`Edge function returned error: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log("Edge function result:", result);
-      
-      if (result.source && result.source.includes("Sample")) {
-        console.warn("Warning: Using sample data because real Meta Ad Library API data was unavailable");
-      }
-      
-      return result;
-    } catch (fetchError) {
-      console.error("Error connecting to edge function:", fetchError);
-      
-      if (fetchError.name === 'AbortError') {
-        console.log("Edge function request timed out, falling back to fetching existing ads");
-      }
-      
-      // If edge function fails but we have some existing ads, still return success
-      if (existingAdsCount && existingAdsCount[0]?.count > 0) {
-        return { 
-          success: true, 
-          message: `Using ${existingAdsCount[0].count} existing ads (edge function unavailable)`,
-          ads_count: existingAdsCount[0].count
+    // If we have less than 10 ads, trigger the scraper
+    if (!existingAdsCount || existingAdsCount[0]?.count < 10) {
+      try {
+        console.log("Insufficient ads in database, triggering ad scraper");
+        
+        const result = await triggerAdScraper();
+        
+        return {
+          success: true,
+          message: `Ad scraping job initiated. Job ID: ${result.job_id}`,
+          source: "Scraper",
+          job_id: result.job_id
         };
-      } else {
-        throw new Error("Unable to populate ad library and no existing ads found");
+      } catch (error) {
+        console.error("Error triggering ad scraper:", error);
+        throw error;
       }
     }
+    
+    return { 
+      success: true, 
+      message: `Using ${existingAdsCount[0].count} existing ads`,
+      source: "Database",
+      ads_count: existingAdsCount[0].count
+    };
   } catch (error) {
     console.error('Error populating Ad Library:', error);
-    throw error;
-  }
-}
-
-// Connect to Facebook Ads (kept for backward compatibility but can now be optional)
-export async function connectFacebookAds(accessToken: string, adAccountId: string, userId: string) {
-  try {
-    const response = await fetch(`https://mbbfcjdfdkoggherfmff.functions.supabase.co/fb-ad-sync`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        accessToken,
-        adAccountId,
-        userId
-      })
-    });
-    
-    const result = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.error || 'Failed to connect to Facebook Ads');
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('Error connecting to Facebook Ads:', error);
     throw error;
   }
 }

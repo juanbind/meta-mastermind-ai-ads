@@ -10,3 +10,7 @@ timeout_seconds = 540 # Increase timeout to 9 minutes for comprehensive ad fetch
 
 [functions.generate-ad-copy]
 verify_jwt = true # Require authentication for ad copy generation
+
+[functions.ad-scraper]
+verify_jwt = false # Allow public access for cron job
+timeout_seconds = 540 # Increase timeout to 9 minutes for ad scraping
