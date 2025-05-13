@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase';
 
 // Interface definitions for type safety
@@ -371,4 +370,52 @@ export async function generateAdsReport(filterOptions: Record<string, any>) {
       { platform: 'Instagram', count: 10, avgEngagement: '4.7%' }
     ]
   };
+}
+
+// Function to trigger the new scrape-ads function with specific filters
+export async function scrapeAdsWithFilters(filters: {
+  keyword?: string;
+  platform?: string;
+  niche?: string;
+  adFormat?: string;
+  dateRange?: string;
+  engagement?: string;
+  runningTime?: string;
+}) {
+  try {
+    console.log("Triggering scrape-ads with filters:", filters);
+    
+    // Construct query parameters
+    const params = new URLSearchParams();
+    
+    if (filters.keyword) params.append("keyword", filters.keyword);
+    if (filters.platform) params.append("platform", filters.platform);
+    if (filters.niche) params.append("niche", filters.niche);
+    if (filters.adFormat) params.append("adFormat", filters.adFormat);
+    if (filters.dateRange) params.append("dateRange", filters.dateRange);
+    if (filters.engagement) params.append("engagement", filters.engagement);
+    if (filters.runningTime) params.append("runningTime", filters.runningTime);
+    
+    const response = await fetch(
+      `https://mbbfcjdfdkoggherfmff.functions.supabase.co/scrape-ads?${params.toString()}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Error triggering scrape-ads: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log("Scrape ads result:", result);
+    
+    return result;
+  } catch (error) {
+    console.error('Error with scrape-ads function:', error);
+    throw error;
+  }
 }
