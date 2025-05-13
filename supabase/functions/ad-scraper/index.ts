@@ -1,8 +1,9 @@
-
 // Supabase Edge Function: Ad Scraper
 // This function scrapes Facebook and Instagram ads and stores them in the database
 
+// Import Deno-compatible packages
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
+import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.36-alpha/deno-dom-wasm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +21,86 @@ const SCRAPER_KEYWORDS = [
   'beauty'
 ];
 
-// Mock data generator for demonstration
+// Function to scrape Facebook Ad Library
+async function scrapeFacebookAds(keyword: string) {
+  console.log(`Scraping Facebook Ads for keyword: ${keyword}`);
+  
+  try {
+    const url = `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&q=${encodeURIComponent(keyword)}&sort_data[direction]=desc&sort_data[mode]=relevancy_monthly_grouped&media_type=all`;
+    
+    // Fetch the HTML content
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch page: ${response.status} ${response.statusText}`);
+    }
+    
+    const html = await response.text();
+    
+    // Parse HTML using Deno DOM
+    const parser = new DOMParser();
+    const document = parser.parseFromString(html, 'text/html');
+    
+    if (!document) {
+      throw new Error('Failed to parse HTML');
+    }
+    
+    console.log('Successfully parsed HTML, extracting ad data...');
+    
+    // Extract ads data (this is a simplified example - actual selectors will need to be updated)
+    const ads = [];
+    const adElements = document.querySelectorAll('[data-testid="ad_card"]');
+    
+    console.log(`Found ${adElements.length} ad elements`);
+    
+    adElements.forEach((adElement, index) => {
+      try {
+        // Extract ad data using appropriate selectors
+        const titleElement = adElement.querySelector('[data-testid="ad_title"]');
+        const bodyElement = adElement.querySelector('[data-testid="ad_body"]');
+        const imageElement = adElement.querySelector('img');
+        const advertiserElement = adElement.querySelector('[data-testid="ad_advertiser"]');
+        
+        // Get ad snapshot URL - this is crucial for deduplication
+        const idMatch = adElement.innerHTML.match(/id=(\d+)/);
+        const adId = idMatch ? idMatch[1] : `unknown-${Date.now()}-${index}`;
+        const snapshotUrl = `https://www.facebook.com/ads/library/?id=${adId}`;
+        
+        ads.push({
+          ad_id: adId,
+          platform: 'Facebook',
+          advertiser_name: advertiserElement ? advertiserElement.textContent : 'Unknown Advertiser',
+          title: titleElement ? titleElement.textContent : null,
+          description: bodyElement ? bodyElement.textContent : null,
+          body_text: bodyElement ? bodyElement.textContent : null,
+          image_url: imageElement ? imageElement.getAttribute('src') : null,
+          snapshot_url: snapshotUrl,
+          original_url: snapshotUrl,
+          creative_type: imageElement ? 'Single Image' : 'Unknown',
+          scraper_keyword: keyword,
+          first_seen: new Date().toISOString(),
+          last_seen_date: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error(`Error extracting data from ad ${index}:`, err);
+      }
+    });
+    
+    console.log(`Successfully extracted ${ads.length} ads`);
+    return ads;
+  } catch (error) {
+    console.error(`Error scraping Facebook Ads for keyword "${keyword}":`, error);
+    return [];
+  }
+}
+
+// Mock data generator for fallback when scraping fails
 const generateMockAd = (platform: string, keyword: string) => {
   const creativeFuncs = {
     'Single Image': () => ({ 
@@ -123,7 +203,7 @@ const generateMockAd = (platform: string, keyword: string) => {
   };
 };
 
-// Function to simulate scraping
+// Function to perform scraping or fall back to mock data
 const scrapeAds = async (supabase, options: { jobId: string, keywords?: string[] }) => {
   const { jobId, keywords = SCRAPER_KEYWORDS } = options;
   
@@ -147,45 +227,54 @@ const scrapeAds = async (supabase, options: { jobId: string, keywords?: string[]
     for (const keyword of keywords) {
       console.log(`Scraping for keyword: ${keyword}`);
       
-      // In a real implementation, here we would:
-      // 1. Navigate to Facebook Ad Library
-      // 2. Search for the keyword
-      // 3. Extract ad details from the page
-      
-      // For demo purposes, we'll generate 2-5 mock ads per platform per keyword
-      const platforms = ['Facebook', 'Instagram'];
-      
-      for (const platform of platforms) {
-        const adCount = 2 + Math.floor(Math.random() * 4); // 2-5 ads
+      // Try real web scraping first
+      let ads = [];
+      try {
+        console.log(`Attempting to scrape real Facebook ads for keyword: ${keyword}`);
+        ads = await scrapeFacebookAds(keyword);
+        console.log(`Got ${ads.length} real ads from scraper for keyword ${keyword}`);
+      } catch (scrapeError) {
+        console.error(`Web scraping failed for keyword "${keyword}":`, scrapeError);
+        errors.push({ keyword, error: `Web scraping failed: ${scrapeError.message}` });
         
-        for (let i = 0; i < adCount; i++) {
-          // Generate mock ad data
-          const adData = generateMockAd(platform, keyword);
+        // Fall back to mock data if scraping fails
+        console.log(`Falling back to mock data for keyword: ${keyword}`);
+        const platforms = ['Facebook', 'Instagram'];
+        
+        for (const platform of platforms) {
+          const adCount = 2 + Math.floor(Math.random() * 4); // 2-5 ads
           
-          // Check if the ad already exists by snapshot URL
-          const { data: existingAd } = await supabase
-            .from('ads')
-            .select('id')
-            .eq('snapshot_url', adData.snapshot_url)
-            .maybeSingle();
-          
-          if (existingAd) {
-            console.log(`Ad with snapshot URL ${adData.snapshot_url} already exists, skipping`);
-            totalSkipped++;
-            continue;
+          for (let i = 0; i < adCount; i++) {
+            ads.push(generateMockAd(platform, keyword));
           }
-          
-          // Insert ad into database
-          const { error } = await supabase
-            .from('ads')
-            .insert([adData]);
-          
-          if (error) {
-            console.error(`Error inserting ad: ${error.message}`);
-            errors.push({ keyword, platform, error: error.message });
-          } else {
-            totalAdded++;
-          }
+        }
+      }
+      
+      // Insert ads into database
+      for (const adData of ads) {
+        // Check if the ad already exists by snapshot URL
+        const { data: existingAd } = await supabase
+          .from('ads')
+          .select('id')
+          .eq('snapshot_url', adData.snapshot_url)
+          .maybeSingle();
+        
+        if (existingAd) {
+          console.log(`Ad with snapshot URL ${adData.snapshot_url} already exists, skipping`);
+          totalSkipped++;
+          continue;
+        }
+        
+        // Insert ad into database
+        const { error } = await supabase
+          .from('ads')
+          .insert([adData]);
+        
+        if (error) {
+          console.error(`Error inserting ad: ${error.message}`);
+          errors.push({ keyword, error: error.message });
+        } else {
+          totalAdded++;
         }
       }
     }
