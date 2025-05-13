@@ -14,7 +14,3 @@ verify_jwt = true # Require authentication for ad copy generation
 [functions.ad-scraper]
 verify_jwt = false # Allow public access for cron job
 timeout_seconds = 540 # Increase timeout to 9 minutes for ad scraping
-
-[functions.scrape-ads]
-verify_jwt = false # Allow public access for this scraper
-timeout_seconds = 540 # Increase timeout to 9 minutes for ad scraping
