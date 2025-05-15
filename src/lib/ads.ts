@@ -4,38 +4,14 @@ import { supabase } from './supabase';
 // Interface definitions for type safety
 export interface Ad {
   id: string;
-  ad_id: string | null;
-  platform: string;
-  advertiser_id: string | null;
-  advertiser_name: string;
-  page_id: string | null;
-  page_name: string | null;
   title: string | null;
-  description: string | null;
-  image_url: string | null;
-  video_url: string | null;
-  landing_url: string | null;
-  original_url: string | null; // Meta ad URL
-  creative_type: string | null;
-  headline: string | null;
-  body_text: string | null;
-  cta_type: string | null;
-  start_date: string | null;
-  last_seen_date: string | null;
-  estimated_duration_days: number | null;
-  engagement: any;
-  estimated_metrics: any;
-  targeting: any | null;
-  metadata: any | null;
-  first_seen: string | null;
-  last_updated: string | null;
-  industry_category: string | null;
-  keywords: string[] | null;
-  language: string | null;
-  user_id: string | null;
+  pageName: string | null;
+  impressions: string | null;
+  engagement: string | null;
+  platform: string | null;
+  format: string | null;
+  date: string | null;
   created_at: string | null;
-  snapshot_url: string | null;
-  scraper_keyword: string | null;
 }
 
 export interface AdCollection {
@@ -79,7 +55,7 @@ export async function fetchAds(options: {
     // Apply search query across multiple fields
     if (query) {
       queryBuilder = queryBuilder.or(
-        `title.ilike.%${query}%,description.ilike.%${query}%,advertiser_name.ilike.%${query}%,body_text.ilike.%${query}%,headline.ilike.%${query}%`
+        `title.ilike.%${query}%,pageName.ilike.%${query}%`
       );
     }
     
@@ -90,7 +66,7 @@ export async function fetchAds(options: {
     
     // Apply format filter
     if (format && format !== 'All') {
-      queryBuilder = queryBuilder.eq('creative_type', format);
+      queryBuilder = queryBuilder.eq('format', format);
     }
     
     // Apply pagination
@@ -230,125 +206,18 @@ export async function createAlert(alert: Omit<AdAlert, 'id' | 'created_at' | 'up
   }
 }
 
-// Fetch insights for ad
-export async function fetchAdInsights(adId: string) {
+// Insert new ads into database
+export async function insertAds(ads: Omit<Ad, 'id' | 'created_at'>[]) {
   try {
     const { data, error } = await supabase
-      .from('ad_insights')
-      .select('*')
-      .eq('ad_id', adId)
-      .order('created_at', { ascending: false });
+      .from('ads')
+      .insert(ads)
+      .select();
       
     if (error) throw error;
-    return data;
+    return data as Ad[];
   } catch (error) {
-    console.error(`Error fetching insights for ad ${adId}:`, error);
-    throw error;
-  }
-}
-
-// Function to manually trigger the ad scraper
-export async function triggerAdScraper(keywords?: string[]) {
-  try {
-    console.log("Manually triggering ad scraper");
-    
-    const response = await fetch(
-      `https://mbbfcjdfdkoggherfmff.functions.supabase.co/ad-scraper`, 
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          run_id: crypto.randomUUID(),
-          keywords: keywords,
-          timestamp: new Date().toISOString()
-        })
-      }
-    );
-    
-    if (!response.ok) {
-      throw new Error(`Error triggering ad scraper: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log("Ad scraper triggered:", result);
-    
-    return result;
-  } catch (error) {
-    console.error('Error triggering ad scraper:', error);
-    throw error;
-  }
-}
-
-// Get recent scraper job status
-export async function getScraperJobStatus() {
-  try {
-    const { data, error } = await supabase
-      .from('scraper_jobs')
-      .select('*')
-      .order('started_at', { ascending: false })
-      .limit(1)
-      .single();
-      
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No jobs found
-        return null;
-      }
-      throw error;
-    }
-    
-    return data;
-  } catch (error) {
-    console.error('Error fetching scraper job status:', error);
-    throw error;
-  }
-}
-
-// Populate the Ad Library with scraped ads
-export async function populateAdLibrary() {
-  try {
-    console.log("Starting populateAdLibrary function");
-    
-    // Check existing ads count
-    const { data: existingAdsCount, error: countError } = await supabase
-      .from('ads')
-      .select('count');
-      
-    if (countError) {
-      console.error("Error checking ads count:", countError);
-    } else {
-      console.log(`Found ${existingAdsCount[0]?.count || 0} existing ads`);
-    }
-    
-    // If we have less than 10 ads, trigger the scraper
-    if (!existingAdsCount || existingAdsCount[0]?.count < 10) {
-      try {
-        console.log("Insufficient ads in database, triggering ad scraper");
-        
-        const result = await triggerAdScraper();
-        
-        return {
-          success: true,
-          message: `Ad scraping job initiated. Job ID: ${result.job_id}`,
-          source: "Scraper",
-          job_id: result.job_id
-        };
-      } catch (error) {
-        console.error("Error triggering ad scraper:", error);
-        throw error;
-      }
-    }
-    
-    return { 
-      success: true, 
-      message: `Using ${existingAdsCount[0].count} existing ads`,
-      source: "Database",
-      ads_count: existingAdsCount[0].count
-    };
-  } catch (error) {
-    console.error('Error populating Ad Library:', error);
+    console.error('Error inserting ads:', error);
     throw error;
   }
 }
@@ -371,4 +240,51 @@ export async function generateAdsReport(filterOptions: Record<string, any>) {
       { platform: 'Instagram', count: 10, avgEngagement: '4.7%' }
     ]
   };
+}
+
+// Function to manually fetch and insert ad data
+export async function fetchAndInsertAdData() {
+  try {
+    console.log("Starting to fetch and insert ad data");
+    
+    // Sample ad data for demonstration
+    const sampleAds = [
+      {
+        title: "Summer Sale - 50% Off All Items",
+        pageName: "Fashion Brand",
+        impressions: "15,000",
+        engagement: "4.2%",
+        platform: "Facebook",
+        format: "Image",
+        date: new Date().toISOString().split('T')[0]
+      },
+      {
+        title: "New Fitness Program Launch",
+        pageName: "Health & Wellness",
+        impressions: "22,400",
+        engagement: "5.7%",
+        platform: "Instagram",
+        format: "Video",
+        date: new Date().toISOString().split('T')[0]
+      },
+      {
+        title: "Limited Time Offer - Free Shipping",
+        pageName: "E-commerce Store",
+        impressions: "8,900",
+        engagement: "3.1%",
+        platform: "Facebook",
+        format: "Carousel",
+        date: new Date().toISOString().split('T')[0]
+      }
+    ];
+    
+    // Insert the sample ads
+    const result = await insertAds(sampleAds);
+    
+    console.log(`Successfully inserted ${result.length} ads`);
+    return result;
+  } catch (error) {
+    console.error('Error fetching and inserting ad data:', error);
+    throw error;
+  }
 }
