@@ -130,6 +130,25 @@ function generateMockAds(count = 10) {
     date.setDate(date.getDate() - Math.floor(Math.random() * 30));
     const dateString = date.toISOString().split('T')[0];
     
+    // Generate placeholder image URL
+    const imageUrl = `https://placehold.co/600x400/EEE/999?text=${encodeURIComponent(platform)}+Ad`;
+    
+    // Generate video URL for video ads
+    const videoUrl = format === 'Video' 
+      ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+      : null;
+    
+    // Generate mock metrics
+    const estimatedMetrics = {
+      impressions_low: impressionsCount * 0.8,
+      impressions_high: impressionsCount * 1.2,
+      engagement_rate: engagementRate / 100,
+      ctr: (Math.random() * 5).toFixed(2),
+      spend_low: Math.floor(impressionsCount * 0.001 * 5),
+      spend_high: Math.floor(impressionsCount * 0.001 * 15),
+      performance_score: Math.floor(Math.random() * 100)
+    };
+    
     ads.push({
       title,
       pageName,
@@ -137,7 +156,15 @@ function generateMockAds(count = 10) {
       engagement,
       platform,
       format,
-      date: dateString
+      date: dateString,
+      advertiser_name: pageName,
+      image_url: imageUrl,
+      video_url: videoUrl,
+      description: `Amazing deals on our ${title.toLowerCase()} campaign! Don't miss out.`,
+      creative_type: format,
+      start_date: dateString,
+      estimated_metrics: estimatedMetrics,
+      ad_id: `ad_${Math.random().toString(36).substr(2, 9)}`
     });
   }
   

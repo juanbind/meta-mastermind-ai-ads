@@ -1,17 +1,32 @@
 
 import { supabase } from './supabase';
 
-// Interface definitions for type safety
+// Updated interface definition for type safety
 export interface Ad {
   id: string;
   title: string | null;
   pageName: string | null;
   impressions: string | null;
   engagement: string | null;
-  platform: string | null;
+  platform: string;
   format: string | null;
   date: string | null;
   created_at: string | null;
+  // Additional fields used in the application
+  ad_id?: string | null;
+  advertiser_id?: string | null;
+  advertiser_name?: string | null;
+  body_text?: string | null;
+  creative_type?: string | null;
+  cta_type?: string | null;
+  description?: string | null;
+  estimated_metrics?: any | null;
+  start_date?: string | null;
+  headline?: string | null;
+  image_url?: string | null;
+  landing_url?: string | null;
+  original_url?: string | null;
+  video_url?: string | null;
 }
 
 export interface AdCollection {
@@ -207,7 +222,7 @@ export async function createAlert(alert: Omit<AdAlert, 'id' | 'created_at' | 'up
 }
 
 // Insert new ads into database
-export async function insertAds(ads: Omit<Ad, 'id' | 'created_at'>[]) {
+export async function insertAds(ads: Partial<Ad>[]) {
   try {
     const { data, error } = await supabase
       .from('ads')
@@ -256,7 +271,10 @@ export async function fetchAndInsertAdData() {
         engagement: "4.2%",
         platform: "Facebook",
         format: "Image",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        advertiser_name: "Fashion Brand",
+        image_url: "https://placehold.co/600x400/EEE/999?text=Fashion+Ad",
+        description: "Get 50% off all summer items while supplies last!"
       },
       {
         title: "New Fitness Program Launch",
@@ -265,7 +283,11 @@ export async function fetchAndInsertAdData() {
         engagement: "5.7%",
         platform: "Instagram",
         format: "Video",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        advertiser_name: "Health & Wellness",
+        video_url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        image_url: "https://placehold.co/600x400/EEE/999?text=Fitness+Ad",
+        description: "Transform your body in just 30 days with our new program!"
       },
       {
         title: "Limited Time Offer - Free Shipping",
@@ -274,7 +296,10 @@ export async function fetchAndInsertAdData() {
         engagement: "3.1%",
         platform: "Facebook",
         format: "Carousel",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        advertiser_name: "E-commerce Store",
+        image_url: "https://placehold.co/600x400/EEE/999?text=Ecommerce+Ad",
+        description: "Free shipping on all orders for a limited time only!"
       }
     ];
     
@@ -285,6 +310,38 @@ export async function fetchAndInsertAdData() {
     return result;
   } catch (error) {
     console.error('Error fetching and inserting ad data:', error);
+    throw error;
+  }
+}
+
+// Function to populate the ad library from the Edge Function
+export async function populateAdLibrary() {
+  try {
+    const response = await fetch(`${window.location.origin}/functions/v1/fetch-ads`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ads: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log(`Successfully fetched ${result.count} ads`);
+      return {
+        success: true,
+        ads_count: result.count,
+        source: "Sample Ads"
+      };
+    } else {
+      throw new Error(result.error || "Unknown error fetching ads");
+    }
+  } catch (error) {
+    console.error('Error populating ad library:', error);
     throw error;
   }
 }
