@@ -5,16 +5,16 @@ import { supabase } from './supabase';
 export interface DatabaseAd {
   id: string;
   title: string | null;
-  page_name: string | null; // Using the actual column name from the database
+  page_name: string | null;
   impressions: string | null;
   engagement: string | null;
-  platform: string;
+  platform: string; // Required by database
   format: string | null;
   date: string | null;
   created_at: string | null;
   ad_id?: string | null;
   advertiser_id?: string | null;
-  advertiser_name?: string | null; // Making this optional to match the database schema
+  advertiser_name: string; // Required by database
   body_text?: string | null;
   creative_type?: string | null;
   cta_type?: string | null;
@@ -28,21 +28,20 @@ export interface DatabaseAd {
   video_url?: string | null;
 }
 
-// Application interface that includes all possible fields with consistent naming
+// Application interface with consistent naming in camelCase
 export interface Ad {
   id: string;
   title: string | null;
-  pageName: string | null; // We use camelCase in the application
+  pageName: string | null; // camelCase in application
   impressions: string | null;
   engagement: string | null;
   platform: string;
   format: string | null;
   date: string | null;
   created_at: string | null;
-  // Additional fields
   ad_id?: string | null;
   advertiser_id?: string | null;
-  advertiser_name?: string | null;
+  advertiser_name: string; // Required, matching database
   body_text?: string | null;
   creative_type?: string | null;
   cta_type?: string | null;
@@ -81,10 +80,10 @@ export interface AdAlert {
 }
 
 // Helper function to convert DatabaseAd to Ad (handling field name differences)
-function convertDatabaseAdToAd(dbAd: any): Ad {
+function convertDatabaseAdToAd(dbAd: DatabaseAd): Ad {
   return {
     ...dbAd,
-    pageName: dbAd.page_name || dbAd.pageName, // Handle both formats
+    pageName: dbAd.page_name,
   };
 }
 
@@ -150,7 +149,7 @@ export async function fetchAds(options: {
           
         if (firstPageResults.error) throw firstPageResults.error;
         
-        const mappedData = (firstPageResults.data || []).map(convertDatabaseAdToAd);
+        const mappedData = (firstPageResults.data || []).map(item => convertDatabaseAdToAd(item as DatabaseAd));
         
         return {
           data: mappedData,
@@ -167,7 +166,7 @@ export async function fetchAds(options: {
     const isLastPage = !data || data.length < pageSize || (count !== null && from + data.length >= count);
     
     // Map database results to application interface
-    const mappedData = (data || []).map(convertDatabaseAdToAd);
+    const mappedData = (data || []).map(item => convertDatabaseAdToAd(item as DatabaseAd));
     
     return { 
       data: mappedData, 
@@ -192,7 +191,7 @@ export async function getAd(id: string) {
       .single();
       
     if (error) throw error;
-    return convertDatabaseAdToAd(data);
+    return convertDatabaseAdToAd(data as DatabaseAd);
   } catch (error) {
     console.error(`Error fetching ad ${id}:`, error);
     throw error;
@@ -277,15 +276,19 @@ export async function insertAds(ads: Array<Partial<DatabaseAd>>) {
   try {
     // Make sure required fields are present
     const validAds = ads.map(ad => {
-      // Ensure platform is set (it's required by the database)
+      // Create a valid ad object with required fields
       const validAd: Partial<DatabaseAd> = { ...ad };
+      
+      // Ensure platform is set (required by the database)
       if (!validAd.platform) {
         validAd.platform = 'Unknown';
       }
-      // Ensure advertiser_name is set if it's truly required by the database schema
+      
+      // Ensure advertiser_name is set (required by the database)
       if (!validAd.advertiser_name) {
         validAd.advertiser_name = validAd.title || 'Unknown Advertiser';
       }
+      
       return validAd;
     });
     
@@ -297,7 +300,8 @@ export async function insertAds(ads: Array<Partial<DatabaseAd>>) {
     if (error) throw error;
     
     // Convert database response to application format
-    return (data || []).map(convertDatabaseAdToAd);
+    const convertedData = (data || []).map(item => convertDatabaseAdToAd(item as DatabaseAd));
+    return convertedData;
   } catch (error) {
     console.error('Error inserting ads:', error);
     throw error;

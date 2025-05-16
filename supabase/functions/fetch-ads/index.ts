@@ -157,7 +157,7 @@ function generateMockAds(count = 10) {
       platform,
       format,
       date: dateString,
-      advertiser_name: pageName,
+      advertiser_name: pageName, // Required field
       image_url: imageUrl,
       video_url: videoUrl,
       description: `Amazing deals on our ${title.toLowerCase()} campaign! Don't miss out.`,
