@@ -151,7 +151,7 @@ function generateMockAds(count = 10) {
     
     ads.push({
       title,
-      pageName,
+      page_name: pageName,
       impressions,
       engagement,
       platform,

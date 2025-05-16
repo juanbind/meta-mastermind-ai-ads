@@ -5,7 +5,7 @@ import { supabase } from './supabase';
 export interface DatabaseAd {
   id: string;
   title: string | null;
-  pageName: string | null;
+  page_name: string | null; // Using the actual column name from the database
   impressions: string | null;
   engagement: string | null;
   platform: string;
@@ -14,7 +14,7 @@ export interface DatabaseAd {
   created_at: string | null;
   ad_id?: string | null;
   advertiser_id?: string | null;
-  advertiser_name?: string | null;
+  advertiser_name?: string | null; // Making this optional to match the database schema
   body_text?: string | null;
   creative_type?: string | null;
   cta_type?: string | null;
@@ -28,11 +28,11 @@ export interface DatabaseAd {
   video_url?: string | null;
 }
 
-// Application interface that includes all possible fields
+// Application interface that includes all possible fields with consistent naming
 export interface Ad {
   id: string;
   title: string | null;
-  pageName: string | null;
+  pageName: string | null; // We use camelCase in the application
   impressions: string | null;
   engagement: string | null;
   platform: string;
@@ -80,6 +80,23 @@ export interface AdAlert {
   user_id: string;
 }
 
+// Helper function to convert DatabaseAd to Ad (handling field name differences)
+function convertDatabaseAdToAd(dbAd: any): Ad {
+  return {
+    ...dbAd,
+    pageName: dbAd.page_name || dbAd.pageName, // Handle both formats
+  };
+}
+
+// Helper function to convert Ad to DatabaseAd (for inserts/updates)
+function convertAdToDatabaseAd(ad: Partial<Ad>): Partial<DatabaseAd> {
+  const { pageName, ...rest } = ad;
+  return {
+    ...rest,
+    page_name: pageName,
+  };
+}
+
 // Fetch ads with filters and improved error handling
 export async function fetchAds(options: {
   query?: string;
@@ -97,7 +114,7 @@ export async function fetchAds(options: {
     // Apply search query across multiple fields
     if (query) {
       queryBuilder = queryBuilder.or(
-        `title.ilike.%${query}%,pageName.ilike.%${query}%`
+        `title.ilike.%${query}%,page_name.ilike.%${query}%`
       );
     }
     
@@ -131,8 +148,12 @@ export async function fetchAds(options: {
           .order('created_at', { ascending: false })
           .range(0, pageSize - 1);
           
+        if (firstPageResults.error) throw firstPageResults.error;
+        
+        const mappedData = (firstPageResults.data || []).map(convertDatabaseAdToAd);
+        
         return {
-          data: (firstPageResults.data || []) as Ad[],
+          data: mappedData,
           count: firstPageResults.count || 0,
           page: 1,
           pageSize,
@@ -145,8 +166,11 @@ export async function fetchAds(options: {
     // Check if we've reached the last page
     const isLastPage = !data || data.length < pageSize || (count !== null && from + data.length >= count);
     
+    // Map database results to application interface
+    const mappedData = (data || []).map(convertDatabaseAdToAd);
+    
     return { 
-      data: (data || []) as Ad[], 
+      data: mappedData, 
       count: count || 0, 
       page, 
       pageSize,
@@ -168,7 +192,7 @@ export async function getAd(id: string) {
       .single();
       
     if (error) throw error;
-    return data as Ad;
+    return convertDatabaseAdToAd(data);
   } catch (error) {
     console.error(`Error fetching ad ${id}:`, error);
     throw error;
@@ -253,10 +277,16 @@ export async function insertAds(ads: Array<Partial<DatabaseAd>>) {
   try {
     // Make sure required fields are present
     const validAds = ads.map(ad => {
-      if (!ad.platform) {
-        ad.platform = 'Unknown';
+      // Ensure platform is set (it's required by the database)
+      const validAd: Partial<DatabaseAd> = { ...ad };
+      if (!validAd.platform) {
+        validAd.platform = 'Unknown';
       }
-      return ad;
+      // Ensure advertiser_name is set if it's truly required by the database schema
+      if (!validAd.advertiser_name) {
+        validAd.advertiser_name = validAd.title || 'Unknown Advertiser';
+      }
+      return validAd;
     });
     
     const { data, error } = await supabase
@@ -265,7 +295,9 @@ export async function insertAds(ads: Array<Partial<DatabaseAd>>) {
       .select();
       
     if (error) throw error;
-    return data as Ad[];
+    
+    // Convert database response to application format
+    return (data || []).map(convertDatabaseAdToAd);
   } catch (error) {
     console.error('Error inserting ads:', error);
     throw error;
@@ -301,7 +333,7 @@ export async function fetchAndInsertAdData() {
     const sampleAds: Array<Partial<DatabaseAd>> = [
       {
         title: "Summer Sale - 50% Off All Items",
-        pageName: "Fashion Brand",
+        page_name: "Fashion Brand",
         impressions: "15,000",
         engagement: "4.2%",
         platform: "Facebook",
@@ -313,7 +345,7 @@ export async function fetchAndInsertAdData() {
       },
       {
         title: "New Fitness Program Launch",
-        pageName: "Health & Wellness",
+        page_name: "Health & Wellness",
         impressions: "22,400",
         engagement: "5.7%",
         platform: "Instagram",
@@ -326,7 +358,7 @@ export async function fetchAndInsertAdData() {
       },
       {
         title: "Limited Time Offer - Free Shipping",
-        pageName: "E-commerce Store",
+        page_name: "E-commerce Store",
         impressions: "8,900",
         engagement: "3.1%",
         platform: "Facebook",
