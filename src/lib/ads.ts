@@ -1,7 +1,34 @@
 
 import { supabase } from './supabase';
 
-// Updated interface definition for type safety
+// Database type definition that matches what's actually in the Supabase table
+export interface DatabaseAd {
+  id: string;
+  title: string | null;
+  pageName: string | null;
+  impressions: string | null;
+  engagement: string | null;
+  platform: string;
+  format: string | null;
+  date: string | null;
+  created_at: string | null;
+  ad_id?: string | null;
+  advertiser_id?: string | null;
+  advertiser_name?: string | null;
+  body_text?: string | null;
+  creative_type?: string | null;
+  cta_type?: string | null;
+  description?: string | null;
+  estimated_metrics?: any | null;
+  start_date?: string | null;
+  headline?: string | null;
+  image_url?: string | null;
+  landing_url?: string | null;
+  original_url?: string | null;
+  video_url?: string | null;
+}
+
+// Application interface that includes all possible fields
 export interface Ad {
   id: string;
   title: string | null;
@@ -12,7 +39,7 @@ export interface Ad {
   format: string | null;
   date: string | null;
   created_at: string | null;
-  // Additional fields used in the application
+  // Additional fields
   ad_id?: string | null;
   advertiser_id?: string | null;
   advertiser_name?: string | null;
@@ -105,7 +132,7 @@ export async function fetchAds(options: {
           .range(0, pageSize - 1);
           
         return {
-          data: firstPageResults.data as Ad[],
+          data: (firstPageResults.data || []) as Ad[],
           count: firstPageResults.count || 0,
           page: 1,
           pageSize,
@@ -119,7 +146,7 @@ export async function fetchAds(options: {
     const isLastPage = !data || data.length < pageSize || (count !== null && from + data.length >= count);
     
     return { 
-      data: data as Ad[], 
+      data: (data || []) as Ad[], 
       count: count || 0, 
       page, 
       pageSize,
@@ -221,12 +248,20 @@ export async function createAlert(alert: Omit<AdAlert, 'id' | 'created_at' | 'up
   }
 }
 
-// Insert new ads into database
-export async function insertAds(ads: Partial<Ad>[]) {
+// Insert new ads into database - fixed type issues
+export async function insertAds(ads: Array<Partial<DatabaseAd>>) {
   try {
+    // Make sure required fields are present
+    const validAds = ads.map(ad => {
+      if (!ad.platform) {
+        ad.platform = 'Unknown';
+      }
+      return ad;
+    });
+    
     const { data, error } = await supabase
       .from('ads')
-      .insert(ads)
+      .insert(validAds)
       .select();
       
     if (error) throw error;
@@ -263,7 +298,7 @@ export async function fetchAndInsertAdData() {
     console.log("Starting to fetch and insert ad data");
     
     // Sample ad data for demonstration
-    const sampleAds = [
+    const sampleAds: Array<Partial<DatabaseAd>> = [
       {
         title: "Summer Sale - 50% Off All Items",
         pageName: "Fashion Brand",
